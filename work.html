@@ -1,0 +1,1095 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="View recent work and demo websites by LevelUp Digital."
+    />
+    <title>Work - LevelUp Digital</title>
+    <link rel="stylesheet" href="style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="assets/favicon/favicon-16.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="assets/favicon/favicon-32.png"
+    />
+    <link rel="apple-touch-icon" href="assets/favicon/apple-touch-icon.png" />
+    <link rel="icon" type="image/x-icon" href="assets/favicon/favicon.ico" />
+  </head>
+  <body>
+    <!-- Header -->
+    <header class="header">
+      <div class="header-content">
+        <a href="index.html" class="logo">
+          <img
+            src="assets/logo/logo-primary.jpg"
+            alt="LevelUp Digital"
+            class="logo-image"
+          />
+          <div class="logo-text">
+            <span class="logo-name">LevelUp Digital</span>
+            <span class="logo-tagline">Websites That Convert</span>
+          </div>
+        </a>
+        <button class="nav-toggle" aria-label="Toggle navigation">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+        <nav class="nav">
+          <a href="index.html">Home</a>
+          <a href="services.html">Services</a>
+          <a href="work.html" class="active">Work</a>
+          <a href="about.html">About</a>
+          <a href="contact.html">Contact</a>
+        </nav>
+        <button class="btn-nav-modal" onclick="openProjectModal()">
+          Start a Project
+        </button>
+      </div>
+    </header>
+
+    <!-- Intro -->
+    <section class="hero">
+      <div class="container">
+        <div class="hero-content">
+          <h1>Recent Work & Demos</h1>
+          <p>
+            Real client projects and concept demos to help you understand which
+            website build fits your business stage.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Featured Work Section -->
+    <section class="section">
+      <div class="container">
+        <div class="section-header">
+          <h2>Featured Work</h2>
+          <p>
+            Real client projects built to solve specific business challenges.
+          </p>
+        </div>
+        <div class="work-projects">
+          <!-- Tour Guide Standard -->
+          <div class="work-project">
+            <div class="work-mockup">
+              <img
+                src="assets/work/tour-standard-desktop.jpeg"
+                alt="Tour Guide Standard Desktop"
+                class="work-mockup-desktop"
+              />
+              <img
+                src="assets/work/tour-standard-mobile.jpeg"
+                alt="Tour Guide Standard Mobile"
+                class="work-mockup-mobile"
+              />
+            </div>
+            <div class="work-project-content">
+              <span class="niche">Tour Guide</span>
+              <h3>Standard Website</h3>
+              <p class="work-outcome">
+                Designed to simplify inquiries and reduce back-and-forth
+                messages.
+              </p>
+              <div style="margin-top: var(--spacing-md)">
+                <a
+                  href="https://web-sushi.github.io/tour-standard-demo/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="btn btn-primary"
+                  style="
+                    font-size: var(--font-size-sm);
+                    padding: var(--spacing-sm) var(--spacing-md);
+                  "
+                  >View Demo →</a
+                >
+              </div>
+            </div>
+          </div>
+          <!-- Tour Guide Pro -->
+          <div class="work-project">
+            <div class="work-mockup">
+              <img
+                src="assets/work/tour-pro-desktop.jpeg"
+                alt="Tour Guide Pro Desktop"
+                class="work-mockup-desktop"
+              />
+              <img
+                src="assets/work/tour-pro-mobile.jpeg"
+                alt="Tour Guide Pro Mobile"
+                class="work-mockup-mobile"
+              />
+            </div>
+            <div class="work-project-content">
+              <span class="niche">Tour Guide</span>
+              <h3>Pro Website</h3>
+              <p class="work-outcome">
+                Built to handle complex bookings and scale with growing demand.
+              </p>
+              <div style="margin-top: var(--spacing-md)">
+                <a
+                  href="https://web-sushi.github.io/tour-pro-demo/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="btn btn-primary"
+                  style="
+                    font-size: var(--font-size-sm);
+                    padding: var(--spacing-sm) var(--spacing-md);
+                  "
+                  >View Demo →</a
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="text-center mt-xl">
+          <a href="contact.html" class="btn btn-secondary"
+            >Let's talk about your project</a
+          >
+        </div>
+      </div>
+    </section>
+
+    <!-- Concept Demos Section -->
+    <section class="section" style="background-color: var(--color-bg-alt)">
+      <div class="container">
+        <div class="section-header">
+          <h2>Concept Demos</h2>
+          <p>
+            Explore Basic, Standard, and Pro builds across different business
+            types to see which approach fits your stage.
+          </p>
+        </div>
+
+        <!-- Tour Guides Category -->
+        <div class="category-divider"></div>
+        <div class="category-header">
+          <h3>Tour Guides</h3>
+          <p class="category-intro">
+            Websites designed for tour operators who rely on inquiries and
+            bookings.
+          </p>
+        </div>
+        <div class="cards">
+          <!-- Tour Guide Basic -->
+          <div class="work-card">
+            <div class="preview-wrapper">
+              <img
+                src="assets/work/tour-basic-desktop.jpeg"
+                alt="Tour Guide Basic desktop demo preview"
+                class="desktop-preview"
+                loading="lazy"
+              />
+              <img
+                src="assets/work/tour-basic-mobile.jpeg"
+                alt="Tour Guide Basic mobile demo preview"
+                class="mobile-preview"
+                loading="lazy"
+              />
+            </div>
+            <div class="work-card-content">
+              <span class="niche">Tour Guide</span>
+              <h3>Basic</h3>
+              <p>
+                Perfect for new tour operators who need a professional online
+                presence quickly.
+              </p>
+              <div class="work-card-tags">
+                <span class="tag">Tour Listings</span>
+                <span class="tag">Booking Flow</span>
+                <span class="tag">Mobile-first</span>
+              </div>
+              <button class="who-toggle" onclick="toggleWho(this)">
+                Who this is for
+              </button>
+              <div class="who-content" style="display: none">
+                <ul>
+                  <li>New tour operators just starting out</li>
+                  <li>Businesses with a simple tour offering</li>
+                  <li>Those who need a website fast and affordable</li>
+                </ul>
+              </div>
+              <div style="margin-top: var(--spacing-md)">
+                <a
+                  href="https://web-sushi.github.io/tour-basic-demo/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="btn btn-primary"
+                  style="
+                    font-size: var(--font-size-sm);
+                    padding: var(--spacing-sm) var(--spacing-md);
+                  "
+                  >View Demo →</a
+                >
+              </div>
+            </div>
+          </div>
+          <!-- Tour Guide Standard -->
+          <div class="work-card">
+            <div class="preview-wrapper">
+              <img
+                src="assets/work/tour-standard-desktop.jpeg"
+                alt="Tour Guide Standard desktop demo preview"
+                class="desktop-preview"
+                loading="lazy"
+              />
+              <img
+                src="assets/work/tour-standard-mobile.jpeg"
+                alt="Tour Guide Standard mobile demo preview"
+                class="mobile-preview"
+                loading="lazy"
+              />
+            </div>
+            <div class="work-card-content">
+              <span class="niche">Tour Guide</span>
+              <h3>Standard</h3>
+              <p>
+                Ideal for established tour businesses ready to showcase their
+                expertise and build trust.
+              </p>
+              <div class="work-card-tags">
+                <span class="tag">Photo Galleries</span>
+                <span class="tag">Testimonials</span>
+                <span class="tag">SEO-optimized</span>
+              </div>
+              <button class="who-toggle" onclick="toggleWho(this)">
+                Who this is for
+              </button>
+              <div class="who-content" style="display: none">
+                <ul>
+                  <li>Established tour operators with multiple offerings</li>
+                  <li>Businesses wanting to showcase customer reviews</li>
+                  <li>Those ready to invest more in their online presence</li>
+                </ul>
+              </div>
+              <div style="margin-top: var(--spacing-md)">
+                <a
+                  href="https://web-sushi.github.io/tour-standard-demo/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="btn btn-primary"
+                  style="
+                    font-size: var(--font-size-sm);
+                    padding: var(--spacing-sm) var(--spacing-md);
+                  "
+                  >View Demo →</a
+                >
+              </div>
+            </div>
+          </div>
+          <!-- Tour Guide Pro -->
+          <div class="work-card">
+            <div class="preview-wrapper">
+              <img
+                src="assets/work/tour-pro-desktop.jpeg"
+                alt="Tour Guide Pro desktop demo preview"
+                class="desktop-preview"
+                loading="lazy"
+              />
+              <img
+                src="assets/work/tour-pro-mobile.jpeg"
+                alt="Tour Guide Pro mobile demo preview"
+                class="mobile-preview"
+                loading="lazy"
+              />
+            </div>
+            <div class="work-card-content">
+              <span class="niche">Tour Guide</span>
+              <h3>Pro</h3>
+              <p>
+                Best for growing tour companies that need advanced features and
+                scalability.
+              </p>
+              <div class="work-card-tags">
+                <span class="tag">Payment Integration</span>
+                <span class="tag">Multi-language</span>
+                <span class="tag">Customer Dashboard</span>
+              </div>
+              <button class="who-toggle" onclick="toggleWho(this)">
+                Who this is for
+              </button>
+              <div class="who-content" style="display: none">
+                <ul>
+                  <li>Growing tour companies with complex booking needs</li>
+                  <li>Businesses serving international customers</li>
+                  <li>Those ready to scale operations significantly</li>
+                </ul>
+              </div>
+              <div style="margin-top: var(--spacing-md)">
+                <a
+                  href="https://web-sushi.github.io/tour-pro-demo/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="btn btn-primary"
+                  style="
+                    font-size: var(--font-size-sm);
+                    padding: var(--spacing-sm) var(--spacing-md);
+                  "
+                  >View Demo →</a
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cafes Category -->
+        <div class="category-divider"></div>
+        <div class="category-header">
+          <h3>Cafes</h3>
+          <p class="category-intro">
+            Clean, inviting websites that showcase menus and make it easy for
+            customers to visit or order.
+          </p>
+        </div>
+        <div class="cards">
+          <!-- Cafe Basic -->
+          <div class="work-card">
+            <div class="preview-wrapper">
+              <img
+                src="assets/work/cafe-basic-desktop.jpeg"
+                alt="Cafe Basic desktop demo preview"
+                class="desktop-preview"
+                loading="lazy"
+              />
+              <img
+                src="assets/work/cafe-basic-mobile.jpeg"
+                alt="Cafe Basic mobile demo preview"
+                class="mobile-preview"
+                loading="lazy"
+              />
+            </div>
+            <div class="work-card-content">
+              <span class="niche">Cafe</span>
+              <h3>Basic</h3>
+              <p>
+                Perfect for small cafes looking to establish a simple, welcoming
+                online presence.
+              </p>
+              <div class="work-card-tags">
+                <span class="tag">Menu Display</span>
+                <span class="tag">Location Map</span>
+                <span class="tag">Fast Loading</span>
+              </div>
+              <button class="who-toggle" onclick="toggleWho(this)">
+                Who this is for
+              </button>
+              <div class="who-content" style="display: none">
+                <ul>
+                  <li>New cafes just opening their doors</li>
+                  <li>Small businesses with a simple menu</li>
+                  <li>Those who need essential information online quickly</li>
+                </ul>
+              </div>
+              <div style="margin-top: var(--spacing-md)">
+                <a
+                  href="https://web-sushi.github.io/cafe-basic-demo/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="btn btn-primary"
+                  style="
+                    font-size: var(--font-size-sm);
+                    padding: var(--spacing-sm) var(--spacing-md);
+                  "
+                  >View Demo →</a
+                >
+              </div>
+            </div>
+          </div>
+          <!-- Cafe Standard -->
+          <div class="work-card">
+            <div class="preview-wrapper">
+              <img
+                src="assets/work/cafe-standard-desktop.jpeg"
+                alt="Cafe Standard desktop demo preview"
+                class="desktop-preview"
+                loading="lazy"
+              />
+              <img
+                src="assets/work/cafe-standard-mobile.jpeg"
+                alt="Cafe Standard mobile demo preview"
+                class="mobile-preview"
+                loading="lazy"
+              />
+            </div>
+            <div class="work-card-content">
+              <span class="niche">Cafe</span>
+              <h3>Standard</h3>
+              <p>
+                Ideal for cafes ready to take online orders and showcase their
+                brand story.
+              </p>
+              <div class="work-card-tags">
+                <span class="tag">Online Ordering</span>
+                <span class="tag">Reviews</span>
+                <span class="tag">Event Booking</span>
+              </div>
+              <button class="who-toggle" onclick="toggleWho(this)">
+                Who this is for
+              </button>
+              <div class="who-content" style="display: none">
+                <ul>
+                  <li>Established cafes with regular customers</li>
+                  <li>Businesses wanting to offer online ordering</li>
+                  <li>Those ready to invest in a stronger brand presence</li>
+                </ul>
+              </div>
+              <div style="margin-top: var(--spacing-md)">
+                <a
+                  href="https://web-sushi.github.io/cafe-standard-demo/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="btn btn-primary"
+                  style="
+                    font-size: var(--font-size-sm);
+                    padding: var(--spacing-sm) var(--spacing-md);
+                  "
+                  >View Demo →</a
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Photography Category -->
+        <div class="category-divider"></div>
+        <div class="category-header">
+          <h3>Photography</h3>
+          <p class="category-intro">
+            Portfolio-focused websites that showcase work and help photographers
+            attract new clients.
+          </p>
+        </div>
+        <div class="cards">
+          <!-- Photographer Basic -->
+          <div class="work-card">
+            <div class="preview-wrapper">
+              <img
+                src="assets/work/photo-basic-desktop.jpeg"
+                alt="Photographer Basic desktop demo preview"
+                class="desktop-preview"
+                loading="lazy"
+              />
+              <img
+                src="assets/work/photo-basic-mobile.jpeg"
+                alt="Photographer Basic mobile demo preview"
+                class="mobile-preview"
+                loading="lazy"
+              />
+            </div>
+            <div class="work-card-content">
+              <span class="niche">Photographer</span>
+              <h3>Basic</h3>
+              <p>
+                Perfect for photographers who want a simple, professional
+                portfolio that showcases their work.
+              </p>
+              <div class="work-card-tags">
+                <span class="tag">Portfolio Gallery</span>
+                <span class="tag">Booking Form</span>
+                <span class="tag">Clean Design</span>
+              </div>
+              <button class="who-toggle" onclick="toggleWho(this)">
+                Who this is for
+              </button>
+              <div class="who-content" style="display: none">
+                <ul>
+                  <li>New photographers building their portfolio</li>
+                  <li>Those who want a clean, minimal showcase</li>
+                  <li>Businesses with straightforward booking needs</li>
+                </ul>
+              </div>
+              <div style="margin-top: var(--spacing-md)">
+                <a
+                  href="https://web-sushi.github.io/photo-basic-demo/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="btn btn-primary"
+                  style="
+                    font-size: var(--font-size-sm);
+                    padding: var(--spacing-sm) var(--spacing-md);
+                  "
+                  >View Demo →</a
+                >
+              </div>
+            </div>
+          </div>
+          <!-- Photographer Standard -->
+          <div class="work-card">
+            <div class="preview-wrapper">
+              <img
+                src="assets/work/photo-standard-desktop.jpeg"
+                alt="Photographer Standard desktop demo preview"
+                class="desktop-preview"
+                loading="lazy"
+              />
+              <img
+                src="assets/work/photo-standard-mobile.jpeg"
+                alt="Photographer Standard mobile demo preview"
+                class="mobile-preview"
+                loading="lazy"
+              />
+            </div>
+            <div class="work-card-content">
+              <span class="niche">Photographer</span>
+              <h3>Standard</h3>
+              <p>
+                Ideal for established photographers ready to showcase expertise
+                and attract premium clients.
+              </p>
+              <div class="work-card-tags">
+                <span class="tag">Advanced Gallery</span>
+                <span class="tag">Pricing Packages</span>
+                <span class="tag">Client Portal</span>
+              </div>
+              <button class="who-toggle" onclick="toggleWho(this)">
+                Who this is for
+              </button>
+              <div class="who-content" style="display: none">
+                <ul>
+                  <li>Established photographers with multiple service types</li>
+                  <li>Those wanting to showcase client testimonials</li>
+                  <li>Businesses ready to present pricing packages clearly</li>
+                </ul>
+              </div>
+              <div style="margin-top: var(--spacing-md)">
+                <a
+                  href="https://web-sushi.github.io/photo-standard-demo/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="btn btn-primary"
+                  style="
+                    font-size: var(--font-size-sm);
+                    padding: var(--spacing-sm) var(--spacing-md);
+                  "
+                  >View Demo →</a
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Home Services Category -->
+        <div class="category-divider"></div>
+        <div class="category-header">
+          <h3>Home Services</h3>
+        </div>
+        <div class="cards">
+          <!-- Home Service Basic -->
+          <div class="work-card">
+            <div class="preview-wrapper">
+              <img
+                src="assets/work/home-service-basic-desktop.jpeg"
+                alt="Home Service Basic desktop demo preview"
+                class="desktop-preview"
+                loading="lazy"
+              />
+              <img
+                src="assets/work/home-service-basic-mobile.jpeg"
+                alt="Home Service Basic mobile demo preview"
+                class="mobile-preview"
+                loading="lazy"
+              />
+            </div>
+            <div class="work-card-content">
+              <span class="niche">Home Service</span>
+              <h3>Basic</h3>
+              <p>
+                Perfect for new home service businesses that need to build trust
+                and make it easy for customers to request quotes.
+              </p>
+              <div class="work-card-tags">
+                <span class="tag">Service Areas</span>
+                <span class="tag">Quote Request</span>
+                <span class="tag">Trust Building</span>
+              </div>
+              <button class="who-toggle" onclick="toggleWho(this)">
+                Who this is for
+              </button>
+              <div class="who-content" style="display: none">
+                <ul>
+                  <li>New home service businesses just starting out</li>
+                  <li>Those with a simple service offering</li>
+                  <li>
+                    Businesses needing a professional online presence quickly
+                  </li>
+                </ul>
+              </div>
+              <div style="margin-top: var(--spacing-md)">
+                <a
+                  href="https://web-sushi.github.io/home-service-basic-demo/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="btn btn-primary"
+                  style="
+                    font-size: var(--font-size-sm);
+                    padding: var(--spacing-sm) var(--spacing-md);
+                  "
+                  >View Demo →</a
+                >
+              </div>
+            </div>
+          </div>
+          <!-- Home Service Standard -->
+          <div class="work-card">
+            <div class="preview-wrapper">
+              <img
+                src="assets/work/home-service-standard-desktop.jpeg"
+                alt="Home Service Standard desktop demo preview"
+                class="desktop-preview"
+                loading="lazy"
+              />
+              <img
+                src="assets/work/home-service-standard-mobile.jpeg"
+                alt="Home Service Standard mobile demo preview"
+                class="mobile-preview"
+                loading="lazy"
+              />
+            </div>
+            <div class="work-card-content">
+              <span class="niche">Home Service</span>
+              <h3>Standard</h3>
+              <p>
+                Ideal for established service businesses ready to showcase
+                expertise and enable online scheduling.
+              </p>
+              <div class="work-card-tags">
+                <span class="tag">Online Scheduling</span>
+                <span class="tag">Before/After Gallery</span>
+                <span class="tag">Customer Reviews</span>
+              </div>
+              <button class="who-toggle" onclick="toggleWho(this)">
+                Who this is for
+              </button>
+              <div class="who-content" style="display: none">
+                <ul>
+                  <li>
+                    Established service businesses with multiple offerings
+                  </li>
+                  <li>
+                    Those wanting to showcase customer reviews and results
+                  </li>
+                  <li>Businesses ready to offer online appointment booking</li>
+                </ul>
+              </div>
+              <div style="margin-top: var(--spacing-md)">
+                <a
+                  href="https://web-sushi.github.io/home-service-standard-demo/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="btn btn-primary"
+                  style="
+                    font-size: var(--font-size-sm);
+                    padding: var(--spacing-sm) var(--spacing-md);
+                  "
+                  >View Demo →</a
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Clinics Category -->
+        <div class="category-divider"></div>
+        <div class="category-header">
+          <h3>Clinics</h3>
+        </div>
+        <div class="cards">
+          <!-- Clinic Basic -->
+          <div class="work-card">
+            <div class="preview-wrapper">
+              <img
+                src="assets/work/clinic-basic-desktop.jpeg"
+                alt="Clinic Basic desktop demo preview"
+                class="desktop-preview"
+                loading="lazy"
+              />
+              <img
+                src="assets/work/clinic-basic-mobile.jpeg"
+                alt="Clinic Basic mobile demo preview"
+                class="mobile-preview"
+                loading="lazy"
+              />
+            </div>
+            <div class="work-card-content">
+              <span class="niche">Clinic</span>
+              <h3>Basic</h3>
+              <p>
+                Perfect for new clinics that need a clean, trustworthy online
+                presence for patients.
+              </p>
+              <div class="work-card-tags">
+                <span class="tag">Appointment Booking</span>
+                <span class="tag">Staff Profiles</span>
+                <span class="tag">Patient-focused</span>
+              </div>
+              <button class="who-toggle" onclick="toggleWho(this)">
+                Who this is for
+              </button>
+              <div class="who-content" style="display: none">
+                <ul>
+                  <li>New clinics just opening their doors</li>
+                  <li>Small practices with straightforward services</li>
+                  <li>Those needing essential patient information online</li>
+                </ul>
+              </div>
+              <div style="margin-top: var(--spacing-md)">
+                <a
+                  href="https://web-sushi.github.io/clinic-basic-demo/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="btn btn-primary"
+                  style="
+                    font-size: var(--font-size-sm);
+                    padding: var(--spacing-sm) var(--spacing-md);
+                  "
+                  >View Demo →</a
+                >
+              </div>
+            </div>
+          </div>
+          <!-- Clinic Standard -->
+          <div class="work-card">
+            <div class="preview-wrapper">
+              <img
+                src="assets/work/clinic-standard-desktop.jpeg"
+                alt="Clinic Standard desktop demo preview"
+                class="desktop-preview"
+                loading="lazy"
+              />
+              <img
+                src="assets/work/clinic-standard-mobile.jpeg"
+                alt="Clinic Standard mobile demo preview"
+                class="mobile-preview"
+                loading="lazy"
+              />
+            </div>
+            <div class="work-card-content">
+              <span class="niche">Clinic</span>
+              <h3>Standard</h3>
+              <p>
+                Ideal for established clinics ready to offer patient portals and
+                enhanced online services.
+              </p>
+              <div class="work-card-tags">
+                <span class="tag">Patient Portal</span>
+                <span class="tag">Health Resources</span>
+                <span class="tag">HIPAA-compliant</span>
+              </div>
+              <button class="who-toggle" onclick="toggleWho(this)">
+                Who this is for
+              </button>
+              <div class="who-content" style="display: none">
+                <ul>
+                  <li>Established clinics with multiple services</li>
+                  <li>Practices wanting to offer patient portal access</li>
+                  <li>Those ready to provide health information resources</li>
+                </ul>
+              </div>
+              <div style="margin-top: var(--spacing-md)">
+                <a
+                  href="https://web-sushi.github.io/clinic-standard-demo/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="btn btn-primary"
+                  style="
+                    font-size: var(--font-size-sm);
+                    padding: var(--spacing-sm) var(--spacing-md);
+                  "
+                  >View Demo →</a
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="category-divider"></div>
+      </div>
+    </section>
+
+    <!-- Pricing Tiers -->
+    <section class="section" style="background-color: var(--color-bg-alt)">
+      <div class="container">
+        <div class="pricing-glass">
+          <h2 class="text-center">What Clients Usually Need</h2>
+          <p
+            class="text-center pricing-intro"
+            style="max-width: 600px; margin: 0 auto var(--spacing-xl)"
+          >
+            Every business is different. These options reflect what most clients
+            usually need. We'll always tailor the final setup to your project.
+          </p>
+          <div class="cards" style="margin-top: var(--spacing-xl)">
+            <div class="card pricing-card pricing-card-basic">
+              <h3>Basic</h3>
+              <p class="pricing-descriptor">Best for getting started</p>
+              <p>
+                A straightforward website that gets your business online quickly
+                with essential pages and clear contact options.
+              </p>
+              <ul>
+                <li>3-5 pages</li>
+                <li>Contact form</li>
+                <li>Mobile-responsive design</li>
+                <li>Basic SEO setup</li>
+              </ul>
+            </div>
+            <div class="card pricing-card pricing-card-standard">
+              <h3>Standard</h3>
+              <p class="pricing-descriptor">Most common choice</p>
+              <p>
+                A more complete website with additional pages and features that
+                help you showcase your business and attract customers.
+              </p>
+              <ul>
+                <li>5-8 pages</li>
+                <li>Enhanced design</li>
+                <li>Additional features</li>
+                <li>Comprehensive SEO</li>
+              </ul>
+            </div>
+            <div class="card pricing-card pricing-card-pro">
+              <h3 id="pro-price">Pro</h3>
+              <p class="pricing-descriptor">
+                For growing or established businesses
+              </p>
+              <p>
+                A fully customized website built around your specific needs,
+                with advanced features and integrations.
+              </p>
+              <ul>
+                <li>Unlimited pages</li>
+                <li>Custom features</li>
+                <li>Third-party integrations</li>
+                <li>Advanced SEO & analytics</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="cta-section">
+      <div class="container">
+        <h2>Ready to Get Started?</h2>
+        <p>Let's discuss how I can help bring your vision to life.</p>
+        <a href="contact.html" class="btn btn-primary"
+          >Let's talk about your project</a
+        >
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="container">
+        <div class="footer-content">
+          <div class="footer-section">
+            <h4>LevelUp Digital</h4>
+            <p class="footer-brand-text">
+              Clean, conversion-focused websites for small businesses and online
+              entrepreneurs.
+            </p>
+
+            <!-- Contact Buttons -->
+            <div class="footer-contact">
+              <span class="footer-location-badge">Tokyo, Japan</span>
+              <div class="footer-contact-buttons">
+                <a
+                  href="mailto:atsushijunior.harada@gmail.com"
+                  class="footer-contact-btn"
+                >
+                  <i class="fas fa-envelope"></i>
+                  <span>atsushijunior.harada@gmail.com</span>
+                </a>
+                <a
+                  href="https://wa.me/818074310125"
+                  class="footer-contact-btn"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <i class="fab fa-whatsapp"></i>
+                  <span>+81 80-7431-0125</span>
+                </a>
+              </div>
+            </div>
+
+            <!-- Social Buttons -->
+            <div class="footer-social">
+              <div class="footer-social-buttons">
+                <a
+                  href="https://www.linkedin.com/in/atsushi-jr-harada"
+                  class="footer-social-btn"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="LinkedIn"
+                >
+                  <i class="fab fa-linkedin-in"></i>
+                </a>
+                <a
+                  href="https://www.facebook.com/atsushijr.harada"
+                  class="footer-social-btn"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Facebook"
+                >
+                  <i class="fab fa-facebook-f"></i>
+                </a>
+                <a
+                  href="https://www.instagram.com/atsushi.jri/"
+                  class="footer-social-btn"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Instagram"
+                >
+                  <i class="fab fa-instagram"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+          <div class="footer-section">
+            <h4>Quick Links</h4>
+            <ul class="footer-links">
+              <li><a href="index.html">Home</a></li>
+              <li><a href="services.html">Services</a></li>
+              <li><a href="work.html">Work</a></li>
+              <li><a href="about.html">About</a></li>
+              <li><a href="contact.html">Contact</a></li>
+            </ul>
+          </div>
+          <div class="footer-section">
+            <h4>Legal</h4>
+            <ul class="footer-links">
+              <li><a href="privacy.html">Privacy Policy</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <p>&copy; 2024 LevelUp Digital. All rights reserved.</p>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Project Inquiry Modal -->
+    <div id="projectModal" class="modal">
+      <div class="modal-overlay" onclick="closeProjectModal()"></div>
+      <div class="modal-content">
+        <button
+          class="modal-close"
+          onclick="closeProjectModal()"
+          aria-label="Close modal"
+        >
+          ✕
+        </button>
+        <h2>Start a Project</h2>
+        <p class="modal-subtitle">
+          Share a few details and I'll get back to you personally.
+        </p>
+        <form
+          name="project-inquiry"
+          method="POST"
+          data-netlify="true"
+          netlify-honeypot="bot-field"
+          id="project-inquiry-form"
+          class="project-inquiry-form"
+        >
+          <input type="hidden" name="form-name" value="project-inquiry" />
+          <p style="display: none">
+            <label
+              >Don't fill this out if you're human: <input name="bot-field"
+            /></label>
+          </p>
+
+          <div class="form-group">
+            <label for="name">Name <span class="required">*</span></label>
+            <input type="text" id="name" name="name" required />
+          </div>
+
+          <div class="form-group">
+            <label for="email">Email <span class="required">*</span></label>
+            <input type="email" id="email" name="email" required />
+          </div>
+
+          <div class="form-group">
+            <label for="business-type"
+              >Business Type <span class="required">*</span></label
+            >
+            <select id="business-type" name="business-type" required>
+              <option value="">Select a type</option>
+              <option value="Tour / Travel">Tour / Travel</option>
+              <option value="Cafe">Cafe</option>
+              <option value="Photography">Photography</option>
+              <option value="Home Service">Home Service</option>
+              <option value="Clinic">Clinic</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="message">Message</label>
+            <textarea
+              id="message"
+              name="message"
+              rows="4"
+              placeholder="Tell me a bit about what you need help with"
+            ></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="timeline">Timeline (optional)</label>
+            <select id="timeline" name="timeline">
+              <option value="">Select timeline</option>
+              <option value="Just exploring">Just exploring</option>
+              <option value="This month">This month</option>
+              <option value="Next 1–3 months">Next 1–3 months</option>
+            </select>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Send Inquiry</button>
+            <button
+              type="button"
+              class="btn btn-secondary"
+              onclick="closeProjectModal()"
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
+        <div id="form-success" class="form-success" style="display: none">
+          <p>Thanks! I'll get back to you within 24–48 hours.</p>
+        </div>
+      </div>
+    </div>
+
+    <script src="js/main.js"></script>
+    <script>
+      function toggleWho(button) {
+        const content = button.nextElementSibling;
+        const isHidden = content.style.display === "none";
+        content.style.display = isHidden ? "block" : "none";
+        button.textContent = isHidden ? "Hide" : "Who this is for";
+      }
+    </script>
+
+    <!-- Floating Mobile CTA Button (outside header, in body) -->
+    <button class="btn-nav-modal-mobile" onclick="openProjectModal()" aria-label="Start a Project">
+      Start a Project
+    </button>
+  </body>
+</html>

@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Learn about LevelUp Digital and the person behind it."
+    />
+    <title>About - LevelUp Digital</title>
+    <link rel="stylesheet" href="style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="assets/favicon/favicon-16.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="assets/favicon/favicon-32.png"
+    />
+    <link rel="apple-touch-icon" href="assets/favicon/apple-touch-icon.png" />
+    <link rel="icon" type="image/x-icon" href="assets/favicon/favicon.ico" />
+  </head>
+  <body class="about-page">
+    <!-- Header -->
+    <header class="header">
+      <div class="header-content">
+        <a href="index.html" class="logo">
+          <img
+            src="assets/logo/logo-primary.jpg"
+            alt="LevelUp Digital"
+            class="logo-image"
+          />
+          <div class="logo-text">
+            <span class="logo-name">LevelUp Digital</span>
+            <span class="logo-tagline">Websites That Convert</span>
+          </div>
+        </a>
+        <button class="nav-toggle" aria-label="Toggle navigation">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+        <nav class="nav">
+          <a href="index.html">Home</a>
+          <a href="services.html">Services</a>
+          <a href="work.html">Work</a>
+          <a href="about.html" class="active">About</a>
+          <a href="contact.html">Contact</a>
+        </nav>
+        <button class="btn-nav-modal" onclick="openProjectModal()">
+          Start a Project
+        </button>
+      </div>
+    </header>
+
+    <!-- About Hero -->
+    <section class="section">
+      <div class="container">
+        <div class="about-hero">
+          <div class="about-portrait">
+            <img
+              src="assets/portrait.jpg"
+              alt="Portrait of the founder of LevelUp Digital"
+              loading="lazy"
+            />
+          </div>
+          <div class="about-hero-content">
+            <div class="about-name">
+              <h1 class="about-name-title">Atsushi Junior Harada</h1>
+              <p class="about-name-subtitle">
+                Founder · Web Developer · Family Man
+              </p>
+              <p class="about-positioning">
+                I build clean, conversion-focused websites for small businesses
+                that value clarity over complexity.
+              </p>
+            </div>
+
+            <h2 class="about-section-heading">My Journey</h2>
+            <div class="about-content">
+              <p>
+                Over the past few years, I've been building myself from the
+                ground up, studying web development in phases, pausing when life
+                required it, then coming back stronger. Like many people
+                supporting a family, I worked full-time jobs while learning
+                whenever time allowed. Progress wasn't fast, but it was
+                consistent.
+              </p>
+
+              <p>
+                Long before freelancing, I was already drawn to two things:
+                history and coding. I liked understanding how things were built,
+                how systems worked, how ideas evolved, how structure and logic
+                shaped outcomes. That curiosity naturally led me to building
+                things on the internet. One of my early projects was a simple
+                web application, a music quiz game that played only the first
+                five seconds of a song and challenged users to guess it. It
+                wasn't perfect, but it taught me something important: I enjoyed
+                creating experiences for people.
+              </p>
+
+              <p>
+                I eventually studied civil engineering, even though it wasn't
+                the path I truly wanted. While it wasn't a perfect fit, it
+                shaped how I think, planning first, building with structure, and
+                making sure foundations are solid. Those habits stayed with me
+                and now influence how I approach websites: not as visuals alone,
+                but as systems designed to support real goals.
+              </p>
+
+              <p>
+                Over time, my focus shifted from just building things to
+                understanding why they work, how design affects decisions, how
+                clarity builds trust, and how the right structure can turn
+                visitors into real inquiries. That's where LevelUp Digital was
+                born.
+              </p>
+            </div>
+
+            <h2 class="about-section-heading">How This Shapes My Approach</h2>
+            <div class="about-content">
+              <p>
+                My background in systems thinking and steady, methodical
+                learning directly influences how I build websites. I start with
+                planning and structure, not just visuals. Every website I create
+                is designed as a system, one that supports clear goals, guides
+                visitors naturally, and helps businesses move forward.
+              </p>
+
+              <p>
+                I believe in clarity over complexity. A website should make it
+                easy for visitors to understand what you do and how to reach
+                you. It should be built on solid foundations, with thoughtful
+                structure that supports real business outcomes, not just
+                impressive visuals.
+              </p>
+            </div>
+
+            <h2 class="about-section-heading">About LevelUp Digital</h2>
+            <div class="about-content">
+              <p>
+                Today, I help small businesses and online entrepreneurs create
+                clean, minimal, and conversion-focused websites. I don't believe
+                in overcomplicating things. I believe in listening first,
+                understanding the client's vision, and building something that
+                actually helps their business move forward.
+              </p>
+
+              <p>
+                LevelUp Digital isn't about shortcuts or hype. It's about steady
+                progress, clear systems, and helping businesses level up one
+                step at a time.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Values -->
+    <section class="section values-section">
+      <div class="container">
+        <h2 class="text-center values-heading">What I Value</h2>
+        <p class="values-intro">These values guide every project I work on.</p>
+        <div class="values">
+          <div class="value-item">
+            <h3>Clarity</h3>
+            <p
+              style="
+                font-size: var(--font-size-sm);
+                color: var(--color-text-light);
+              "
+            >
+              I believe in clear communication, straightforward processes, and
+              websites that don't confuse visitors. Clarity builds trust and
+              drives action.
+            </p>
+          </div>
+          <div class="value-item">
+            <h3>Reliability</h3>
+            <p
+              style="
+                font-size: var(--font-size-sm);
+                color: var(--color-text-light);
+              "
+            >
+              You can count on me to deliver what I promise, when I promise it.
+              Steady progress and consistent quality over flashy promises.
+            </p>
+          </div>
+          <div class="value-item">
+            <h3>Growth</h3>
+            <p
+              style="
+                font-size: var(--font-size-sm);
+                color: var(--color-text-light);
+              "
+            >
+              I'm committed to continuous learning and improvement both for
+              myself and for the businesses I work with. Growth happens one step
+              at a time.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Who I Work Best With -->
+    <section class="section" style="background-color: var(--color-bg-alt)">
+      <div class="container">
+        <h2 class="text-center">Who I Work Best With</h2>
+        <div class="who-i-work-with-panel">
+          <ul class="who-i-work-with">
+            <li>Small business owners launching or improving a website</li>
+            <li>
+              Service-based businesses that rely on inquiries and bookings
+            </li>
+            <li>
+              Clients who value clarity, communication, and steady progress
+            </li>
+            <li>
+              Businesses ready to invest in their online presence without
+              unnecessary complexity
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="cta-section">
+      <div class="container">
+        <h2>Let's Build Something Clear and Useful Together</h2>
+        <p>
+          If my approach resonates with you, let's start a conversation about
+          your project.
+        </p>
+        <a href="contact.html" class="btn btn-primary">Start a Project</a>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="container">
+        <div class="footer-content">
+          <div class="footer-section">
+            <h4>LevelUp Digital</h4>
+            <p class="footer-brand-text">
+              Clean, conversion-focused websites for small businesses and online
+              entrepreneurs.
+            </p>
+
+            <!-- Contact Buttons -->
+            <div class="footer-contact">
+              <span class="footer-location-badge">Tokyo, Japan</span>
+              <div class="footer-contact-buttons">
+                <a
+                  href="mailto:atsushijunior.harada@gmail.com"
+                  class="footer-contact-btn"
+                >
+                  <i class="fas fa-envelope"></i>
+                  <span>atsushijunior.harada@gmail.com</span>
+                </a>
+                <a
+                  href="https://wa.me/818074310125"
+                  class="footer-contact-btn"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <i class="fab fa-whatsapp"></i>
+                  <span>+81 80-7431-0125</span>
+                </a>
+              </div>
+            </div>
+
+            <!-- Social Buttons -->
+            <div class="footer-social">
+              <div class="footer-social-buttons">
+                <a
+                  href="https://www.linkedin.com/in/atsushi-jr-harada"
+                  class="footer-social-btn"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="LinkedIn"
+                >
+                  <i class="fab fa-linkedin-in"></i>
+                </a>
+                <a
+                  href="https://www.facebook.com/atsushijr.harada"
+                  class="footer-social-btn"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Facebook"
+                >
+                  <i class="fab fa-facebook-f"></i>
+                </a>
+                <a
+                  href="https://www.instagram.com/atsushi.jri/"
+                  class="footer-social-btn"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Instagram"
+                >
+                  <i class="fab fa-instagram"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+          <div class="footer-section">
+            <h4>Quick Links</h4>
+            <ul class="footer-links">
+              <li><a href="index.html">Home</a></li>
+              <li><a href="services.html">Services</a></li>
+              <li><a href="work.html">Work</a></li>
+              <li><a href="about.html">About</a></li>
+              <li><a href="contact.html">Contact</a></li>
+            </ul>
+          </div>
+          <div class="footer-section">
+            <h4>Legal</h4>
+            <ul class="footer-links">
+              <li><a href="privacy.html">Privacy Policy</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <p>&copy; 2024 LevelUp Digital. All rights reserved.</p>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Project Inquiry Modal -->
+    <div id="projectModal" class="modal">
+      <div class="modal-overlay" onclick="closeProjectModal()"></div>
+      <div class="modal-content">
+        <button
+          class="modal-close"
+          onclick="closeProjectModal()"
+          aria-label="Close modal"
+        >
+          ✕
+        </button>
+        <h2>Start a Project</h2>
+        <p class="modal-subtitle">
+          Share a few details and I'll get back to you personally.
+        </p>
+        <form
+          name="project-inquiry"
+          method="POST"
+          data-netlify="true"
+          netlify-honeypot="bot-field"
+          id="project-inquiry-form"
+          class="project-inquiry-form"
+        >
+          <input type="hidden" name="form-name" value="project-inquiry" />
+          <p style="display: none">
+            <label
+              >Don't fill this out if you're human: <input name="bot-field"
+            /></label>
+          </p>
+
+          <div class="form-group">
+            <label for="name">Name <span class="required">*</span></label>
+            <input type="text" id="name" name="name" required />
+          </div>
+
+          <div class="form-group">
+            <label for="email">Email <span class="required">*</span></label>
+            <input type="email" id="email" name="email" required />
+          </div>
+
+          <div class="form-group">
+            <label for="business-type"
+              >Business Type <span class="required">*</span></label
+            >
+            <select id="business-type" name="business-type" required>
+              <option value="">Select a type</option>
+              <option value="Tour / Travel">Tour / Travel</option>
+              <option value="Cafe">Cafe</option>
+              <option value="Photography">Photography</option>
+              <option value="Home Service">Home Service</option>
+              <option value="Clinic">Clinic</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="message">Message</label>
+            <textarea
+              id="message"
+              name="message"
+              rows="4"
+              placeholder="Tell me a bit about what you need help with"
+            ></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="timeline">Timeline (optional)</label>
+            <select id="timeline" name="timeline">
+              <option value="">Select timeline</option>
+              <option value="Just exploring">Just exploring</option>
+              <option value="This month">This month</option>
+              <option value="Next 1–3 months">Next 1–3 months</option>
+            </select>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Send Inquiry</button>
+            <button
+              type="button"
+              class="btn btn-secondary"
+              onclick="closeProjectModal()"
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
+        <div id="form-success" class="form-success" style="display: none">
+          <p>Thanks! I'll get back to you within 24–48 hours.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Floating Mobile CTA Button (outside header, in body) -->
+    <button class="btn-nav-modal-mobile" onclick="openProjectModal()" aria-label="Start a Project">
+      Start a Project
+    </button>
+
+    <script src="js/main.js"></script>
+  </body>
+</html>

@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Website builds for small businesses. Clean, modern websites that turn visitors into real inquiries."
+    />
+    <title>Website Builds - LevelUp Digital</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="assets/favicon/favicon-16.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="assets/favicon/favicon-32.png"
+    />
+    <link rel="apple-touch-icon" href="assets/favicon/apple-touch-icon.png" />
+    <link rel="icon" type="image/x-icon" href="assets/favicon/favicon.ico" />
+  </head>
+  <body class="services-page">
+    <!-- Header -->
+    <header class="header">
+      <div class="header-content">
+        <a href="index.html" class="logo">
+          <img
+            src="assets/logo/logo-primary.jpg"
+            alt="LevelUp Digital"
+            class="logo-image"
+          />
+          <div class="logo-text">
+            <span class="logo-name">LevelUp Digital</span>
+            <span class="logo-tagline">Websites That Convert</span>
+          </div>
+        </a>
+        <button class="nav-toggle" aria-label="Toggle navigation">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+        <nav class="nav">
+          <a href="index.html">Home</a>
+          <a href="services.html" class="active">Services</a>
+          <a href="work.html">Work</a>
+          <a href="about.html">About</a>
+          <a href="contact.html">Contact</a>
+        </nav>
+        <button class="btn-nav-modal" onclick="openProjectModal()">Start a Project</button>
+        <button class="btn-nav-modal-mobile" onclick="openProjectModal()" aria-label="Start a Project">
+          Start a Project
+        </button>
+      </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+      <div class="container">
+        <div class="hero-content">
+          <h1>Website Builds for Small Businesses</h1>
+          <p>Clean, modern websites that turn visitors into real inquiries.</p>
+          <div class="hero-cta">
+            <a href="contact.html" class="btn btn-primary"
+              >Let's talk about your project</a
+            >
+          </div>
+          <div style="margin-top: var(--spacing-md)">
+            <a href="work.html" class="hero-secondary-link">See examples</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Service Benefits Section -->
+    <section class="section service-benefits-section">
+      <div class="container">
+        <div class="service-benefits">
+          <div class="benefit-card">
+            <div class="benefit-icon">
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+              </svg>
+            </div>
+            <h4>Conversion-focused structure</h4>
+            <p>Every page guides visitors toward taking action.</p>
+          </div>
+          <div class="benefit-card">
+            <div class="benefit-icon">
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+                <line x1="12" y1="18" x2="12.01" y2="18"></line>
+              </svg>
+            </div>
+            <h4>Mobile-first design</h4>
+            <p>Looks great and works perfectly on all devices.</p>
+          </div>
+          <div class="benefit-card">
+            <div class="benefit-icon">
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path
+                  d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+                ></path>
+                <line x1="9" y1="10" x2="15" y2="10"></line>
+                <line x1="9" y1="14" x2="15" y2="14"></line>
+              </svg>
+            </div>
+            <h4>Clear inquiry flow</h4>
+            <p>Makes it easy for potential customers to reach you.</p>
+          </div>
+          <div class="benefit-card">
+            <div class="benefit-icon">
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+              </svg>
+            </div>
+            <h4>Built to scale later</h4>
+            <p>Start simple, add features as you grow.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Qualification Section -->
+    <section class="section">
+      <div class="container">
+        <div class="section-header">
+          <h2>Who this works best for</h2>
+          <p class="section-intro">
+            Not every website service is the same. This approach works best for
+            businesses that value clarity, simplicity, and steady growth without
+            unnecessary complexity.
+          </p>
+        </div>
+        <div class="qualification-container">
+          <div class="qualification-card qualification-card-yes">
+            <h3>This works well if...</h3>
+            <ul>
+              <li>
+                You want a professional website and clear guidance from day one
+              </li>
+              <li>
+                You care about design <em>and</em> results, not just how it
+                looks
+              </li>
+              <li>
+                You're ready to invest in your online presence at a sustainable
+                pace
+              </li>
+              <li>
+                You prefer a simple, structured process without technical jargon
+              </li>
+            </ul>
+          </div>
+          <div class="qualification-card qualification-card-no">
+            <h3>This may not be ideal if...</h3>
+            <ul>
+              <li>
+                You're looking for a large custom system or advanced web
+                application
+              </li>
+              <li>You're choosing purely based on the lowest possible price</li>
+              <li>
+                You need frequent design changes or experiments every week
+              </li>
+              <li>
+                You require a fully custom platform built entirely from scratch
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div class="qualification-cta">
+          <p class="soft-cta-text">
+            If most of the left side sounds like you, we should probably talk.
+          </p>
+          <a href="contact.html" class="soft-cta-link">
+            Let's talk about your project →
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Deliverables Section -->
+    <section class="section deliverables-section">
+      <div class="container">
+        <div class="section-header">
+          <h2>What you'll receive</h2>
+          <p>Everything you need to launch and manage your website.</p>
+        </div>
+        <div class="deliverables-grid">
+          <div class="deliverable-card">
+            <div class="deliverable-icon">📱</div>
+            <h4>Fully responsive website</h4>
+            <p>Works perfectly on phones, tablets, and desktops.</p>
+          </div>
+          <div class="deliverable-card">
+            <div class="deliverable-icon">⚡</div>
+            <h4>Fast loading speed</h4>
+            <p>Optimized for quick page loads and better search rankings.</p>
+          </div>
+          <div class="deliverable-card">
+            <div class="deliverable-icon">📧</div>
+            <h4>Contact forms</h4>
+            <p>
+              Easy-to-use forms that capture inquiries directly to your email.
+            </p>
+          </div>
+          <div class="deliverable-card">
+            <div class="deliverable-icon">🔍</div>
+            <h4>SEO-ready structure</h4>
+            <p>Built with search engines in mind from the start.</p>
+          </div>
+          <div class="deliverable-card">
+            <div class="deliverable-icon">🎨</div>
+            <h4>Brand-aligned design</h4>
+            <p>Colors, fonts, and style that match your business identity.</p>
+          </div>
+          <div class="deliverable-card">
+            <div class="deliverable-icon">📝</div>
+            <h4>Content management</h4>
+            <p>Simple system to update text and images yourself.</p>
+          </div>
+          <div class="deliverable-card">
+            <div class="deliverable-icon">🔒</div>
+            <h4>Security setup</h4>
+            <p>SSL certificate and basic security measures included.</p>
+          </div>
+          <div class="deliverable-card">
+            <div class="deliverable-icon">📚</div>
+            <h4>Training & documentation</h4>
+            <p>Walkthrough on how to manage your site after launch.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Website Build Levels -->
+    <section class="section build-levels-section">
+      <div class="container">
+        <div class="section-header">
+          <h2>Website build levels</h2>
+          <p>Choose the option that fits your needs and timeline.</p>
+        </div>
+        <div class="build-levels-container">
+          <div class="build-level-card">
+            <h3>Basic</h3>
+            <p class="build-level-who">Perfect for getting started quickly</p>
+            <ul class="build-level-inclusions">
+              <li>3-5 pages</li>
+              <li>Contact form</li>
+              <li>Mobile-responsive design</li>
+              <li>Basic SEO setup</li>
+            </ul>
+            <div class="build-level-meta">
+              <p><strong>Timeline:</strong> 2-3 days</p>
+              <p><strong>Investment:</strong> Starting at ¥15,000 / $100</p>
+            </div>
+          </div>
+          <div class="build-level-card build-level-standard">
+            <span class="build-level-badge">Most chosen</span>
+            <h3>Standard</h3>
+            <p class="build-level-who">
+              Most popular choice for established businesses
+            </p>
+            <ul class="build-level-inclusions">
+              <li>5-8 pages</li>
+              <li>Enhanced design features</li>
+              <li>Additional functionality</li>
+              <li>Comprehensive SEO</li>
+            </ul>
+            <div class="build-level-meta">
+              <p><strong>Timeline:</strong> 5-7 days</p>
+              <p><strong>Investment:</strong> Starting at ¥50,000 / $300</p>
+            </div>
+          </div>
+          <div class="build-level-card build-level-pro">
+            <h3>Pro</h3>
+            <p class="build-level-who">
+              Fully customized solution for growing businesses
+            </p>
+            <ul class="build-level-inclusions">
+              <li>Unlimited pages</li>
+              <li>Custom features</li>
+              <li>Third-party integrations</li>
+              <li>Advanced SEO & analytics</li>
+            </ul>
+            <div class="build-level-meta">
+              <p><strong>Timeline:</strong> 10-14 days</p>
+              <p><strong>Investment:</strong> Starting at ¥150,000 / $1,000</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Timeline Breakdown -->
+    <section class="section" style="background-color: var(--color-bg-alt)">
+      <div class="container">
+        <div class="section-header">
+          <h2>What happens and when</h2>
+          <p>A clear timeline so you know what to expect.</p>
+          <p class="section-reassurance">
+            No surprises. You'll always know what stage we're in.
+          </p>
+        </div>
+        <div class="timeline-grid">
+          <div class="timeline-item">
+            <div class="timeline-level">Basic</div>
+            <div class="timeline-duration">2-3 days</div>
+            <div class="timeline-steps">
+              <p><strong>Day 1 —</strong> Align & prepare</p>
+              <p><strong>Day 2 —</strong> Build & design</p>
+              <p><strong>Day 3 —</strong> Refine & launch</p>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-level">Standard</div>
+            <div class="timeline-duration">5-7 days</div>
+            <div class="timeline-steps">
+              <p><strong>Days 1-2 —</strong> Align & organize</p>
+              <p><strong>Days 3-5 —</strong> Build & design</p>
+              <p><strong>Days 6-7 —</strong> Refine & launch</p>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-level">Pro</div>
+            <div class="timeline-duration">10-14 days</div>
+            <div class="timeline-steps">
+              <p><strong>Days 1-3 —</strong> Discover & plan</p>
+              <p><strong>Days 4-9 —</strong> Build & customize</p>
+              <p><strong>Days 10-14 —</strong> Refine & launch</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Optional Add-ons -->
+    <section class="section">
+      <div class="container">
+        <div class="section-header">
+          <h2>Optional add-ons</h2>
+          <p>Some clients start simple, then add these later when needed.</p>
+        </div>
+        <div class="addons-list">
+          <div class="addon-tile">
+            <div class="addon-icon">🔧</div>
+            <div class="addon-content">
+              <h4>Maintenance & Updates</h4>
+              <p>
+                Keep your site secure and up-to-date with regular updates,
+                security patches, and content changes.
+              </p>
+            </div>
+          </div>
+          <div class="addon-tile">
+            <div class="addon-icon">🔍</div>
+            <div class="addon-content">
+              <h4>SEO Setup</h4>
+              <p>
+                Technical SEO, local SEO optimization, and best practices to
+                help your site rank better in search results.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- How We Work -->
+    <section class="section process-section">
+      <div class="container">
+        <div class="section-header">
+          <h2>How we work</h2>
+          <p>Clear steps, no jargon, no guesswork.</p>
+        </div>
+        <div class="process-simple">
+          <div class="process-simple-step">
+            <div class="process-simple-number">1</div>
+            <h4>Discovery</h4>
+            <p>We discuss your goals, target audience, and what you need.</p>
+          </div>
+          <div class="process-simple-connector"></div>
+          <div class="process-simple-step">
+            <div class="process-simple-number">2</div>
+            <h4>Build</h4>
+            <p>We create your website based on your chosen level.</p>
+          </div>
+          <div class="process-simple-connector"></div>
+          <div class="process-simple-step">
+            <div class="process-simple-number">3</div>
+            <h4>Review</h4>
+            <p>You review and request any changes you'd like.</p>
+          </div>
+          <div class="process-simple-connector"></div>
+          <div class="process-simple-step">
+            <div class="process-simple-number">4</div>
+            <h4>Launch</h4>
+            <p>We go live and show you how to manage your site.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Final CTA -->
+    <section class="cta-section">
+      <div class="container">
+        <h2>Let's talk about your project</h2>
+        <p>Not sure where to start? That's completely okay.</p>
+        <a href="contact.html" class="btn btn-primary">Get in Touch</a>
+        <p class="cta-micro-copy">Free, no-pressure conversation</p>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="container">
+        <div class="footer-content">
+          <div class="footer-section">
+            <h4>LevelUp Digital</h4>
+            <p class="footer-brand-text">
+              Clean, conversion-focused websites for small businesses and online
+              entrepreneurs.
+            </p>
+            
+            <!-- Contact Buttons -->
+            <div class="footer-contact">
+              <span class="footer-location-badge">Tokyo, Japan</span>
+              <div class="footer-contact-buttons">
+                <a href="mailto:atsushijunior.harada@gmail.com" class="footer-contact-btn">
+                  <i class="fas fa-envelope"></i>
+                  <span>atsushijunior.harada@gmail.com</span>
+                </a>
+                <a href="https://wa.me/818074310125" class="footer-contact-btn" target="_blank" rel="noopener noreferrer">
+                  <i class="fab fa-whatsapp"></i>
+                  <span>+81 80-7431-0125</span>
+                </a>
+              </div>
+            </div>
+            
+            <!-- Social Buttons -->
+            <div class="footer-social">
+              <div class="footer-social-buttons">
+                <a href="https://www.linkedin.com/in/atsushi-jr-harada" class="footer-social-btn" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+                  <i class="fab fa-linkedin-in"></i>
+                </a>
+                <a href="https://www.facebook.com/atsushijr.harada" class="footer-social-btn" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
+                  <i class="fab fa-facebook-f"></i>
+                </a>
+                <a href="https://www.instagram.com/atsushi.jri/" class="footer-social-btn" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+                  <i class="fab fa-instagram"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+          <div class="footer-section">
+            <h4>Quick Links</h4>
+            <ul class="footer-links">
+              <li><a href="index.html">Home</a></li>
+              <li><a href="services.html">Services</a></li>
+              <li><a href="work.html">Work</a></li>
+              <li><a href="about.html">About</a></li>
+              <li><a href="contact.html">Contact</a></li>
+            </ul>
+          </div>
+          <div class="footer-section">
+            <h4>Legal</h4>
+            <ul class="footer-links">
+              <li><a href="privacy.html">Privacy Policy</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <p>&copy; 2024 LevelUp Digital. All rights reserved.</p>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Project Inquiry Modal -->
+    <div id="projectModal" class="modal">
+      <div class="modal-overlay" onclick="closeProjectModal()"></div>
+      <div class="modal-content">
+        <button class="modal-close" onclick="closeProjectModal()" aria-label="Close modal">✕</button>
+        <h2>Start a Project</h2>
+        <p class="modal-subtitle">Share a few details and I'll get back to you personally.</p>
+        <form
+          name="project-inquiry"
+          method="POST"
+          data-netlify="true"
+          netlify-honeypot="bot-field"
+          id="project-inquiry-form"
+          class="project-inquiry-form"
+        >
+          <input type="hidden" name="form-name" value="project-inquiry" />
+          <p style="display: none;">
+            <label>Don't fill this out if you're human: <input name="bot-field" /></label>
+          </p>
+          
+          <div class="form-group">
+            <label for="name">Name <span class="required">*</span></label>
+            <input type="text" id="name" name="name" required />
+          </div>
+          
+          <div class="form-group">
+            <label for="email">Email <span class="required">*</span></label>
+            <input type="email" id="email" name="email" required />
+          </div>
+          
+          <div class="form-group">
+            <label for="business-type">Business Type <span class="required">*</span></label>
+            <select id="business-type" name="business-type" required>
+              <option value="">Select a type</option>
+              <option value="Tour / Travel">Tour / Travel</option>
+              <option value="Cafe">Cafe</option>
+              <option value="Photography">Photography</option>
+              <option value="Home Service">Home Service</option>
+              <option value="Clinic">Clinic</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label for="message">Message</label>
+            <textarea
+              id="message"
+              name="message"
+              rows="4"
+              placeholder="Tell me a bit about what you need help with"
+            ></textarea>
+          </div>
+          
+          <div class="form-group">
+            <label for="timeline">Timeline (optional)</label>
+            <select id="timeline" name="timeline">
+              <option value="">Select timeline</option>
+              <option value="Just exploring">Just exploring</option>
+              <option value="This month">This month</option>
+              <option value="Next 1–3 months">Next 1–3 months</option>
+            </select>
+          </div>
+          
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Send Inquiry</button>
+            <button type="button" class="btn btn-secondary" onclick="closeProjectModal()">Cancel</button>
+          </div>
+        </form>
+        <div id="form-success" class="form-success" style="display: none;">
+          <p>Thanks! I'll get back to you within 24–48 hours.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Floating Mobile CTA Button (outside header, in body) -->
+    <button class="btn-nav-modal-mobile" onclick="openProjectModal()" aria-label="Start a Project">
+      Start a Project
+    </button>
+
+    <script src="js/main.js"></script>
+  </body>
+</html>

@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="LevelUp Digital helps small businesses and online entrepreneurs grow with clean, conversion-focused websites."
+    />
+    <title>
+      LevelUp Digital - Websites That Turn Visitors Into Real Inquiries
+    </title>
+    <link rel="stylesheet" href="style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="assets/favicon/favicon-16.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="assets/favicon/favicon-32.png"
+    />
+    <link rel="apple-touch-icon" href="assets/favicon/apple-touch-icon.png" />
+    <link rel="icon" type="image/x-icon" href="assets/favicon/favicon.ico" />
+  </head>
+  <body>
+    <!-- Header -->
+    <header class="header">
+      <div class="header-content">
+        <a href="index.html" class="logo">
+          <img
+            src="assets/logo/logo-primary.jpg"
+            alt="LevelUp Digital"
+            class="logo-image"
+          />
+          <div class="logo-text">
+            <span class="logo-name">LevelUp Digital</span>
+            <span class="logo-tagline">Websites That Convert</span>
+          </div>
+        </a>
+        <button class="nav-toggle" aria-label="Toggle navigation">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+        <nav class="nav">
+          <a href="index.html" class="active">Home</a>
+          <a href="services.html">Services</a>
+          <a href="work.html">Work</a>
+          <a href="about.html">About</a>
+          <a href="contact.html">Contact</a>
+        </nav>
+        <button class="btn-nav-modal" onclick="openProjectModal()">
+          Start a Project
+        </button>
+      </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+      <div class="container">
+        <div class="hero-content">
+          <h1>Websites That Turn Visitors Into Real Inquiries</h1>
+          <p>
+            LevelUp Digital helps small businesses and online entrepreneurs grow
+            with clean, conversion-focused websites.
+          </p>
+          <div class="hero-trust-cards">
+            <div class="hero-trust-card">Mobile-first</div>
+            <div class="hero-trust-card">Clear inquiry flow</div>
+            <div class="hero-trust-card">Fast + SEO-ready</div>
+          </div>
+          <div class="hero-cta">
+            <a href="contact.html" class="btn btn-primary"
+              >Get a Free Consultation</a
+            >
+            <a href="work.html" class="btn btn-secondary">View My Work</a>
+          </div>
+          <p class="hero-trust-note">
+            No pressure. Free 15–20 minute consultation.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Services Preview -->
+    <section class="section services-preview">
+      <div class="container">
+        <h2 class="text-center">What I Offer</h2>
+        <p
+          class="text-center"
+          style="
+            max-width: 700px;
+            margin: 0 auto var(--spacing-2xl);
+            font-size: var(--font-size-lg);
+            line-height: 1.7;
+            color: var(--color-text-light);
+          "
+        >
+          I provide three core services designed to help your business establish
+          a strong online presence and convert visitors into customers. Each
+          service is tailored to meet the specific needs of small businesses and
+          online entrepreneurs.
+        </p>
+        <div class="cards">
+          <div class="card">
+            <img
+              src="assets/services/service-development.jpg"
+              alt="Website Development"
+              class="card-image"
+            />
+            <div class="card-content">
+              <h3>Website Development</h3>
+              <p>
+                Custom websites built from scratch, tailored to your business
+                goals and designed to convert visitors into inquiries.
+              </p>
+              <ul class="service-highlights">
+                <li>Mobile-first design</li>
+                <li>Clear inquiry flow</li>
+                <li>SEO-ready setup</li>
+              </ul>
+              <a href="services.html" class="service-link">Learn more →</a>
+            </div>
+          </div>
+          <div class="card">
+            <img
+              src="assets/services/service-maintenance.jpg"
+              alt="Maintenance & Updates"
+              class="card-image"
+            />
+            <div class="card-content">
+              <h3>Maintenance & Updates</h3>
+              <p>
+                Keep your site running smoothly with regular updates, security
+                patches, and content changes when you need them.
+              </p>
+              <ul class="service-highlights">
+                <li>Security updates</li>
+                <li>Performance monitoring</li>
+                <li>Technical support</li>
+              </ul>
+              <a href="services.html" class="service-link">Learn more →</a>
+            </div>
+          </div>
+          <div class="card">
+            <img
+              src="assets/services/service-seo.jpg"
+              alt="SEO Setup"
+              class="card-image"
+            />
+            <div class="card-content">
+              <h3>SEO Setup</h3>
+              <p>
+                Technical SEO, local SEO optimization, and best practices to
+                help your site rank better in search results.
+              </p>
+              <ul class="service-highlights">
+                <li>Local SEO optimization</li>
+                <li>Search-friendly structure</li>
+                <li>Performance tracking</li>
+              </ul>
+              <a href="services.html" class="service-link">Learn more →</a>
+            </div>
+          </div>
+        </div>
+        <div class="text-center mt-xl">
+          <a href="services.html" class="btn btn-secondary"
+            >View All Services</a
+          >
+        </div>
+      </div>
+    </section>
+
+    <!-- Featured Work Preview -->
+    <section class="section" style="background-color: var(--color-bg-alt)">
+      <div class="container">
+        <h2 class="text-center">Recent Work</h2>
+        <p
+          class="text-center"
+          style="
+            max-width: 700px;
+            margin: 0 auto var(--spacing-2xl);
+            font-size: var(--font-size-lg);
+            line-height: 1.7;
+            color: var(--color-text-light);
+          "
+        >
+          Below are examples of websites I've built for different business
+          types. Each project focuses on clear communication, easy navigation,
+          and conversion optimization to help businesses connect with their
+          ideal customers.
+        </p>
+        <div class="work-projects">
+          <div class="work-project">
+            <div class="work-mockup">
+              <img
+                src="assets/work/tour-standard-desktop.jpeg"
+                alt="Tour Guide Standard Desktop"
+                class="work-mockup-desktop"
+              />
+              <img
+                src="assets/work/tour-standard-mobile.jpeg"
+                alt="Tour Guide Standard Mobile"
+                class="work-mockup-mobile"
+              />
+            </div>
+            <div class="work-project-content">
+              <span class="niche">Tour Guide</span>
+              <h3>Standard Website</h3>
+              <p class="work-outcome">
+                Designed to simplify inquiries and reduce back-and-forth
+                messages.
+              </p>
+              <a
+                href="https://web-sushi.github.io/tour-standard-demo/"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="btn btn-secondary"
+                style="
+                  font-size: var(--font-size-sm);
+                  padding: var(--spacing-sm) var(--spacing-md);
+                  margin-top: var(--spacing-sm);
+                "
+                >View Tour Website Demo</a
+              >
+            </div>
+          </div>
+          <div class="work-project">
+            <div class="work-mockup">
+              <img
+                src="assets/work/cafe-standard-desktop.jpeg"
+                alt="Cafe Standard Desktop"
+                class="work-mockup-desktop"
+              />
+              <img
+                src="assets/work/cafe-standard-mobile.jpeg"
+                alt="Cafe Standard Mobile"
+                class="work-mockup-mobile"
+              />
+            </div>
+            <div class="work-project-content">
+              <span class="niche">Cafe</span>
+              <h3>Standard Website</h3>
+              <p class="work-outcome">
+                Built to clearly present services and drive contact form
+                submissions.
+              </p>
+              <a
+                href="https://web-sushi.github.io/cafe-standard-demo/"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="btn btn-secondary"
+                style="
+                  font-size: var(--font-size-sm);
+                  padding: var(--spacing-sm) var(--spacing-md);
+                  margin-top: var(--spacing-sm);
+                "
+                >View Cafe Website Demo</a
+              >
+            </div>
+          </div>
+          <div class="work-project">
+            <div class="work-mockup">
+              <img
+                src="assets/work/photo-standard-desktop.jpeg"
+                alt="Photography Standard Desktop"
+                class="work-mockup-desktop"
+              />
+              <img
+                src="assets/work/photo-standard-mobile.jpeg"
+                alt="Photography Standard Mobile"
+                class="work-mockup-mobile"
+              />
+            </div>
+            <div class="work-project-content">
+              <span class="niche">Photography</span>
+              <h3>Standard Website</h3>
+              <p class="work-outcome">
+                Focused on showcasing work cleanly and guiding visitors to reach
+                out.
+              </p>
+              <a
+                href="https://web-sushi.github.io/photo-standard-demo/"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="btn btn-secondary"
+                style="
+                  font-size: var(--font-size-sm);
+                  padding: var(--spacing-sm) var(--spacing-md);
+                  margin-top: var(--spacing-sm);
+                "
+                >View Photography Website Demo</a
+              >
+            </div>
+          </div>
+        </div>
+        <div class="work-cta-card">
+          <p class="work-cta-text">
+            Each project is built with a different goal, audience, and business
+            stage in mind.
+          </p>
+          <a href="work.html" class="btn btn-primary">View All Work</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- About Teaser -->
+    <section class="section">
+      <div class="container">
+        <div class="about-teaser">
+          <div class="about-teaser-image">
+            <img
+              src="assets/portrait.jpg"
+              alt="Portrait of the founder of LevelUp Digital"
+              loading="lazy"
+            />
+          </div>
+          <div class="about-teaser-content">
+            <h2>Built by Someone Who Understands Your Journey</h2>
+            <p
+              style="
+                font-size: var(--font-size-lg);
+                line-height: 1.8;
+                margin-bottom: var(--spacing-md);
+              "
+            >
+              I've been where you are, building something from the ground up
+              while balancing work, learning, and real-life constraints.
+            </p>
+            <p
+              style="
+                font-size: var(--font-size-base);
+                line-height: 1.7;
+                color: var(--color-text-light);
+                margin-bottom: var(--spacing-lg);
+              "
+            >
+              Whether you're launching your first website or looking to improve
+              an existing one, I understand the challenges small business owners
+              face. My approach is straightforward: listen to your needs, build
+              something that works, and help you grow your business online
+              without unnecessary complexity.
+            </p>
+            <div class="mt-xl">
+              <a href="about.html" class="btn btn-secondary"
+                >How I Work With Small Businesses</a
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Final CTA -->
+    <section class="cta-section">
+      <div class="container">
+        <h2>Ready to Build a Website That Actually Works?</h2>
+        <div
+          style="
+            max-width: 650px;
+            margin: 0 auto var(--spacing-xl);
+            font-size: var(--font-size-lg);
+            line-height: 1.7;
+          "
+        >
+          <p style="margin-bottom: var(--spacing-md)">
+            Many small businesses struggle with websites that don't convert
+            visitors into real inquiries.
+          </p>
+          <p>
+            Let's talk about your project and how we can build something that
+            actually helps your business grow.
+          </p>
+        </div>
+        <a href="contact.html" class="btn btn-primary"
+          >Let's talk about your project</a
+        >
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="container">
+        <div class="footer-content">
+          <div class="footer-section">
+            <h4>LevelUp Digital</h4>
+            <p class="footer-brand-text">
+              Clean, conversion-focused websites for small businesses and online
+              entrepreneurs.
+            </p>
+
+            <!-- Contact Buttons -->
+            <div class="footer-contact">
+              <span class="footer-location-badge">Tokyo, Japan</span>
+              <div class="footer-contact-buttons">
+                <a
+                  href="mailto:atsushijunior.harada@gmail.com"
+                  class="footer-contact-btn"
+                >
+                  <i class="fas fa-envelope"></i>
+                  <span>atsushijunior.harada@gmail.com</span>
+                </a>
+                <a
+                  href="https://wa.me/818074310125"
+                  class="footer-contact-btn"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <i class="fab fa-whatsapp"></i>
+                  <span>+81 80-7431-0125</span>
+                </a>
+              </div>
+            </div>
+
+            <!-- Social Buttons -->
+            <div class="footer-social">
+              <div class="footer-social-buttons">
+                <a
+                  href="https://www.linkedin.com/in/atsushi-jr-harada"
+                  class="footer-social-btn"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="LinkedIn"
+                >
+                  <i class="fab fa-linkedin-in"></i>
+                </a>
+                <a
+                  href="https://www.facebook.com/atsushijr.harada"
+                  class="footer-social-btn"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Facebook"
+                >
+                  <i class="fab fa-facebook-f"></i>
+                </a>
+                <a
+                  href="https://www.instagram.com/atsushi.jri/"
+                  class="footer-social-btn"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Instagram"
+                >
+                  <i class="fab fa-instagram"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+          <div class="footer-section">
+            <h4>Quick Links</h4>
+            <ul class="footer-links">
+              <li><a href="index.html">Home</a></li>
+              <li><a href="services.html">Services</a></li>
+              <li><a href="work.html">Work</a></li>
+              <li><a href="about.html">About</a></li>
+              <li><a href="contact.html">Contact</a></li>
+            </ul>
+          </div>
+          <div class="footer-section">
+            <h4>Legal</h4>
+            <ul class="footer-links">
+              <li><a href="privacy.html">Privacy Policy</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <p>&copy; 2024 LevelUp Digital. All rights reserved.</p>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Project Inquiry Modal -->
+    <div id="projectModal" class="modal">
+      <div class="modal-overlay" onclick="closeProjectModal()"></div>
+      <div class="modal-content">
+        <button
+          class="modal-close"
+          onclick="closeProjectModal()"
+          aria-label="Close modal"
+        >
+          ✕
+        </button>
+        <h2>Start a Project</h2>
+        <p class="modal-subtitle">
+          Share a few details and I'll get back to you personally.
+        </p>
+        <form
+          name="project-inquiry"
+          method="POST"
+          data-netlify="true"
+          netlify-honeypot="bot-field"
+          id="project-inquiry-form"
+          class="project-inquiry-form"
+        >
+          <input type="hidden" name="form-name" value="project-inquiry" />
+          <p style="display: none">
+            <label
+              >Don't fill this out if you're human: <input name="bot-field"
+            /></label>
+          </p>
+
+          <div class="form-group">
+            <label for="name">Name <span class="required">*</span></label>
+            <input type="text" id="name" name="name" required />
+          </div>
+
+          <div class="form-group">
+            <label for="email">Email <span class="required">*</span></label>
+            <input type="email" id="email" name="email" required />
+          </div>
+
+          <div class="form-group">
+            <label for="business-type"
+              >Business Type <span class="required">*</span></label
+            >
+            <select id="business-type" name="business-type" required>
+              <option value="">Select a type</option>
+              <option value="Tour / Travel">Tour / Travel</option>
+              <option value="Cafe">Cafe</option>
+              <option value="Photography">Photography</option>
+              <option value="Home Service">Home Service</option>
+              <option value="Clinic">Clinic</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="message">Message</label>
+            <textarea
+              id="message"
+              name="message"
+              rows="4"
+              placeholder="Tell me a bit about what you need help with"
+            ></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="timeline">Timeline (optional)</label>
+            <select id="timeline" name="timeline">
+              <option value="">Select timeline</option>
+              <option value="Just exploring">Just exploring</option>
+              <option value="This month">This month</option>
+              <option value="Next 1–3 months">Next 1–3 months</option>
+            </select>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Send Inquiry</button>
+            <button
+              type="button"
+              class="btn btn-secondary"
+              onclick="closeProjectModal()"
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
+        <div id="form-success" class="form-success" style="display: none">
+          <p>Thanks! I'll get back to you within 24–48 hours.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Floating Mobile CTA Button (outside header, in body) -->
+    <button class="btn-nav-modal-mobile" onclick="openProjectModal()" aria-label="Start a Project">
+      Start a Project
+    </button>
+
+    <script src="js/main.js"></script>
+  </body>
+</html>
