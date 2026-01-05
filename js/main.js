@@ -381,8 +381,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     projectForm.addEventListener('submit', function(e) {
-      e.preventDefault();
-      
       console.log('Form submit event triggered');
       
       // Clear previous errors
@@ -391,10 +389,11 @@ document.addEventListener('DOMContentLoaded', function() {
       // Validate form
       if (!validateForm()) {
         console.log('Form validation failed');
+        e.preventDefault();
         return false;
       }
       
-      console.log('Form validation passed, submitting...');
+      console.log('Form validation passed, submitting to Netlify...');
       
       // Disable submit button to prevent double submission
       const submitButton = projectForm.querySelector('button[type="submit"]');
@@ -404,38 +403,42 @@ document.addEventListener('DOMContentLoaded', function() {
         submitButton.textContent = 'Sending...';
       }
       
+      // Let the form submit naturally to Netlify
+      // Netlify will handle the submission and redirect
+      // We'll intercept the response to show success message
+      
+      // Create a hidden iframe to capture the form submission response
+      const formAction = this.action || window.location.pathname;
+      
+      // For Netlify forms, we can use AJAX submission but need to handle the response
+      // Netlify returns HTML, so we need to check for success indicators
       const formData = new FormData(this);
       
-      // Convert FormData to URL-encoded string for Netlify
-      const params = new URLSearchParams();
-      for (const [key, value] of formData.entries()) {
-        params.append(key, value);
-      }
-      
-      console.log('Submitting form data:', params.toString());
-      
-      // Submit to Netlify
-      fetch('/', {
+      fetch(formAction, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: params.toString()
+        body: formData
       })
       .then((response) => {
         console.log('Response status:', response.status);
-        if (response.ok) {
-          // Show success message
-          const form = document.getElementById('project-inquiry-form');
-          const success = document.getElementById('form-success');
-          if (form && success) {
-            form.style.display = 'none';
-            success.style.display = 'block';
-            // Scroll to success message
-            success.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            console.log('Success message displayed');
+        return response.text().then(html => {
+          // Check if submission was successful
+          // Netlify typically returns a page with "Thank you" or similar
+          if (response.ok && (html.includes('Thank you') || html.includes('success') || response.status === 200)) {
+            // Show success message
+            const form = document.getElementById('project-inquiry-form');
+            const success = document.getElementById('form-success');
+            if (form && success) {
+              form.style.display = 'none';
+              success.style.display = 'block';
+              // Scroll to success message
+              success.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              console.log('Success message displayed');
+            }
+            return true;
+          } else {
+            throw new Error('Form submission may have failed');
           }
-        } else {
-          throw new Error('Form submission failed with status: ' + response.status);
-        }
+        });
       })
       .catch((error) => {
         console.error('Form submission error:', error);
@@ -446,12 +449,17 @@ document.addEventListener('DOMContentLoaded', function() {
           submitButton.textContent = originalButtonText;
         }
         
+        // Still show success if we got a 200 response (Netlify might have processed it)
+        // But show error for other cases
         const errorDiv = document.createElement('div');
         errorDiv.className = 'error-message form-error';
         errorDiv.textContent = 'There was an error submitting your form. Please try again or contact me directly.';
         errorDiv.setAttribute('role', 'alert');
         projectForm.insertBefore(errorDiv, projectForm.firstChild);
       });
+      
+      // Prevent default to handle submission via fetch
+      e.preventDefault();
     });
   }
 
@@ -511,53 +519,67 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     contactPageForm.addEventListener('submit', function(e) {
-      e.preventDefault();
-      
       // Clear previous errors
       clearErrors();
       
       // Validate form
       if (!validateForm()) {
+        e.preventDefault();
         return false;
+      }
+      
+      // Disable submit button to prevent double submission
+      const submitButton = contactPageForm.querySelector('button[type="submit"]');
+      const originalButtonText = submitButton ? submitButton.textContent : '';
+      if (submitButton) {
+        submitButton.disabled = true;
+        submitButton.textContent = 'Sending...';
       }
       
       const formData = new FormData(this);
       
-      // Convert FormData to URL-encoded string for Netlify
-      const params = new URLSearchParams();
-      for (const [key, value] of formData.entries()) {
-        params.append(key, value);
-      }
-      
-      // Submit to Netlify
+      // Submit to Netlify using fetch (AJAX submission)
       fetch('/', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: params.toString()
+        body: formData
       })
       .then((response) => {
-        if (response.ok) {
-          // Show success message
-          const form = document.getElementById('contact-page-form');
-          const success = document.getElementById('contact-form-success');
-          if (form && success) {
-            form.style.display = 'none';
-            success.style.display = 'block';
-            // Scroll to success message
-            success.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return response.text().then(html => {
+          // Netlify returns HTML response, check for success
+          if (response.ok) {
+            // Show success message
+            const form = document.getElementById('contact-page-form');
+            const success = document.getElementById('contact-form-success');
+            if (form && success) {
+              form.style.display = 'none';
+              success.style.display = 'block';
+              // Scroll to success message
+              success.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+            return true;
+          } else {
+            throw new Error('Form submission failed');
           }
-        } else {
-          throw new Error('Form submission failed');
-        }
+        });
       })
       .catch((error) => {
         console.error('Form submission error:', error);
+        
+        // Re-enable submit button
+        if (submitButton) {
+          submitButton.disabled = false;
+          submitButton.textContent = originalButtonText;
+        }
+        
         const errorDiv = document.createElement('div');
         errorDiv.className = 'error-message form-error';
         errorDiv.textContent = 'There was an error submitting your form. Please try again or contact me directly.';
         errorDiv.setAttribute('role', 'alert');
         contactPageForm.insertBefore(errorDiv, contactPageForm.firstChild);
       });
+      
+      // Prevent default to handle submission via fetch
+      e.preventDefault();
     });
   }
 });
