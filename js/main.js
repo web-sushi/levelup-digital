@@ -3,29 +3,41 @@
 // Manage CTA buttons: Remove from DOM based on screen size
 // - Tablet/Mobile: Remove header CTA, keep floating CTA
 // - Desktop: Remove floating CTA, keep header CTA
+// - Contact page: Never show floating CTA (form is already on the page)
 function manageCTAButtons() {
   const isMobileOrTablet = window.innerWidth <= 1024;
   const headerContent = document.querySelector('.header-content');
   const body = document.body;
+  
+  // Check if we're on the contact page (check for contact form or contact page URL)
+  const isContactPage = document.getElementById('contact-page-form') !== null ||
+                        window.location.pathname.includes('contact.html') ||
+                        window.location.pathname.endsWith('/contact') ||
+                        window.location.pathname.endsWith('/contact/');
   
   // Get or create button references
   let headerCTA = document.querySelector('.header-content .btn-nav-modal');
   let floatingCTA = document.querySelector('.btn-nav-modal-mobile');
   
   if (isMobileOrTablet) {
-    // Tablet/Mobile: Remove header CTA, ensure floating CTA exists
+    // Tablet/Mobile: Remove header CTA, ensure floating CTA exists (except on contact page)
     if (headerCTA && headerCTA.parentNode) {
       headerCTA.remove();
     }
     
-    // Create floating CTA if it doesn't exist
-    if (!floatingCTA) {
+    // Create floating CTA if it doesn't exist (but not on contact page)
+    if (!floatingCTA && !isContactPage) {
       floatingCTA = document.createElement('button');
       floatingCTA.className = 'btn-nav-modal-mobile';
       floatingCTA.setAttribute('onclick', 'openProjectModal()');
       floatingCTA.setAttribute('aria-label', 'Start a Project');
       floatingCTA.textContent = 'Start a Project';
       body.appendChild(floatingCTA);
+    }
+    
+    // Remove floating CTA if we're on contact page
+    if (isContactPage && floatingCTA && floatingCTA.parentNode) {
+      floatingCTA.remove();
     }
   } else {
     // Desktop: Remove floating CTA, ensure header CTA exists
