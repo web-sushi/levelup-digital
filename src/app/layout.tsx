@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
+import { GoogleAnalytics } from "@/components/analytics/GoogleAnalytics";
+import { SiteShell } from "@/components/layout/SiteShell";
+import { SkipLink } from "@/components/layout/SkipLink";
 import "./globals.css";
 
-/** Google Analytics (gtag) — measurement ID G-8S5ZWSYC00. Wire in a later phase; do not duplicate scripts here. */
 export const metadata: Metadata = {
   metadataBase: new URL("https://levelup-digital.dev"),
   title: {
@@ -19,8 +21,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="min-h-screen antialiased">
-        <main>{children}</main>
+      <body className="min-h-screen overflow-x-hidden antialiased">
+        <SkipLink />
+        <GoogleAnalytics />
+        <SiteShell>{children}</SiteShell>
       </body>
     </html>
   );

@@ -1,6 +1,6 @@
 export default function HomePage() {
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center px-6 text-center">
+    <div className="flex min-h-[calc(100vh-12rem)] flex-col items-center justify-center px-6 py-16 text-center">
       <p className="text-sm font-medium tracking-[0.35em] text-accent-primary uppercase">
         LevelUp Digital
       </p>
