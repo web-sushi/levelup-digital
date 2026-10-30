@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Mail, MessageCircle } from "lucide-react";
+import { LevelMark } from "@/components/brand/LevelMark";
 import {
   legacyFooterDescription,
   primaryNavLinks,
@@ -12,12 +13,14 @@ export function Footer() {
 
   return (
     <footer className="site-footer">
-      <div className="footer-grid-accent" aria-hidden />
       <div className="site-container footer-inner">
         <div className="footer-brand-block">
           <p className="footer-logo">
-            <span className="footer-logo-mark">LevelUp</span>
-            <span className="footer-logo-sub">Digital</span>
+            <LevelMark size={28} variant="green" decorative />
+            <span className="footer-logo-text">
+              <span className="footer-logo-mark">LevelUp</span>
+              <span className="footer-logo-sub">Digital</span>
+            </span>
           </p>
           <p className="footer-description">{legacyFooterDescription}</p>
           <Link href={projectCta.href} className="footer-cta-link focus-ring">
