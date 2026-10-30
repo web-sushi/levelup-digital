@@ -38,7 +38,8 @@ export function ClientCaseStudy({ project }: { project: ClientProject }) {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                Visit markmaedatravelandtour.com
+                Visit live website
+                <span aria-hidden="true"> ↗</span>
                 <span className="sr-only"> (opens in a new tab)</span>
               </a>
             </div>

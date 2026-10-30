@@ -52,7 +52,7 @@ export const clientProjects: ClientProject[] = [
     number: "01",
     title: "Enjoy Travel & Tours",
     category: "Travel Platform / Booking & Operations System",
-    status: "In development",
+    status: "Launched",
     summary:
       "A custom travel platform combining tour discovery, transfers, experiences, custom trip planning, booking workflows, enquiries, quotations, eSIM services, and administrative operations.",
     highlights: [
@@ -64,7 +64,7 @@ export const clientProjects: ClientProject[] = [
       "Operations dashboard",
     ],
     introduction:
-      "Enjoy Travel & Tours is a Japan travel platform in development. The public site introduces tours, experiences, transfers, vehicles, eSIM plans, and a custom tour builder. An operations console is being built alongside it for bookings, enquiries, quotations, and fulfillment.",
+      "Enjoy Travel & Tours is a launched Japan travel website. The public site covers tours, experiences, transfers, vehicles, eSIM plans, and a custom tour builder. An operations console supports bookings, enquiries, quotations, and fulfillment, while some backend areas are still in development.",
     hero: shot(
       "enjoy-travel/enjoy-travel-homepage.webp",
       "Enjoy Travel and Tours homepage with the headline Japan, your way, and entry points for tours, experiences, transfers, vehicles, eSIM, and a custom tour builder.",
@@ -72,7 +72,7 @@ export const clientProjects: ClientProject[] = [
     ),
     overview: [
       "The goal is one travel platform for customer-facing services and the internal work of running them. Visitors can explore Japan tours, start a custom trip, and move into a booking flow. Staff use a separate operations console to review activity, prepare quotations, and fulfill eSIM orders.",
-      "The product is still in development. Some regions and analytics views are marked as upcoming inside the interface. The screens below show the areas captured for this case study. They are not a claim that every service is launched.",
+      "The public website is live. Some regions and analytics views are still marked as upcoming inside the interface. The screens below show captured areas of the product. They are not a claim that every planned feature is complete.",
     ],
     sections: [
       {
@@ -155,11 +155,12 @@ export const clientProjects: ClientProject[] = [
       { name: "Stripe", detail: "Payment integration" },
     ],
     statusNote: [
-      "This project is in development. The public site and the operations console are both underway, and several areas inside the product are explicitly marked as not ready.",
+      "The public website is launched. Additional backend work is still in progress, and several areas inside the operations console are explicitly marked as not ready.",
       "Tohoku and Shikoku are marked soon in the tour filters. The dashboard analytics views are marked coming soon. eSIM fulfillment can store activation details, and automatic customer email delivery is not in place yet.",
     ],
+    liveUrl: "https://www.enjoytravelandtoursjapan.com/",
     seoDescription:
-      "Case study of Enjoy Travel and Tours, a travel platform in development for tour discovery, custom trip planning, bookings, quotations, and operations.",
+      "Case study of Enjoy Travel and Tours, a launched travel website for tour discovery, custom trip planning, bookings, quotations, and operations. Some backend features are still in development.",
   },
   {
     slug: "mark-maeda-travel-and-tour",

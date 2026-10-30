@@ -1514,7 +1514,7 @@ body {
   flex-wrap: wrap;
   gap: 0.45rem 0.85rem;
   align-items: center;
-  margin-top: 0.85rem;
+  margin-top: 0.3rem;
   font-size: var(--text-label);
   font-weight: 600;
   letter-spacing: 0.08em;

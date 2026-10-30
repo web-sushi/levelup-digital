@@ -14,7 +14,7 @@ import { createPageMetadata } from "@/lib/metadata";
 export const metadata = createPageMetadata({
   title: "Work",
   description:
-    "Real client projects and Concept Lab demos for LevelUp Digital, including travel platforms in development and in market.",
+    "Real client projects and Concept Lab demos for LevelUp Digital, including launched travel platforms.",
   path: "/work",
 });
 
