@@ -1,0 +1,81 @@
+import { createHmac } from "node:crypto";
+import { DEVELOPMENT_ORIGINS, HONEYPOT_FIELD, SUGGESTED_RATE_LIMIT } from "@/lib/inquiries/schema";
+import type { InquiryRateLimiter, RateLimitResult } from "@/lib/inquiries/types";
+
+const MIN_RATE_LIMIT_SECRET_LENGTH = 16;
+
+export function normalizeOrigin(value: string) {
+  try {
+    const url = new URL(value);
+    if (url.origin === "null") {
+      return null;
+    }
+    return url.origin;
+  } catch {
+    return null;
+  }
+}
+
+export function isOriginAllowed(
+  originHeader: string | null,
+  trustedOrigins: readonly string[],
+  allowDevelopmentOrigins: boolean,
+) {
+  if (originHeader === null || originHeader.trim() === "") {
+    return allowDevelopmentOrigins;
+  }
+  const origin = normalizeOrigin(originHeader);
+  if (!origin) {
+    return false;
+  }
+  const trusted = new Set(trustedOrigins.map((item) => normalizeOrigin(item)).filter((item): item is string => item !== null));
+  if (allowDevelopmentOrigins) {
+    for (const developmentOrigin of DEVELOPMENT_ORIGINS) {
+      trusted.add(developmentOrigin);
+    }
+  }
+  return trusted.has(origin);
+}
+
+export function honeypotTriggered(value: unknown) {
+  return typeof value === "string" && value.trim().length > 0;
+}
+
+export function honeypotField() {
+  return HONEYPOT_FIELD;
+}
+
+/**
+ * Uses the platform-set Vercel client IP header only.
+ * `x-forwarded-for` is not accepted because a caller can supply it.
+ */
+export function trustedClientAddress(headers: Headers) {
+  const header = headers.get("x-vercel-forwarded-for");
+  if (!header) {
+    return null;
+  }
+  const first = header.split(",")[0]?.trim() ?? "";
+  if (!first || first.length > 128 || !/^[0-9a-fA-F:.]+$/.test(first)) {
+    return null;
+  }
+  return first;
+}
+
+export function rateLimitSecret(value: string | null | undefined) {
+  if (!value || value.trim().length < MIN_RATE_LIMIT_SECRET_LENGTH) {
+    return null;
+  }
+  return value.trim();
+}
+
+export function hashClientKey(address: string, secret: string) {
+  return createHmac("sha256", secret).update(address).digest("hex");
+}
+
+export class UnavailableRateLimiter implements InquiryRateLimiter {
+  async consume(): Promise<RateLimitResult> {
+    return { status: "unavailable" };
+  }
+}
+
+export const recommendedRateLimit = SUGGESTED_RATE_LIMIT;

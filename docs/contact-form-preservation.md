@@ -65,3 +65,7 @@ UI: selectable cards, progress indicator, accessible transitions. Final submit m
 - No new submission endpoint.
 - No form implementation in Next.js app.
 - No changes to field names inside `legacy/`.
+
+## Phase LS-08B
+
+`POST /api/inquiries` is a separate, disabled Next.js contract. It is documented in `docs/inquiry-submission.md`. It does not replace the legacy Netlify field names above, and the current wizard does not post to it.
