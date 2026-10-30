@@ -23,7 +23,7 @@ export function ProjectHero({ project, overview }: ProjectHeroProps) {
         <h1 className="page-title">{project.title}</h1>
         <p className="page-lead">{overview}</p>
         <p className="case-study-disclaimer">
-          Illustrative concept demo — not a verified client engagement. Explore
+          Illustrative concept demo, not a verified client engagement. Explore
           structure here, then open the live demo on GitHub Pages.
         </p>
         <div className="case-study-hero-actions">

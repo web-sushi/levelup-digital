@@ -36,7 +36,7 @@ export async function generateMetadata({
   }
 
   const path = `/work/${slug}` as const;
-  const title = `${project.title} — Concept case study`;
+  const title = `${project.title} | Concept case study`;
   const description = detail.seoDescription;
 
   return {

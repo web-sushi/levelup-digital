@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     template: "%s | LevelUp Digital",
   },
   description:
-    "LevelUp Digital — creative digital studio for websites, custom web applications, and business-focused digital solutions.",
+    "LevelUp Digital is a creative digital studio for websites, custom web applications, and business-focused digital solutions.",
 };
 
 export default function RootLayout({

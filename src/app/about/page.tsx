@@ -32,11 +32,11 @@ export default function AboutPage() {
           </div>
           <div className="page-prose">
             <p className="about-subtitle">
-              Atsushi Junior Harada — Founder · Web Developer · Family Man
+              Atsushi Junior Harada, founder, web developer, and family man
             </p>
             <p>
               I help businesses and entrepreneurs build clear, structured digital
-              experiences — from marketing websites to more custom applications when
+              experiences, from marketing websites to more custom applications when
               scope calls for it.
             </p>
 
@@ -49,7 +49,7 @@ export default function AboutPage() {
               Progress wasn&apos;t fast, but it was consistent.
             </p>
             <p>
-              Long before freelancing, I was drawn to history and coding — how things
+              Long before freelancing, I was drawn to history and coding: how things
               are built, how systems work, how structure shapes outcomes. One early
               project was a simple web application: a music quiz game that played only
               the first five seconds of a song. It wasn&apos;t perfect, but it showed
@@ -59,7 +59,7 @@ export default function AboutPage() {
               I studied civil engineering even though it wasn&apos;t the path I truly
               wanted. It shaped how I think: plan first, build with structure, keep
               foundations solid. That influences how I approach websites and
-              applications today — not visuals alone, but systems designed to support
+              applications today. Not visuals alone, but systems designed to support
               real goals.
             </p>
             <p>
@@ -77,7 +77,7 @@ export default function AboutPage() {
             </p>
             <p>
               I believe in clarity over complexity. A site or app should make it easy
-              to understand what you do and how to reach you — with thoughtful
+              to understand what you do and how to reach you, with thoughtful
               structure behind the surface.
             </p>
 
@@ -85,7 +85,7 @@ export default function AboutPage() {
             <p>
               Today I work with small businesses and online entrepreneurs on websites
               and custom digital work. I listen first, align on scope, and build what
-              actually helps the business move forward — without unnecessary hype.
+              actually helps the business move forward, without unnecessary hype.
             </p>
             <p>
               LevelUp Digital is about steady progress, clear systems, and leveling up

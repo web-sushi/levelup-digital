@@ -9,7 +9,7 @@ export function HomeClosingCta() {
           <span>Let&apos;s build it.</span>
         </h2>
         <p>
-          Share your goals through the contact page — email or WhatsApp. We can
+          Share your goals through the contact page by email or WhatsApp. We can
           discuss scope, timeline, and whether a website package or custom build
           fits best.
         </p>

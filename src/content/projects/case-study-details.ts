@@ -2,7 +2,7 @@ import type { CaseStudyDetail } from "@/content/projects/types";
 
 export const caseStudyDetails: Record<string, CaseStudyDetail> = {
   "cafe-basic": {
-    "seoDescription": "Cafe Basic Website - LevelUp Digital — concept demo case study from LevelUp Digital.",
+    "seoDescription": "Cafe Basic Website - LevelUp Digital: concept demo case study from LevelUp Digital.",
     "overview": "A clean, inviting cafe website that showcases your menu, location, and atmosphere. Perfect for small cafes looking to establish an online presence with essential information and easy contact options. Features a warm, welcoming design that makes customers want to visit.",
     "websiteIntro": "Everything you need to showcase your cafe and connect with your ideal customers.",
     "websiteIncludes": [
@@ -108,7 +108,7 @@ export const caseStudyDetails: Record<string, CaseStudyDetail> = {
     ]
   },
   "cafe-standard": {
-    "seoDescription": "Cafe Standard Website - LevelUp Digital — concept demo case study from LevelUp Digital.",
+    "seoDescription": "Cafe Standard Website - LevelUp Digital: concept demo case study from LevelUp Digital.",
     "overview": "An enhanced cafe website with online ordering, menu categories, event booking, and social media integration. Perfect for cafes ready to expand their online presence and offer more convenience to customers.",
     "websiteIntro": "Everything you need to showcase your cafe and connect with your ideal customers.",
     "websiteIncludes": [
@@ -218,7 +218,7 @@ export const caseStudyDetails: Record<string, CaseStudyDetail> = {
     ]
   },
   "clinic-basic": {
-    "seoDescription": "Clinic Basic Website - LevelUp Digital — concept demo case study from LevelUp Digital.",
+    "seoDescription": "Clinic Basic Website - LevelUp Digital: concept demo case study from LevelUp Digital.",
     "overview": "A clean, professional clinic website that presents your services, staff, and location information clearly. Designed to make it easy for patients to find information and book appointments. Features a calming, trustworthy design that puts patients at ease.",
     "websiteIntro": "Everything you need to showcase your clinic and connect with your ideal customers.",
     "websiteIncludes": [
@@ -328,8 +328,8 @@ export const caseStudyDetails: Record<string, CaseStudyDetail> = {
     ]
   },
   "clinic-standard": {
-    "seoDescription": "Clinic Standard website concept demo — LevelUp Digital case study (illustrative features only).",
-    "overview": "An enhanced clinic website concept exploring patient portal areas, online appointment scheduling, health information resources, and testimonial sections. Demo features illustrate possible patient experiences — not verified HIPAA compliance or live healthcare integrations.",
+    "seoDescription": "Clinic Standard website concept demo: LevelUp Digital case study (illustrative features only).",
+    "overview": "An enhanced clinic website concept exploring patient portal areas, online appointment scheduling, health information resources, and testimonial sections. Demo features illustrate possible patient experiences. They are not verified HIPAA compliance or live healthcare integrations.",
     "websiteIntro": "Everything you need to showcase your clinic and connect with your ideal customers.",
     "websiteIncludes": [
       {
@@ -442,7 +442,7 @@ export const caseStudyDetails: Record<string, CaseStudyDetail> = {
     ]
   },
   "home-service-basic": {
-    "seoDescription": "Home Service Basic Website - LevelUp Digital — concept demo case study from LevelUp Digital.",
+    "seoDescription": "Home Service Basic Website - LevelUp Digital: concept demo case study from LevelUp Digital.",
     "overview": "A professional home service website that clearly presents your services, service areas, and contact information. Designed to build trust and make it easy for homeowners to request quotes and schedule appointments.",
     "websiteIntro": "Everything you need to showcase your home service business and connect with your ideal customers.",
     "websiteIncludes": [
@@ -548,7 +548,7 @@ export const caseStudyDetails: Record<string, CaseStudyDetail> = {
     ]
   },
   "home-service-standard": {
-    "seoDescription": "Home Service Standard Website - LevelUp Digital — concept demo case study from LevelUp Digital.",
+    "seoDescription": "Home Service Standard Website - LevelUp Digital: concept demo case study from LevelUp Digital.",
     "overview": "A comprehensive home service website with detailed service pages, before/after galleries, customer reviews, and online scheduling. Perfect for established service businesses ready to showcase their expertise and make it easy for customers to book appointments online.",
     "websiteIntro": "Everything you need to showcase your home service business and connect with your ideal customers.",
     "websiteIncludes": [
@@ -662,7 +662,7 @@ export const caseStudyDetails: Record<string, CaseStudyDetail> = {
     ]
   },
   "photo-basic": {
-    "seoDescription": "Photographer Basic Website - LevelUp Digital — concept demo case study from LevelUp Digital.",
+    "seoDescription": "Photographer Basic Website - LevelUp Digital: concept demo case study from LevelUp Digital.",
     "overview": "A minimalist photographer portfolio that puts your work front and center. Clean, elegant galleries showcase your best shots while making it easy for clients to view your work and book sessions. Perfect for photographers who want a simple, professional online presence.",
     "websiteIntro": "Everything you need to showcase your photography business and connect with your ideal customers.",
     "websiteIncludes": [
@@ -768,7 +768,7 @@ export const caseStudyDetails: Record<string, CaseStudyDetail> = {
     ]
   },
   "photo-standard": {
-    "seoDescription": "Photographer Standard Website - LevelUp Digital — concept demo case study from LevelUp Digital.",
+    "seoDescription": "Photographer Standard Website - LevelUp Digital: concept demo case study from LevelUp Digital.",
     "overview": "An enhanced photographer website with advanced gallery features, client testimonials, pricing packages, and a comprehensive booking system. Includes blog functionality and social media integration to help you showcase your work and attract new clients.",
     "websiteIntro": "Everything you need to showcase your photography business and connect with your ideal customers.",
     "websiteIncludes": [
@@ -882,7 +882,7 @@ export const caseStudyDetails: Record<string, CaseStudyDetail> = {
     ]
   },
   "tour-basic": {
-    "seoDescription": "Tour Guide Basic Website - LevelUp Digital — concept demo case study from LevelUp Digital.",
+    "seoDescription": "Tour Guide Basic Website - LevelUp Digital: concept demo case study from LevelUp Digital.",
     "overview": "A straightforward tour guide website that highlights your tours, pricing, and booking options. Designed to convert visitors into bookings with clear call-to-actions and easy-to-find contact information.",
     "websiteIntro": "Everything you need to showcase your tours and make it easy for travelers to book with you.",
     "websiteIncludes": [
@@ -988,7 +988,7 @@ export const caseStudyDetails: Record<string, CaseStudyDetail> = {
     ]
   },
   "tour-pro": {
-    "seoDescription": "Tour Guide Pro Website - LevelUp Digital — concept demo case study from LevelUp Digital.",
+    "seoDescription": "Tour Guide Pro Website - LevelUp Digital: concept demo case study from LevelUp Digital.",
     "overview": "A premium tour guide website with advanced booking system, multi-language support, payment integration, and customer dashboard. Perfect for established tour operators ready to scale their online presence and streamline bookings.",
     "websiteIntro": "Everything you need to showcase your tour business and connect with your ideal customers.",
     "websiteIncludes": [
@@ -1102,7 +1102,7 @@ export const caseStudyDetails: Record<string, CaseStudyDetail> = {
     ]
   },
   "tour-standard": {
-    "seoDescription": "Tour Guide Standard Website - LevelUp Digital — concept demo case study from LevelUp Digital.",
+    "seoDescription": "Tour Guide Standard Website - LevelUp Digital: concept demo case study from LevelUp Digital.",
     "overview": "A comprehensive tour guide website with detailed tour descriptions, photo galleries, customer testimonials, and an integrated booking system. Features enhanced visual storytelling to showcase your tours and build trust with potential customers.",
     "websiteIntro": "Everything you need to showcase your tour business and connect with your ideal customers.",
     "websiteIncludes": [

@@ -1233,13 +1233,13 @@ body {
 
 @media (min-width: 1024px) {
   .home-hero-grid {
-    grid-template-columns: minmax(0, 1fr) minmax(16rem, 22rem);
+    grid-template-columns: minmax(0, 1fr) minmax(16rem, 20rem);
     grid-template-areas:
-      "title title"
+      "title art"
       "copy art";
-    align-items: end;
-    column-gap: 2.5rem;
-    row-gap: 1.25rem;
+    align-items: start;
+    column-gap: clamp(1.5rem, 3vw, 2.75rem);
+    row-gap: 1.5rem;
   }
 
   .home-hero-title {
@@ -1270,18 +1270,12 @@ body {
   display: block;
 }
 
-.home-hero-br {
+.home-hero-gap {
   display: none;
 }
 
-@media (max-width: 1199px) {
-  .home-hero-gap {
-    display: none;
-  }
-
-  .home-hero-br {
-    display: block;
-  }
+.home-hero-br {
+  display: block;
 }
 
 .home-hero-line-accent {
@@ -1317,9 +1311,14 @@ body {
 }
 
 @media (min-width: 1024px) {
+  .home-hero-lead {
+    margin-top: 0;
+  }
+
   .home-hero-art {
     width: 100%;
     margin: 0;
+    align-self: start;
   }
 }
 

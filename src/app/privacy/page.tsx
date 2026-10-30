@@ -21,7 +21,7 @@ export default function PrivacyPage() {
       <section className="page-section">
         <div className="site-container page-prose" style={{ maxWidth: "48rem" }}>
           <p>
-            <strong>Last updated:</strong> 2024 (baseline from legacy policy — see
+            <strong>Last updated:</strong> 2024 (baseline from legacy policy; see
             review notes below)
           </p>
 

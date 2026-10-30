@@ -17,8 +17,8 @@ export function RelatedProjects({ projects }: RelatedProjectsProps) {
           Related concept demos
         </h2>
         <p className="page-section-intro">
-          Other illustrative builds in the Concept Lab — same data, no ranking
-          claims.
+          Other illustrative builds in the Concept Lab, using the same data and no
+          ranking claims.
         </p>
         <ul className="case-study-related-list">
           {projects.map((project) => (

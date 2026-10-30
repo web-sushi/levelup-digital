@@ -109,7 +109,11 @@ The LevelMark motif appears as the hero artwork (five ascending slabs). It is no
 
 ### Hero
 
-The headline spans the width. Copy and CTAs sit beside the five-bar artwork, without a full-viewport gap, so the primary CTA stays in the first desktop screen. Below 1200px the first line breaks after “don’t” so the type can stay large. The second line stays green. The artwork is inline SVG, `aria-hidden`, flat fills only.
+From 1024px up, the headline and five-bar artwork share the first row. The artwork column starts at the same top edge as the headline, so the tallest green bar sits with the first line. Supporting copy and CTAs stay in the left column beneath the headline. The first line breaks after “don’t” so the type can stay large beside the artwork. The second line stays green. The artwork is inline SVG, `aria-hidden`, flat fills only. Below 1024px the stack is headline, copy, CTAs, then artwork.
+
+## Editorial copy
+
+Do not use em dashes in user-facing website copy. Use a comma, colon, period, or a rewritten sentence. Keep meaning and factual limits intact, including concept-project labels, pricing, and package scope. Hyphenated words, URLs, code, and technical identifiers stay as they are. Privacy and legal sentences should change by punctuation only.
 
 ### Service rows
 

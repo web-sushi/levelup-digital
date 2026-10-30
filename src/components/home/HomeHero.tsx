@@ -33,7 +33,7 @@ export function HomeHero() {
         <div className="home-hero-copy">
           <p className="home-hero-lead">
             Websites, custom web applications, booking systems, payment
-            integrations, and other business-focused digital solutions — scoped
+            integrations, and other business-focused digital solutions, scoped
             clearly so you know what you are getting.
           </p>
           <div className="home-hero-actions">

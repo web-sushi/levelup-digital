@@ -38,7 +38,7 @@ export default function ContactPage() {
           >
             <h2 id="inquiry-future-heading">Project inquiry (coming soon)</h2>
             <p>
-              A low-typing, step-by-step inquiry flow will live here — covering
+              A low-typing, step-by-step inquiry flow will live here, covering
               project type, budget, timeline, contact details, optional notes, and
               review before submit.
             </p>

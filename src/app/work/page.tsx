@@ -38,7 +38,7 @@ export default function WorkPage() {
           {clientProjects.length === 0 ? (
             <div className="page-empty-state" role="status">
               No client projects are listed yet. Concept demos below are
-              illustrative builds hosted externally — not live client engagements.
+              illustrative builds hosted externally, not live client engagements.
             </div>
           ) : (
             <ul className="concept-grid">
@@ -58,8 +58,8 @@ export default function WorkPage() {
           <p className="page-section-intro">
             Eleven interactive demos across niches and build tiers (Basic,
             Standard, Pro). Open a case study for structure and details, then
-            follow through to the external GitHub Pages demo — not a production
-            client URL.
+            follow through to the external GitHub Pages demo. That address is not a
+            production client URL.
           </p>
           {Object.entries(grouped).map(([category, projects]) => (
             <div key={category} style={{ marginTop: "2.5rem" }}>

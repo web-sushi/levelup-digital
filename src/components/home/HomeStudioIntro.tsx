@@ -26,7 +26,7 @@ export function HomeStudioIntro() {
           <p className="home-studio-name">Atsushi Junior Harada, founder and web developer</p>
           <p>
             I help businesses and entrepreneurs build clear, structured digital
-            experiences — from marketing websites to custom applications when scope
+            experiences, from marketing websites to custom applications when scope
             calls for it. Progress comes from planning first, keeping foundations
             solid, and focusing on clarity over unnecessary complexity.
           </p>

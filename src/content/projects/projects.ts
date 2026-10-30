@@ -5,7 +5,7 @@ import type { CaseStudyDetail, PortfolioProject } from "@/content/projects/types
 export const portfolioProjects: PortfolioProject[] = [
   {
     slug: "tour-basic",
-    title: "Tour Guide — Basic",
+    title: "Tour Guide: Basic",
     kind: "concept",
     category: "Tour Guides",
     tier: "Basic",
@@ -19,7 +19,7 @@ export const portfolioProjects: PortfolioProject[] = [
   },
   {
     slug: "tour-standard",
-    title: "Tour Guide — Standard",
+    title: "Tour Guide: Standard",
     kind: "concept",
     category: "Tour Guides",
     tier: "Standard",
@@ -33,7 +33,7 @@ export const portfolioProjects: PortfolioProject[] = [
   },
   {
     slug: "tour-pro",
-    title: "Tour Guide — Pro",
+    title: "Tour Guide: Pro",
     kind: "concept",
     category: "Tour Guides",
     tier: "Pro",
@@ -47,7 +47,7 @@ export const portfolioProjects: PortfolioProject[] = [
   },
   {
     slug: "cafe-basic",
-    title: "Cafe — Basic",
+    title: "Cafe: Basic",
     kind: "concept",
     category: "Cafes",
     tier: "Basic",
@@ -61,7 +61,7 @@ export const portfolioProjects: PortfolioProject[] = [
   },
   {
     slug: "cafe-standard",
-    title: "Cafe — Standard",
+    title: "Cafe: Standard",
     kind: "concept",
     category: "Cafes",
     tier: "Standard",
@@ -75,7 +75,7 @@ export const portfolioProjects: PortfolioProject[] = [
   },
   {
     slug: "photo-basic",
-    title: "Photography — Basic",
+    title: "Photography: Basic",
     kind: "concept",
     category: "Photography",
     tier: "Basic",
@@ -89,7 +89,7 @@ export const portfolioProjects: PortfolioProject[] = [
   },
   {
     slug: "photo-standard",
-    title: "Photography — Standard",
+    title: "Photography: Standard",
     kind: "concept",
     category: "Photography",
     tier: "Standard",
@@ -103,7 +103,7 @@ export const portfolioProjects: PortfolioProject[] = [
   },
   {
     slug: "home-service-basic",
-    title: "Home Service — Basic",
+    title: "Home Service: Basic",
     kind: "concept",
     category: "Home Services",
     tier: "Basic",
@@ -117,7 +117,7 @@ export const portfolioProjects: PortfolioProject[] = [
   },
   {
     slug: "home-service-standard",
-    title: "Home Service — Standard",
+    title: "Home Service: Standard",
     kind: "concept",
     category: "Home Services",
     tier: "Standard",
@@ -131,7 +131,7 @@ export const portfolioProjects: PortfolioProject[] = [
   },
   {
     slug: "clinic-basic",
-    title: "Clinic — Basic",
+    title: "Clinic: Basic",
     kind: "concept",
     category: "Clinics",
     tier: "Basic",
@@ -145,7 +145,7 @@ export const portfolioProjects: PortfolioProject[] = [
   },
   {
     slug: "clinic-standard",
-    title: "Clinic — Standard",
+    title: "Clinic: Standard",
     kind: "concept",
     category: "Clinics",
     tier: "Standard",
@@ -191,7 +191,7 @@ export function getPublishedConceptSlugs(): string[] {
     .map((p) => p.slug);
 }
 
-/** Same-category concept demos first, then others — stable slug order, excludes current. */
+/** Same-category concept demos first, then others. Stable slug order, excludes current. */
 export function getRelatedConceptProjects(
   slug: string,
   limit = 3,

@@ -21,7 +21,7 @@ export function HomeSelectedWork() {
           Selected work
         </h2>
         <p className="home-section-lead">
-          Concept projects — illustrative demos, not verified client engagements.
+          Concept projects are illustrative demos, not verified client engagements.
           Open a case study, then the live demo.
         </p>
         <div className="home-work-stage">

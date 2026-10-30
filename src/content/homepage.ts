@@ -16,7 +16,7 @@ export const homepageServiceOverview: HomepageServiceOverview[] = [
   {
     title: "Business Websites",
     description:
-      "Structured marketing sites with clear pages, mobile-responsive layouts, and inquiry paths — scoped through Basic, Standard, or Pro build levels.",
+      "Structured marketing sites with clear pages, mobile-responsive layouts, and inquiry paths, scoped through Basic, Standard, or Pro build levels.",
     href: "/services#business-websites",
   },
   {
@@ -28,13 +28,13 @@ export const homepageServiceOverview: HomepageServiceOverview[] = [
   {
     title: "Booking & Payment Systems",
     description:
-      "Reservation flows, scheduling, and payment integrations when your project requires them — capabilities and integrations are agreed per project.",
+      "Reservation flows, scheduling, and payment integrations when your project requires them. Capabilities and integrations are agreed per project.",
     href: "/services#booking-and-payments",
   },
   {
     title: "Website Improvements & Maintenance",
     description:
-      "Updates, security-minded maintenance, SEO setup, and iterative improvements — optional add-ons or standalone engagements depending on need.",
+      "Updates, security-minded maintenance, SEO setup, and iterative improvements. These can be optional add-ons or standalone engagements, depending on need.",
     href: "/services#website-improvements",
   },
 ];

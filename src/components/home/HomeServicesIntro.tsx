@@ -9,7 +9,7 @@ export function HomeServicesIntro() {
           What we build
         </h2>
         <p className="home-section-lead">
-          From marketing websites to custom applications — each engagement is
+          From marketing websites to custom applications, each engagement is
           scoped in discovery. Fixed website packages cover defined marketing-site
           work; applications, integrations, and add-ons are quoted separately when
           needed.

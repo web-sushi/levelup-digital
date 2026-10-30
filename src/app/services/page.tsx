@@ -14,7 +14,7 @@ export default function ServicesPage() {
     <>
       <PageHeader
         title="Services"
-        description="Structured website builds and custom digital products — scoped clearly, built for clarity and real business goals."
+        description="Structured website builds and custom digital products, scoped clearly and built for clarity and real business goals."
       >
         <Link href="/contact" className="page-link-button focus-ring">
           Start a project ↗
@@ -50,7 +50,7 @@ export default function ServicesPage() {
           <h2 className="page-section-title">Who this works best for</h2>
           <p className="page-section-intro">
             A good fit if you value clarity, thoughtful structure, and steady
-            progress — whether you need a marketing site or a more custom build.
+            progress, whether you need a marketing site or a more custom build.
           </p>
           <div className="page-grid-2">
             <div className="page-card">
@@ -79,7 +79,7 @@ export default function ServicesPage() {
           <h2 className="page-section-title">Website build levels</h2>
           <p className="page-section-intro">
             Starting prices below. Final scope, timeline, and deliverables are
-            confirmed after discovery — especially for Standard and Pro work.
+            confirmed after discovery, especially for Standard and Pro work.
           </p>
           <div className="page-grid-3">
             <div className="page-card">
@@ -117,7 +117,7 @@ export default function ServicesPage() {
             <div className="page-card">
               <h3>Pro</h3>
               <p>
-                Custom builds for growing businesses — scope, integrations, and
+                Custom builds for growing businesses. Scope, integrations, and
                 complexity vary significantly by project.
               </p>
               <ul>
@@ -144,7 +144,7 @@ export default function ServicesPage() {
           <h2 className="page-section-title">Custom web applications</h2>
           <p className="page-section-intro">
             Separate from fixed website packages. Capabilities are scoped per
-            project — not all items below are included in the Pro starting price.
+            project. Not all items below are included in the Pro starting price.
           </p>
           <ul id="booking-and-payments" className="page-prose">
             <li>Business websites and product-style web experiences</li>
@@ -201,7 +201,7 @@ export default function ServicesPage() {
               <h3>SEO setup</h3>
               <p>
                 Technical and on-page SEO improvements aligned to your market and
-                content — not guaranteed ranking outcomes.
+                content. These are not guaranteed ranking outcomes.
               </p>
             </div>
           </div>
@@ -213,16 +213,16 @@ export default function ServicesPage() {
           <h2 className="page-section-title">How we work</h2>
           <ol className="page-prose">
             <li>
-              <strong>Discovery</strong> — goals, audience, content, and constraints
+              <strong>Discovery:</strong> goals, audience, content, and constraints
             </li>
             <li>
-              <strong>Build</strong> — design and development within agreed scope
+              <strong>Build:</strong> design and development within agreed scope
             </li>
             <li>
-              <strong>Review</strong> — feedback cycles within the project plan
+              <strong>Review:</strong> feedback cycles within the project plan
             </li>
             <li>
-              <strong>Launch</strong> — go-live and practical handoff
+              <strong>Launch:</strong> go-live and practical handoff
             </li>
           </ol>
           <Link href="/work" className="page-inline-cta page-inline-cta-secondary focus-ring">
