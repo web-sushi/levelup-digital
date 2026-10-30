@@ -158,8 +158,20 @@ Hover only: service rule, arrow translate, case-study label color. No scroll ani
 - The closing band is near-black with a green button to `/contact`. Copy points to email or WhatsApp, not an inquiry form.
 - Styles are prefixed `services-` so shared page cards on other routes are unchanged.
 
+## Work page (Phase 02E)
+
+`/work` uses the same tokens and buttons. Styles are prefixed `work-`.
+
+- Hero: “Ideas made” in white, “real.” in green, with a small five-bar mark. One H1.
+- Client projects stay empty until verified records exist. No placeholder clients are shown.
+- The Concept Lab keeps all 11 concept projects in published order, grouped by category. The first project is featured. Later rows alternate a wider and a narrower column from 1024px up.
+- Each project is one link to its case study and shows the category, a visible “Concept project” label, and a decorative `01 / 11` index.
+- Screenshots stay at 960×454 through `next/image`. Hover scales the image slightly, moves the arrow, and turns the top rule and title green. `prefers-reduced-motion` removes those transforms.
+- The close is a charcoal band, not the homepage green field, and links to `/contact`.
+- Individual case-study pages are unchanged.
+
 ## Future considerations
 
-- Work, case studies, About, and Contact still use the foundation type and buttons, not this homepage composition.
+- Case studies, About, and Contact still use the foundation type and buttons, not this homepage composition.
 - Do not add a motion library for the mark; it should read while static.
 - Favicon is still the previous mark.
