@@ -1,16 +1,5 @@
-import { verifiedContactLinks } from "@/lib/nav";
+import { ProjectInquiryWizard } from "@/components/contact/ProjectInquiryWizard";
 
-const prompts = [
-  "Type of website or application",
-  "Main business goal",
-  "Desired timeline",
-  "Approximate budget, if known",
-] as const;
-
-/**
- * Static project introduction. LS-08 replaces the contents of
- * `.contact-inquiry-slot` with the inquiry wizard.
- */
 export function ContactProjectIntro() {
   return (
     <section className="contact-band contact-band-surface" aria-labelledby="contact-project-heading">
@@ -20,21 +9,13 @@ export function ContactProjectIntro() {
             Tell us what you&apos;re building.
           </h2>
           <p className="contact-lead">
-            You can reach LevelUp Digital through the direct channels on this
-            page. Email is the simplest way to start. You do not need every
-            detail figured out yet.
+            Answer a few questions about the project. Nothing you type is sent or
+            saved. Email, WhatsApp, and the social links further down the page
+            still work if you would rather write directly.
           </p>
         </div>
         <div className="contact-inquiry-slot">
-          <p className="contact-slot-label">Useful details, if you have them</p>
-          <ul>
-            {prompts.map((item) => (
-              <li key={item}>{item}</li>
-            ))}
-          </ul>
-          <a href={verifiedContactLinks.email} className="page-link-button focus-ring">
-            Email your project idea ↗
-          </a>
+          <ProjectInquiryWizard />
         </div>
       </div>
     </section>

@@ -197,13 +197,13 @@ All 11 concept routes use `src/app/work/[slug]/page.tsx` and the components in `
 `/contact` uses the same tokens, type, and buttons. Styles are prefixed `contact-`. Destinations come from `verifiedContactLinks`.
 
 - Hero: “Got a project?” in white, “Let’s make it happen.” in green.
-- `ContactProjectIntro` holds the future inquiry wizard in `.contact-inquiry-slot`. LS-07D shows email guidance there, not a form.
+- `ContactProjectIntro` places the inquiry wizard in `.contact-inquiry-slot`. LS-08A is the guided form only. It does not submit, store, or email the answers.
 - Direct rows: email, WhatsApp, LinkedIn, Facebook, and Instagram. Tokyo, Japan stays as the location line.
 - “What happens next?” is a usual first conversation, not a response-time or acceptance promise.
 - The close links to `/work` and `/services`.
 
 ## Future considerations
 
-- Real-client case studies still use their existing compositions. Concept case studies use the shared template from Phase LS-07C. About has its own editorial composition (Phase LS-07B). Contact has its own composition from Phase LS-07D. The inquiry wizard is not built yet.
+- Real-client case studies still use their existing compositions. Concept case studies use the shared template from Phase LS-07C. About has its own editorial composition (Phase LS-07B). Contact has its own composition from Phase LS-07D. The inquiry wizard UI exists in Phase LS-08A and does not submit, store, or email answers. Backend delivery is a later phase.
 - Do not add a motion library for the mark; it should read while static.
 - Favicon is still the previous mark.
