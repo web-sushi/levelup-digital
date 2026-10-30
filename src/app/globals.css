@@ -463,3 +463,439 @@ body {
 .footer-bottom p {
   margin: 0;
 }
+
+/* ——— Marketing pages (Phase 01C-A) ——— */
+.page-header {
+  border-bottom: 1px solid color-mix(in srgb, var(--color-text-primary) 8%, transparent);
+  padding-block: 3rem 2.5rem;
+}
+
+.page-header-inner {
+  max-width: 48rem;
+}
+
+.page-title {
+  font-size: clamp(2rem, 5vw, 2.75rem);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+}
+
+.page-lead {
+  margin-top: 1rem;
+  max-width: 40rem;
+  font-size: 1.0625rem;
+  line-height: 1.65;
+  color: var(--color-text-muted);
+}
+
+.page-section {
+  padding-block: 3rem;
+}
+
+.page-section-surface {
+  background: var(--color-surface);
+  border-block: 1px solid color-mix(in srgb, var(--color-text-primary) 6%, transparent);
+}
+
+.page-section-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.75rem;
+}
+
+.page-section-intro {
+  max-width: 42rem;
+  color: var(--color-text-muted);
+  line-height: 1.65;
+  margin-bottom: 2rem;
+}
+
+.page-prose {
+  max-width: 42rem;
+  line-height: 1.75;
+  color: color-mix(in srgb, var(--color-text-primary) 92%, var(--color-text-muted));
+}
+
+.page-prose p + p {
+  margin-top: 1rem;
+}
+
+.page-prose h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
+}
+
+.page-prose ul {
+  margin: 0.75rem 0 0 1.25rem;
+}
+
+.page-prose li + li {
+  margin-top: 0.35rem;
+}
+
+.page-grid-2 {
+  display: grid;
+  gap: 1.25rem;
+}
+
+@media (min-width: 768px) {
+  .page-grid-2 {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.page-grid-3 {
+  display: grid;
+  gap: 1.25rem;
+}
+
+@media (min-width: 900px) {
+  .page-grid-3 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.page-card {
+  background: color-mix(in srgb, var(--color-surface) 90%, black);
+  border: 1px solid color-mix(in srgb, var(--color-text-primary) 10%, transparent);
+  padding: 1.25rem 1.35rem;
+  border-radius: 2px;
+}
+
+.page-card h3 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.page-card p,
+.page-card li {
+  font-size: 0.9375rem;
+  color: var(--color-text-muted);
+  line-height: 1.6;
+}
+
+.page-card ul {
+  margin: 0.75rem 0 0 1rem;
+}
+
+.page-card-price {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid color-mix(in srgb, var(--color-text-primary) 8%, transparent);
+  font-size: 0.9375rem;
+}
+
+.page-card-price strong {
+  color: var(--color-accent-primary);
+}
+
+.page-link-button,
+.page-inline-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.75rem;
+  margin-top: 1.25rem;
+  padding: 0.625rem 1.125rem;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--color-background);
+  background: var(--color-accent-primary);
+  border: 1px solid color-mix(in srgb, var(--color-accent-primary) 80%, white);
+}
+
+.page-inline-cta-secondary {
+  background: transparent;
+  color: var(--color-accent-secondary);
+  border-color: color-mix(in srgb, var(--color-accent-secondary) 50%, transparent);
+}
+
+.page-benefits {
+  display: grid;
+  gap: 1rem;
+}
+
+@media (min-width: 768px) {
+  .page-benefits {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .page-benefits {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.page-benefit {
+  padding: 1rem;
+  border-left: 2px solid var(--color-accent-primary);
+  background: color-mix(in srgb, var(--color-surface) 50%, transparent);
+}
+
+.page-benefit h3 {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  margin-bottom: 0.35rem;
+}
+
+.page-benefit p {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  line-height: 1.55;
+}
+
+.page-empty-state {
+  padding: 1.5rem;
+  border: 1px dashed color-mix(in srgb, var(--color-text-muted) 40%, transparent);
+  color: var(--color-text-muted);
+  line-height: 1.65;
+}
+
+.concept-card {
+  display: grid;
+  gap: 1.25rem;
+  padding: 1.25rem;
+  background: color-mix(in srgb, var(--color-surface) 85%, black);
+  border: 1px solid color-mix(in srgb, var(--color-text-primary) 8%, transparent);
+}
+
+@media (min-width: 900px) {
+  .concept-card {
+    grid-template-columns: 1.1fr 1fr;
+    align-items: center;
+  }
+}
+
+.concept-card-preview {
+  position: relative;
+  min-height: 12rem;
+  background: color-mix(in srgb, var(--color-background) 80%, black);
+  border: 1px solid color-mix(in srgb, var(--color-text-primary) 6%, transparent);
+  overflow: hidden;
+}
+
+.concept-card-desktop {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.concept-card-mobile {
+  position: absolute;
+  right: 0.75rem;
+  bottom: 0.75rem;
+  width: 28%;
+  max-width: 7rem;
+  height: auto;
+  border: 1px solid color-mix(in srgb, var(--color-text-primary) 15%, transparent);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+
+.concept-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.concept-badge {
+  margin-left: 0.35rem;
+  padding: 0.15rem 0.45rem;
+  color: var(--color-accent-primary);
+  border: 1px solid color-mix(in srgb, var(--color-accent-primary) 35%, transparent);
+}
+
+.concept-card-title {
+  margin-top: 0.5rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.concept-card-summary {
+  margin-top: 0.5rem;
+  color: var(--color-text-muted);
+  line-height: 1.6;
+}
+
+.concept-card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin: 0.75rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.concept-card-tags li {
+  font-size: 0.75rem;
+  padding: 0.2rem 0.45rem;
+  color: var(--color-text-muted);
+  border: 1px solid color-mix(in srgb, var(--color-text-primary) 12%, transparent);
+}
+
+.concept-grid {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.about-layout {
+  display: grid;
+  gap: 2rem;
+}
+
+@media (min-width: 900px) {
+  .about-layout {
+    grid-template-columns: minmax(12rem, 16rem) 1fr;
+    align-items: start;
+  }
+}
+
+.about-portrait {
+  border: 1px solid color-mix(in srgb, var(--color-text-primary) 10%, transparent);
+  background: var(--color-surface);
+}
+
+.about-portrait img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.about-subtitle {
+  margin-top: 0.35rem;
+  color: var(--color-text-muted);
+  font-size: 0.9375rem;
+}
+
+.contact-layout {
+  display: grid;
+  gap: 2rem;
+}
+
+@media (min-width: 900px) {
+  .contact-layout {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.contact-methods {
+  padding: 1.5rem;
+  background: var(--color-surface);
+  border: 1px solid color-mix(in srgb, var(--color-text-primary) 8%, transparent);
+}
+
+.contact-methods-list,
+.contact-methods-social {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.contact-method-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 2.75rem;
+  color: var(--color-text-primary);
+  text-decoration: none;
+}
+
+.contact-methods-location {
+  font-size: 0.8125rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.contact-methods-social {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1rem;
+  margin-top: 0.5rem;
+}
+
+.contact-methods-social a {
+  min-height: 2.75rem;
+  display: inline-flex;
+  align-items: center;
+  color: var(--color-accent-secondary);
+  text-decoration: none;
+}
+
+.contact-methods-social-label {
+  margin-top: 1.25rem;
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+}
+
+.inquiry-placeholder {
+  padding: 1.5rem;
+  border: 1px dashed color-mix(in srgb, var(--color-accent-secondary) 35%, transparent);
+  background: color-mix(in srgb, var(--color-surface) 60%, transparent);
+}
+
+.inquiry-placeholder h2 {
+  font-size: 1.125rem;
+  margin-bottom: 0.5rem;
+}
+
+.inquiry-placeholder p {
+  color: var(--color-text-muted);
+  line-height: 1.65;
+}
+
+.policy-review-note {
+  margin: 1.25rem 0;
+  padding: 1rem 1.1rem;
+  border-left: 3px solid var(--color-accent-secondary);
+  background: color-mix(in srgb, var(--color-accent-secondary) 8%, transparent);
+}
+
+.policy-review-note-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-accent-secondary);
+  margin-bottom: 0.35rem;
+}
+
+.policy-review-note-body {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  line-height: 1.55;
+}
+
+.thank-you-panel {
+  max-width: 36rem;
+  margin-inline: auto;
+  text-align: center;
+  padding-block: 4rem 3rem;
+}
+
+.thank-you-panel p {
+  margin-top: 1rem;
+  color: var(--color-text-muted);
+  line-height: 1.65;
+}
+
+.thank-you-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: center;
+  margin-top: 1.75rem;
+}
