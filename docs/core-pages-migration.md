@@ -11,7 +11,7 @@
 | `/privacy` | `legacy/privacy.html` | Migrated with review flags |
 | `/thank-you` | `legacy/thank-you.html` | Future destination; not linked from live submit |
 
-Homepage (`/`) remains the Phase 01A placeholder.
+Homepage (`/`) — Phase 01D content migration (hero, services intro, selected concept work, studio intro, closing CTA).
 
 ## Approved pricing (services page only)
 
