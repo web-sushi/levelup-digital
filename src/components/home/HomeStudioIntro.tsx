@@ -3,24 +3,24 @@ import Link from "next/link";
 
 export function HomeStudioIntro() {
   return (
-    <section className="page-section" aria-labelledby="home-about-heading">
-      <div className="site-container about-layout">
-        <div className="about-portrait">
+    <section className="home-studio" aria-labelledby="home-about-heading">
+      <div className="site-container home-studio-grid">
+        <div className="home-studio-portrait">
+          <span className="home-studio-cobalt" aria-hidden="true" />
           <Image
             src="/images/portrait.jpg"
             alt="Portrait of Atsushi Junior Harada, founder of LevelUp Digital"
             width={704}
             height={1472}
-            sizes="(max-width: 900px) 100vw, 16rem"
+            className="home-studio-image"
+            sizes="(max-width: 900px) 100vw, 28rem"
           />
         </div>
-        <div className="page-prose">
-          <h2 id="home-about-heading" className="page-section-title">
+        <div className="home-studio-copy">
+          <h2 id="home-about-heading" className="home-section-title">
             A hands-on development studio
           </h2>
-          <p className="about-subtitle">
-            Atsushi Junior Harada — Founder · Web Developer
-          </p>
+          <p className="home-studio-name">Atsushi Junior Harada, founder and web developer</p>
           <p>
             I help businesses and entrepreneurs build clear, structured digital
             experiences — from marketing websites to custom applications when scope

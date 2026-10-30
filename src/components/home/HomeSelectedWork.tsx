@@ -8,73 +8,64 @@ export function HomeSelectedWork() {
     .map((slug) => getProjectBySlug(slug))
     .filter((project): project is NonNullable<typeof project> => Boolean(project));
 
+  const [featured, ...supporting] = projects;
+
+  if (!featured) {
+    return null;
+  }
+
   return (
-    <section
-      className="page-section page-section-surface"
-      aria-labelledby="home-work-heading"
-    >
+    <section className="home-work" aria-labelledby="home-work-heading">
       <div className="site-container">
-        <h2 id="home-work-heading" className="page-section-title">
+        <h2 id="home-work-heading" className="home-section-title">
           Selected work
         </h2>
-        <p className="page-section-intro">
-          <span className="concept-badge">Concept projects</span>{" "}
-          <span style={{ marginLeft: "0.35rem" }}>
-            Illustrative demos across industries and build tiers — explore structure
-            on case studies, then open live GitHub Pages demos. Not verified client
-            engagements.
-          </span>
+        <p className="home-section-lead">
+          Concept projects — illustrative demos, not verified client engagements.
+          Open a case study, then the live demo.
         </p>
-        <ul className="home-work-grid">
-          {projects.map((project) => (
-            <li key={project.slug}>
-              <article className="home-work-card">
-                <div className="home-work-preview">
-                  <Image
-                    src={project.imageDesktop}
-                    alt={`${project.title} desktop concept preview`}
-                    width={960}
-                    height={454}
-                    className="home-work-desktop"
-                    sizes="(max-width: 900px) 100vw, 33vw"
-                  />
-                  <Image
-                    src={project.imageMobile}
-                    alt={`${project.title} mobile concept preview`}
-                    width={320}
-                    height={420}
-                    className="home-work-mobile"
-                    sizes="120px"
-                  />
-                </div>
-                <div className="home-work-body">
-                  <p className="concept-card-meta">
-                    <span>{project.category}</span>
-                    <span aria-hidden> · </span>
-                    <span>{project.tier}</span>
-                    <span className="concept-badge">Concept</span>
-                  </p>
-                  <h3>
-                    <Link href={`/work/${project.slug}`} className="focus-ring">
-                      {project.title}
-                    </Link>
-                  </h3>
-                  <p>{project.summary}</p>
-                  <Link
-                    href={`/work/${project.slug}`}
-                    className="page-link-button-secondary focus-ring home-work-link"
-                  >
-                    View case study
-                  </Link>
-                </div>
-              </article>
-            </li>
-          ))}
-        </ul>
+        <div className="home-work-stage">
+          <ProjectFeature project={featured} priority />
+          <div className="home-work-support">
+            {supporting.map((project) => (
+              <ProjectFeature key={project.slug} project={project} />
+            ))}
+          </div>
+        </div>
         <Link href="/work" className="page-inline-cta focus-ring">
           View all concept demos
         </Link>
       </div>
     </section>
+  );
+}
+
+function ProjectFeature({
+  project,
+  priority = false,
+}: {
+  project: NonNullable<ReturnType<typeof getProjectBySlug>>;
+  priority?: boolean;
+}) {
+  return (
+    <article className={priority ? "home-work-feature" : "home-work-item"}>
+      <Link href={`/work/${project.slug}`} className="home-work-link focus-ring">
+        <Image
+          src={project.imageDesktop}
+          alt={`${project.title} desktop concept preview`}
+          width={960}
+          height={454}
+          className="home-work-image"
+          sizes={priority ? "(max-width: 1024px) 100vw, 62vw" : "(max-width: 1024px) 100vw, 30vw"}
+          priority={priority}
+        />
+        <p className="home-work-kicker">
+          <span>{project.category}</span>
+          <span className="home-work-concept">Concept project</span>
+        </p>
+        <h3>{project.title}</h3>
+        <span className="home-work-go">View case study</span>
+      </Link>
+    </article>
   );
 }

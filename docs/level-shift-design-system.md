@@ -91,8 +91,44 @@ The favicon is unchanged.
 - Decorative marks are hidden from assistive technology.
 - Do not set long text in `#00F050` on `#050505`.
 
+## Homepage composition (Phase 02C)
+
+The homepage is five contrasting bands. Section layouts on inner pages are unchanged.
+
+1. Black editorial hero — two-line display headline, supporting service copy, two CTAs, and a five-bar geometric field.
+2. Charcoal services — four numbered rows from `homepageServiceOverview`, one link to `/services`.
+3. Black selected work — one large concept project and two supporting projects (`tour-standard`, `cafe-standard`, `photo-standard`).
+4. Charcoal studio — cropped portrait, one cobalt vertical bar, link to `/about`.
+5. Full-width electric-green close — near-black type, near-black button with white text to `/contact`.
+
+The LevelMark motif appears as the hero artwork (five ascending slabs). It is not repeated in every section. Header and footer keep the small mark.
+
+### Hero
+
+Desktop is a two-column grid: type on the left, artwork aligned to the end on the right. The second line is green. The artwork is inline SVG, `aria-hidden`, flat fills only. Below 1024px the artwork sits under the copy at a smaller width.
+
+### Service rows
+
+Ordered list. The index is visual; the list itself exposes order to assistive technology. Hover lengthens a green rule and shifts a decorative arrow. Rows are not links. Motion is a color and width transition covered by the global reduced-motion reset.
+
+### Project showcase
+
+At 1024px and up, the stage is 8 / 4. Below that, projects stack. Each block is one link to `/work/[slug]` and includes the words “Concept project” and “View case study”. Screenshots use `next/image` with intrinsic 960×454 so they are not stretched.
+
+### Cobalt
+
+One vertical bar beside the studio portrait. No other blue decoration on the homepage.
+
+### Closing CTA
+
+Green field `#00F050`, near-black headline. The button is `#050505` with white text, 44px minimum height, and a white focus ring offset from the green field.
+
+### Motion
+
+Hover only: service rule, arrow translate, case-study label color. No scroll animation and no animation library.
+
 ## Future considerations
 
-- Homepage section composition (asymmetric work, numbered services, poster fields) is a later phase.
+- Inner pages still use the foundation type and buttons, not this homepage composition.
 - Do not add a motion library for the mark; it should read while static.
-- Cobalt stays a secondary accent until a later composition phase uses it as a field.
+- Favicon is still the previous mark.
