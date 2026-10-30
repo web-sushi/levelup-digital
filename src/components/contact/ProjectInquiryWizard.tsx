@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState, type FormEvent } from "react";
 import { InquiryContactFields } from "@/components/contact/InquiryContactFields";
 import { InquiryOptionGroup } from "@/components/contact/InquiryOptionGroup";
 import { InquiryProgress } from "@/components/contact/InquiryProgress";
 import { InquiryProjectDetails } from "@/components/contact/InquiryProjectDetails";
 import { InquiryReferences } from "@/components/contact/InquiryReferences";
 import { InquiryReview } from "@/components/contact/InquiryReview";
+import { InquirySubmission } from "@/components/contact/InquirySubmission";
 import {
   budgets,
   createInquiryDraft,
@@ -21,23 +22,59 @@ import {
   type InquiryDraft,
   type InquiryErrors,
 } from "@/components/contact/inquiry-model";
-import { verifiedContactLinks } from "@/lib/nav";
+import {
+  createInquiryClient,
+  validateInquiryDraft,
+  type InquiryClient,
+  type InquirySubmissionState,
+} from "@/lib/inquiries/client";
 
-export function ProjectInquiryWizard() {
+type ProjectInquiryWizardProps = {
+  submissionsAvailable?: boolean;
+  client?: InquiryClient;
+};
+
+export function ProjectInquiryWizard({
+  submissionsAvailable = false,
+  client,
+}: ProjectInquiryWizardProps) {
   const [step, setStep] = useState(0);
   const [draft, setDraft] = useState<InquiryDraft>(createInquiryDraft);
   const [errors, setErrors] = useState<InquiryErrors>({});
+  const [privacyAccepted, setPrivacyAccepted] = useState(false);
+  const [privacyError, setPrivacyError] = useState<string | undefined>();
+  const [companyWebsite, setCompanyWebsite] = useState("");
+  const [submission, setSubmission] = useState<InquirySubmissionState>({ status: "idle" });
   const headingRef = useRef<HTMLHeadingElement>(null);
   const previousStep = useRef(step);
+  const pendingFocus = useRef<string | null>(null);
+  const [inquiryClient] = useState<InquiryClient>(() => client ?? createInquiryClient());
   const headingId = useId();
+  const busy = submission.status === "submitting";
 
   useEffect(() => {
-    if (previousStep.current === step) {
+    const fieldId = pendingFocus.current;
+    const stepChanged = previousStep.current !== step;
+    if (!stepChanged && !fieldId) {
       return;
     }
     previousStep.current = step;
-    headingRef.current?.focus();
-  }, [step]);
+    pendingFocus.current = null;
+    if (fieldId) {
+      document.getElementById(fieldId)?.focus();
+      return;
+    }
+    if (stepChanged) {
+      headingRef.current?.focus();
+    }
+  }, [step, submission]);
+
+  useEffect(() => {
+    if (submission.status === "idle" || submission.status === "validation_error" || submission.status === "aborted") {
+      return;
+    }
+    document.getElementById("inquiry-status")?.focus();
+  }, [submission]);
 
   function patch(partial: Partial<InquiryDraft>) {
     setDraft((current) => ({ ...current, ...partial }));
@@ -47,6 +84,20 @@ export function ProjectInquiryWizard() {
         delete next[key];
       }
       return next;
+    });
+  }
+
+  function showFieldErrors(nextStep: number, nextErrors: InquiryErrors, focusId: string) {
+    setErrors(nextErrors);
+    pendingFocus.current = focusId;
+    if (nextStep !== step) {
+      setStep(nextStep);
+      return;
+    }
+    window.requestAnimationFrame(() => {
+      if (focusId) {
+        document.getElementById(focusId)?.focus();
+      }
     });
   }
 
@@ -65,18 +116,57 @@ export function ProjectInquiryWizard() {
   }
 
   function edit(nextStep: number) {
+    if (busy) {
+      return;
+    }
     setErrors({});
     setStep(nextStep);
   }
 
+  async function submitInquiry(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!submissionsAvailable || busy) {
+      return;
+    }
+    if (submission.status !== "idle" && submission.status !== "validation_error" && submission.status !== "rate_limited" && submission.status !== "unavailable" && submission.status !== "error") {
+      return;
+    }
+    const ready = validateInquiryDraft(draft, privacyAccepted);
+    if (ready.status === "validation_error") {
+      setPrivacyError(ready.privacy);
+      setSubmission(ready);
+      showFieldErrors(ready.step, ready.errors, ready.focusId);
+      return;
+    }
+    setPrivacyError(undefined);
+    setErrors({});
+    setSubmission({ status: "submitting" });
+    const result = await inquiryClient.submit(draft, companyWebsite);
+    if (result.status === "aborted" || result.status === "submitting") {
+      return;
+    }
+    if (result.status === "validation_error") {
+      setSubmission(result);
+      showFieldErrors(result.step, result.errors, result.focusId);
+      return;
+    }
+    setSubmission(result);
+  }
+
   const current = steps[step];
+  const support = step === 5 && !submissionsAvailable
+    ? "Check the details. Online submissions are not available yet, and nothing you type is sent or saved."
+    : step === 5
+      ? "Check the details, then send your inquiry."
+      : current.support;
 
   return (
     <form
       className="inquiry"
       noValidate
+      aria-busy={busy || undefined}
       onSubmit={(event) => {
-        event.preventDefault();
+        void submitInquiry(event);
       }}
     >
       <InquiryProgress step={step} label={current.progress} />
@@ -86,7 +176,7 @@ export function ProjectInquiryWizard() {
         </span>
         {current.title}
       </h3>
-      <p className="inquiry-support">{current.support}</p>
+      <p className="inquiry-support">{support}</p>
 
       {step === 0 ? (
         <InquiryOptionGroup
@@ -198,19 +288,21 @@ export function ProjectInquiryWizard() {
 
       {step === 5 ? (
         <>
-          <InquiryReview draft={draft} onEdit={edit} />
-          <div className="inquiry-submit-block">
-            <button type="button" className="inquiry-disabled" disabled>
-              Submission available soon
-            </button>
-            <p>
-              The inquiry form is being finalized. For now, you can send your project
-              details directly by email.
-            </p>
-            <a href={verifiedContactLinks.email} className="page-link-button focus-ring">
-              Email your project idea ↗
-            </a>
-          </div>
+          <InquiryReview draft={draft} editsDisabled={busy} onEdit={edit} />
+          <InquirySubmission
+            submissionsAvailable={submissionsAvailable}
+            privacyAccepted={privacyAccepted}
+            privacyError={privacyError}
+            onPrivacy={(accepted) => {
+              setPrivacyAccepted(accepted);
+              if (accepted) {
+                setPrivacyError(undefined);
+              }
+            }}
+            companyWebsite={companyWebsite}
+            onCompanyWebsite={setCompanyWebsite}
+            state={submission}
+          />
         </>
       ) : null}
 
@@ -219,6 +311,7 @@ export function ProjectInquiryWizard() {
           <button
             type="button"
             className="page-link-button-secondary focus-ring"
+            disabled={busy}
             onClick={() => {
               setErrors({});
               setStep((currentStep) => currentStep - 1);

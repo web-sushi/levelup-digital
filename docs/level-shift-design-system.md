@@ -197,13 +197,13 @@ All 11 concept routes use `src/app/work/[slug]/page.tsx` and the components in `
 `/contact` uses the same tokens, type, and buttons. Styles are prefixed `contact-`. Destinations come from `verifiedContactLinks`.
 
 - Hero: “Got a project?” in white, “Let’s make it happen.” in green.
-- `ContactProjectIntro` places the inquiry wizard in `.contact-inquiry-slot`. LS-08A is the guided form only. It does not submit, store, or email the answers. LS-08B adds a disabled `POST /api/inquiries` foundation. LS-08C adds a Brevo email adapter that the public route does not call. LS-08C.1 adds an unwired Upstash Redis rate limit and idempotency store. The wizard is not connected to that route.
+- `ContactProjectIntro` places the inquiry wizard in `.contact-inquiry-slot`. LS-08A is the guided form. LS-08B adds a disabled `POST /api/inquiries` foundation. LS-08C adds a Brevo email adapter that the public route does not call. LS-08C.1 adds an unwired Upstash Redis rate limit and idempotency store. LS-08D.1 connects the wizard to that API contract, while the public page keeps online submission closed.
 - Direct rows: email, WhatsApp, LinkedIn, Facebook, and Instagram. Tokyo, Japan stays as the location line.
 - “What happens next?” is a usual first conversation, not a response-time or acceptance promise.
 - The close links to `/work` and `/services`.
 
 ## Future considerations
 
-- Real-client case studies still use their existing compositions. Concept case studies use the shared template from Phase LS-07C. About has its own editorial composition (Phase LS-07B). Contact has its own composition from Phase LS-07D. The inquiry wizard UI exists in Phase LS-08A and does not submit, store, or email answers. Phase LS-08B adds a fail-closed `POST /api/inquiries` handler. Phase LS-08C adds a Brevo adapter that the handler does not call. Phase LS-08C.1 adds Redis rate limiting and idempotency that the handler does not call. Submissions stay disabled. See `docs/inquiry-submission.md`.
+- Real-client case studies still use their existing compositions. Concept case studies use the shared template from Phase LS-07C. About has its own editorial composition (Phase LS-07B). Contact has its own composition from Phase LS-07D. The inquiry wizard can prepare an API request in Phase LS-08D.1. The public page does not send it. Submissions stay disabled. See `docs/inquiry-submission.md`.
 - Do not add a motion library for the mark; it should read while static.
 - Favicon is still the previous mark.

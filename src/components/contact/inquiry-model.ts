@@ -73,7 +73,7 @@ export const steps = [
   {
     progress: "Review",
     title: "Let's review your project.",
-    support: "Check the details. Nothing on this page is sent or saved.",
+    support: "Check the details. Online submissions are not available yet, and nothing you type is sent or saved.",
   },
 ] as const;
 

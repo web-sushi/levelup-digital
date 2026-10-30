@@ -1,6 +1,6 @@
 # Inquiry submission foundation
 
-Phase LS-08B adds a server-side contract for future project inquiries. The contact wizard stays in the browser. It does not call this endpoint, and the public route cannot report a successful submission.
+Phase LS-08B adds the server-side contract for project inquiries. Phase LS-08D.1 adds a browser client that can `POST` to this endpoint. The public contact page does not show a working send button, and the public route still cannot report a successful submission.
 
 ## Endpoint
 
@@ -232,6 +232,32 @@ Redis and Brevo are not one transaction. If Brevo accepts the business notificat
 
 Storage errors before delivery return `503` `INQUIRY_STORAGE_UNAVAILABLE` and do not send mail. Responses stay generic. They do not include Redis keys, fingerprints, IP hashes, tokens, or provider bodies. Every response still sends `Cache-Control: no-store`.
 
+## Wizard client
+
+`src/lib/inquiries/client.ts` maps the wizard draft to the request fields above. It omits the step, reference ids, validation messages, and the privacy checkbox. Optional business name, project details, and references are included only when they have text. `companyWebsite` is always sent and stays empty unless a hidden field is filled.
+
+The browser posts to the same-origin path `/api/inquiries` with `Content-Type: application/json` and `Idempotency-Key`. It does not set `Origin` or a forwarded IP header. The key comes from `crypto.randomUUID()`. One logical inquiry keeps that key while the normalized payload is unchanged. Editing the inquiry after a rejected or unavailable attempt creates a new key. An unknown outcome, a persistence failure, a processing response, or a payload conflict keeps the original key and does not send another request by itself. The key is not written to `localStorage`, `sessionStorage`, or the page URL, and it is not logged.
+
+The client treats one status at a time:
+
+| State | What the visitor sees |
+| --- | --- |
+| `success` | Shown only for HTTP 200 with `ok: true`. A confirmation value of `accepted` adds that a confirmation email was queued. `rejected`, `unknown`, or a missing confirmation still counts as an accepted inquiry and does not ask for another submission. |
+| `validation_error` | HTTP 422 `VALIDATION_ERROR`. Known field messages are shown on the matching step. Unknown field names are ignored. |
+| `rate_limited` | HTTP 429 `RATE_LIMITED`. No automatic retry. A numeric `Retry-After` header can be shown. No countdown is invented. |
+| `unavailable` | HTTP 503 before delivery: `SUBMISSIONS_UNAVAILABLE`, `RATE_LIMIT_UNAVAILABLE`, `INQUIRY_STORAGE_UNAVAILABLE`, or `DELIVERY_UNAVAILABLE`. |
+| `persistence_uncertain` | HTTP 503 `IDEMPOTENCY_PERSISTENCE_FAILED`. The inquiry may already have been received. |
+| `unknown_outcome` | HTTP 503 `DELIVERY_OUTCOME_UNKNOWN`, or a network failure after the request was sent. |
+| `processing` | HTTP 409 `INQUIRY_PROCESSING`. |
+| `conflict` | HTTP 409 `IDEMPOTENCY_CONFLICT`. |
+| `error` | An invalid idempotency key or a response that does not match this contract. The client does not loop on a new key. |
+
+The review step asks the visitor to acknowledge that LevelUp Digital will use the inquiry to respond. The checkbox is unchecked until the visitor selects it, and it links to `/privacy`. It is not consent for marketing email.
+
+The honeypot is a visually hidden `companyWebsite` input outside the tab order. It is not the business-name field.
+
+`publicInquirySubmissionsAvailable` is `false`. The contact page passes that value into the wizard, so ordinary visitors see the review, the acknowledgment, and an email link, without a send button. Tests can inject a client and a true availability flag. There is no public query parameter that pretends a submission succeeded. Turning on the page later means changing that server value after the API flag, Redis, and Brevo are ready. The client cannot override the API.
+
 ## Security limitations
 
 - The endpoint does not verify that an email inbox exists.
@@ -240,7 +266,7 @@ Storage errors before delivery return `503` `INQUIRY_STORAGE_UNAVAILABLE` and do
 - The public route still uses the unavailable rate limiter and the unavailable delivery adapter. Redis and Brevo credentials do not attach those adapters.
 - Turning `INQUIRY_SUBMISSIONS_ENABLED` on does not create a successful submission while those production adapters stay unavailable.
 - Honeypot hits use the same generic `400` body as other bad requests. They are not stored.
-- This phase does not add a database, connect the wizard, or enable the public route to send mail.
+- The public contact page does not offer a working send button. The wizard client can call this route only when a later phase turns on the server availability value. This phase does not add a database or enable the public route to send mail.
 
 ## Local testing
 
