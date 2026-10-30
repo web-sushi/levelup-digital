@@ -97,7 +97,7 @@ Level Shift is about 60% creative agency and 40% software studio. Display type, 
 
 ## Homepage composition (Phase 02C, refined in 02C.1)
 
-The homepage is five contrasting bands, then a footer signature. Services, Work, and About each have their own editorial composition. Contact still uses the foundation layout.
+The homepage is five contrasting bands, then a footer signature. Services, Work, About, and Contact each have their own editorial composition.
 
 1. Black editorial hero — two-line display headline, supporting service copy, two CTAs, and a five-bar geometric field.
 2. Charcoal services — four numbered rows from `homepageServiceOverview`, one link to `/services`.
@@ -192,8 +192,18 @@ All 11 concept routes use `src/app/work/[slug]/page.tsx` and the components in `
 - The close links to `/contact` and `/work`. Copy treats the demos as possibilities, not products for sale.
 - Clinic Standard keeps its existing note that demo features are not verified HIPAA compliance or live healthcare integrations.
 
+## Contact page (Phase LS-07D)
+
+`/contact` uses the same tokens, type, and buttons. Styles are prefixed `contact-`. Destinations come from `verifiedContactLinks`.
+
+- Hero: “Got a project?” in white, “Let’s make it happen.” in green.
+- `ContactProjectIntro` holds the future inquiry wizard in `.contact-inquiry-slot`. LS-07D shows email guidance there, not a form.
+- Direct rows: email, WhatsApp, LinkedIn, Facebook, and Instagram. Tokyo, Japan stays as the location line.
+- “What happens next?” is a usual first conversation, not a response-time or acceptance promise.
+- The close links to `/work` and `/services`.
+
 ## Future considerations
 
-- Real-client case studies and Contact still use their existing compositions. Concept case studies use the shared template from Phase LS-07C. About has its own editorial composition (Phase LS-07B).
+- Real-client case studies still use their existing compositions. Concept case studies use the shared template from Phase LS-07C. About has its own editorial composition (Phase LS-07B). Contact has its own composition from Phase LS-07D. The inquiry wizard is not built yet.
 - Do not add a motion library for the mark; it should read while static.
 - Favicon is still the previous mark.
