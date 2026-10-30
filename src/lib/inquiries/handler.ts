@@ -9,6 +9,7 @@ import { createInquiryRuntime } from "@/lib/inquiries/config";
 import { parseJsonObject, readLimitedBody } from "@/lib/inquiries/parse";
 import { errorResponse, inquiryJson, messages } from "@/lib/inquiries/responses";
 import { INQUIRY_FIELDS } from "@/lib/inquiries/schema";
+import { submitWithIdempotency } from "@/lib/inquiries/submission-flow";
 import type { InquiryRuntime } from "@/lib/inquiries/types";
 import { unexpectedReferenceKeys, validateInquiry } from "@/lib/inquiries/validation";
 
@@ -76,6 +77,10 @@ export async function handleInquiryPost(request: Request, runtime: InquiryRuntim
 
     if (!runtime.submissionsEnabled) {
       return errorResponse(503, "SUBMISSIONS_UNAVAILABLE", messages.unavailable);
+    }
+
+    if (runtime.idempotency) {
+      return submitWithIdempotency(request, runtime, validated.inquiry);
     }
 
     const address = trustedClientAddress(request.headers);

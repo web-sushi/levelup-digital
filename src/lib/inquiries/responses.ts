@@ -35,4 +35,9 @@ export const messages = {
   validation: "Please check the highlighted fields.",
   unavailable: "Online inquiries are temporarily unavailable. Please contact us directly by email.",
   rateLimited: "Too many requests. Please try again later.",
+  idempotencyKey: "A valid Idempotency-Key header is required.",
+  idempotencyConflict: "This submission key was already used for different inquiry details.",
+  processing: "This inquiry is already being submitted. Wait for it to finish instead of sending it again.",
+  outcomeUnknown: "We could not confirm whether this inquiry was received. Please contact us by email instead of submitting it again.",
+  persistenceFailed: "Your inquiry may have been received, but the result could not be saved. Please contact us by email instead of submitting it again.",
 } as const;

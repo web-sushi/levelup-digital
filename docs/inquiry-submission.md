@@ -83,6 +83,9 @@ All of these are server-only. Do not put them in `NEXT_PUBLIC_` variables. `.env
 | `BREVO_SENDER_EMAIL` | none | From address. Must be verified in Brevo before any live send. |
 | `BREVO_SENDER_NAME` | none | Display name for the from address. |
 | `INQUIRY_NOTIFICATION_EMAIL` | none | Inbox that receives the business notification. Also used as the customer confirmation reply-to. |
+| `UPSTASH_REDIS_REST_URL` | none | HTTPS Upstash Redis REST URL. Presence does not enable submissions or attach the adapter. |
+| `UPSTASH_REDIS_REST_TOKEN` | none | Upstash REST token. Server-only. |
+| `INQUIRY_IDEMPOTENCY_KEY_SECRET` | none | HMAC secret for idempotency keys. At least 16 characters. Separate from the rate-limit secret. |
 
 `NODE_ENV=development` also allows these origins: `http://localhost:3000`, `http://127.0.0.1:3000`, `http://localhost:3001`, and `http://127.0.0.1:3001`. A missing `Origin` header is allowed only in that development mode, so local `curl` can exercise the route. Production rejects a missing or malformed origin. Localhost is not added to the production allow list. The `Host` header is not used.
 
@@ -94,9 +97,9 @@ Browser requests are checked against the configured origin list. There is no per
 
 The production handler does not use an in-memory map. This site is intended for serverless hosting, so a process-local counter would not be a real limit.
 
-No persistent rate-limit provider is configured. The production adapter is `UnavailableRateLimiter`, which always reports that a decision is unavailable. When submissions are enabled, that result fails closed with `503`.
+The public route still uses `UnavailableRateLimiter`. A Redis-backed limiter now exists in `src/lib/inquiries/redis-store.ts`, and it is not attached to the route. Upstash credentials do not enable it. When submissions are enabled without that limiter, the handler still fails closed with `503`.
 
-The recommended provider, when it is approved and installed, is Upstash Ratelimit through the Vercel Marketplace. It is not installed in this phase. A starting policy for that later review is 5 requests per hour for each client key, plus any broader controls the provider supports. Distributed limiting is not active until that provider is configured and tested.
+The starting policy is 5 requests per hour for each client key. It is a fixed window, so a client can be allowed five times at the end of one hour and five times at the start of the next. The check and increment run in one Redis `EVAL` script: `INCR`, then `EXPIRE` when the counter is created. A separate in-memory limiter remains inside the older handler tests. It is not used by the route.
 
 Client keys come only from the first address in `x-vercel-forwarded-for`, and only when that address matches a simple IP character check. `x-forwarded-for` is ignored because a caller can set it. The address is HMAC-SHA256 hashed with `INQUIRY_RATE_LIMIT_KEY_SECRET` before it is passed to the limiter. Raw addresses are not logged.
 
@@ -169,30 +172,73 @@ A timeout, a network error, or an HTTP 201 body without a usable `messageId` is 
 
 ### Idempotency
 
-This phase has no durable store, so it cannot provide exactly-once delivery. An in-memory key would not survive serverless retries and is not used.
-
-Repeated clicks, browser retries, a timeout after Brevo has already accepted the message, and a customer-confirmation failure can all produce more than one business notification. Automatic retries after an unknown outcome are intentionally absent.
-
-Before public launch, a durable idempotency record is a production prerequisite. The future contract is an `Idempotency-Key` request header of 16 to 128 characters matching `[A-Za-z0-9_-]`. The server would store a hash of that key with the delivery result for at least 24 hours and return the stored result on a replay. That store is not implemented here.
+Phase LS-08C.1 adds a durable idempotency store. The public route does not call it yet. Until that store is attached, repeated clicks, browser retries, and a timeout after Brevo has accepted a message can still produce more than one business notification. The handler does not retry an unknown outcome by itself.
 
 ### Remaining production prerequisites
 
 - Keep `INQUIRY_SUBMISSIONS_ENABLED` false.
 - Verify `BREVO_SENDER_EMAIL` inside Brevo. Do not assume the Gmail sender is already verified.
 - Store `BREVO_API_KEY` only in the host environment.
-- Add a persistent rate limiter. The production limiter is still unavailable, and this phase does not install one.
-- Attach `createBrevoInquiryDelivery` to the runtime only after that limiter is in place. Credentials alone must not enable sending.
-- Add durable idempotency before public launch if duplicate mail must be prevented.
+- Create an Upstash Redis database and set its REST URL and token only in the host environment. Adding a payment method moves a free database onto a paid plan.
+- Attach the Redis rate limiter, the Redis idempotency store, and `createBrevoInquiryDelivery` together. Credentials alone must not enable sending.
 - Prefer a verified sender on `levelup-digital.dev` once that mailbox exists, with SPF, DKIM, and DMARC.
 - The wizard stays disconnected. There is no public test-send route.
+
+## Distributed storage
+
+Upstash Redis is the selected store for both the rate limit and the idempotency record. Its REST API works from a Vercel serverless function, and `EVAL` runs a Lua script as one atomic step. `SET` with `NX` and `EX` is also available. The scripts in `src/lib/inquiries/redis-scripts.ts` use `EVAL` so a claim is not a separate `GET` followed by `SET`.
+
+Pricing was read from Upstash's pricing and billing pages on 30 October 2026. The free tier listed 250 MB, 500,000 commands per month, and 10 GB of bandwidth, with no credit card. Pay as you go was listed at $0.20 per 100,000 commands. An `EVAL` script is billed as one command plus one command for each `redis.call`. Those figures can change. No Upstash account was created for this phase, and the Lua scripts were not executed on a live Redis server. The automated tests run the same decisions against an in-memory map and check that the Upstash client sends one `EVAL` request. That does not prove live atomicity.
+
+Low inquiry volume, on the order of a few submissions an hour, stays far inside the free command allowance.
+
+Redis keys use two namespaces:
+
+- `inquiry:ratelimit:v1:<client hash>:<window>`
+- `inquiry:idempotency:v1:<idempotency hash>`
+
+The idempotency hash is HMAC-SHA256 of the header value with `INQUIRY_IDEMPOTENCY_KEY_SECRET`. That secret is separate from `INQUIRY_RATE_LIMIT_KEY_SECRET` so disclosing one does not forge the other. The raw header and the raw IP address are not used as Redis keys and are not logged.
+
+The payload fingerprint is a SHA-256 hash of the validated fields in a fixed order: project type, budget, timeline, name, email, business name, details, and each reference URL with its note. Optional text becomes an empty string. Reference order is part of the fingerprint. HTTP headers are not included. The stored record keeps that hash, the state, and the confirmation outcome. It does not keep the name, email, or message text.
+
+### Operation order
+
+When the idempotency store is injected, the handler keeps the existing parse, origin, honeypot, and validation steps. A disabled submission flag returns `503` before Redis or email. After that:
+
+1. Require a trusted client address and both secrets. A missing address is `503` `RATE_LIMIT_UNAVAILABLE`. A missing idempotency secret is `503` `INQUIRY_STORAGE_UNAVAILABLE`.
+2. Read `Idempotency-Key` from the header only. A missing or invalid key consumes one rate-limit slot, then returns `400` `INVALID_IDEMPOTENCY_KEY`. The query string is ignored.
+3. Run one atomic script. A finalized record with the same payload fingerprint is returned without consuming a slot and without sending mail. A new claim, a conflict, and an in-progress duplicate consume a slot. The new claim is written only when the slot is available.
+4. The claim owner calls the delivery adapter once.
+5. The owner finalizes the record with a second atomic script. A different owner cannot overwrite it.
+
+Accepted replays stay available after the hourly budget is exhausted. In-progress polling and invalid keys do use the budget, so they cannot be an unlimited path into delivery. A double-click can spend two of the five hourly attempts.
+
+The public route does not inject the store, so it never reaches this sequence.
+
+### Idempotency state
+
+| State | Meaning | Later request with the same key and payload |
+| --- | --- | --- |
+| `processing` | A claim is inside its 120 second lease. | `409` `INQUIRY_PROCESSING`. No email. |
+| `accepted` | Brevo accepted the business notification. The confirmation may have failed. | The stored `200` result. No email. |
+| `rejected` | The provider definitively did not accept the business notification. | `503` `DELIVERY_UNAVAILABLE`. No email. A retry needs a new key. |
+| `unknown` | The outcome is uncertain, or the processing lease expired before finalization. | `503` `DELIVERY_OUTCOME_UNKNOWN`. No email. |
+
+A different payload with the same key returns `409` `IDEMPOTENCY_CONFLICT` and does not send mail or replace the original record.
+
+The processing lease is 120 seconds. The Redis key itself is kept for 7 days, which is longer than the 24 hour minimum. Lease expiry does not allow a second email. The next request turns an expired processing record into `unknown` and refreshes the 7 day retention. If the key then expires, a later request can claim it again. That is not exactly-once delivery.
+
+Redis and Brevo are not one transaction. If Brevo accepts the business notification and the finalize script fails, the response is `503` `IDEMPOTENCY_PERSISTENCE_FAILED`. It does not say the inquiry was rejected, and it does not send the email again. Until the lease expires, a duplicate receives `INQUIRY_PROCESSING`. After that, the record becomes `unknown` if Redis still has it. If Redis lost the key, a later request can send another email. That residual risk remains until the real database is tested.
+
+Storage errors before delivery return `503` `INQUIRY_STORAGE_UNAVAILABLE` and do not send mail. Responses stay generic. They do not include Redis keys, fingerprints, IP hashes, tokens, or provider bodies. Every response still sends `Cache-Control: no-store`.
 
 ## Security limitations
 
 - The endpoint does not verify that an email inbox exists.
 - The endpoint does not fetch or inspect reference URLs.
 - Origin checks apply to browser `Origin` headers. A non-browser client can omit that header; production rejects the omission, and development allows it for local testing.
-- Rate limiting does not run in production yet. The unavailable limiter blocks delivery rather than pretending a limit was enforced.
-- Turning `INQUIRY_SUBMISSIONS_ENABLED` on does not create a successful submission while delivery and the production limiter stay unavailable.
+- The public route still uses the unavailable rate limiter and the unavailable delivery adapter. Redis and Brevo credentials do not attach those adapters.
+- Turning `INQUIRY_SUBMISSIONS_ENABLED` on does not create a successful submission while those production adapters stay unavailable.
 - Honeypot hits use the same generic `400` body as other bad requests. They are not stored.
 - This phase does not add a database, connect the wizard, or enable the public route to send mail.
 

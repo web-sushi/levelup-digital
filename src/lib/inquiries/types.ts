@@ -28,6 +28,12 @@ export type InquiryErrorCode =
   | "RATE_LIMITED"
   | "RATE_LIMIT_UNAVAILABLE"
   | "DELIVERY_UNAVAILABLE"
+  | "DELIVERY_OUTCOME_UNKNOWN"
+  | "IDEMPOTENCY_PERSISTENCE_FAILED"
+  | "INVALID_IDEMPOTENCY_KEY"
+  | "IDEMPOTENCY_CONFLICT"
+  | "INQUIRY_PROCESSING"
+  | "INQUIRY_STORAGE_UNAVAILABLE"
   | "SUBMISSIONS_UNAVAILABLE"
   | "METHOD_NOT_ALLOWED"
   | "INTERNAL_ERROR";
@@ -83,6 +89,34 @@ export interface InquiryRateLimiter {
   consume(clientKey: string): Promise<RateLimitResult>;
 }
 
+export type IdempotencyBeginResult =
+  | { status: "claimed"; owner: string }
+  | { status: "processing" }
+  | { status: "replay_accepted"; confirmation?: "accepted" | "rejected" | "unknown" }
+  | { status: "replay_rejected" }
+  | { status: "replay_unknown" }
+  | { status: "conflict" }
+  | { status: "limited"; retryAfterSeconds: number }
+  | { status: "unavailable" };
+
+export type IdempotencyFinalizeResult = "finalized" | "not_owner" | "unavailable";
+
+export interface InquiryIdempotency {
+  begin(input: {
+    clientHash: string;
+    idempotencyHash: string;
+    fingerprint: string;
+    owner: string;
+  }): Promise<IdempotencyBeginResult>;
+  finalize(input: {
+    idempotencyHash: string;
+    owner: string;
+    state: "accepted" | "rejected" | "unknown";
+    confirmation: "accepted" | "rejected" | "unknown" | "-";
+    category: string;
+  }): Promise<IdempotencyFinalizeResult>;
+}
+
 export type InquiryRuntime = {
   submissionsEnabled: boolean;
   trustedOrigins: readonly string[];
@@ -90,4 +124,7 @@ export type InquiryRuntime = {
   rateLimitKeySecret: string | null;
   rateLimiter: InquiryRateLimiter;
   delivery: InquiryDelivery;
+  /** Present only in tests or a future activation phase. The public runtime leaves this unset. */
+  idempotency?: InquiryIdempotency | null;
+  idempotencyKeySecret?: string | null;
 };
