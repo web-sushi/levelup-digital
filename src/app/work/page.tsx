@@ -1,17 +1,20 @@
 import Image from "next/image";
 import Link from "next/link";
+import { ProjectStatusBadge } from "@/components/portfolio/ProjectStatusBadge";
 import {
-  getClientProjects,
-  getConceptProjects,
-  groupProjectsByCategory,
-} from "@/content/projects/projects";
+  CLIENT_IMAGE_HEIGHT,
+  CLIENT_IMAGE_WIDTH,
+  clientProjects,
+} from "@/content/projects/client-work";
+import type { ClientProject } from "@/content/projects/client-work";
+import { getConceptProjects, groupProjectsByCategory } from "@/content/projects/projects";
 import type { PortfolioProject } from "@/content/projects/types";
 import { createPageMetadata } from "@/lib/metadata";
 
 export const metadata = createPageMetadata({
   title: "Work",
   description:
-    "Concept Lab demos and client project space for LevelUp Digital.",
+    "Real client projects and Concept Lab demos for LevelUp Digital, including travel platforms in development and in market.",
   path: "/work",
 });
 
@@ -24,6 +27,40 @@ function WorkBars() {
       <rect x="84" y="12" width="18" height="60" fill="#FFFFFF" />
       <rect x="112" y="0" width="18" height="72" fill="#00F050" />
     </svg>
+  );
+}
+
+function ClientPiece({ project, flip = false }: { project: ClientProject; flip?: boolean }) {
+  return (
+    <article className={flip ? "work-client work-client-flip" : "work-client"}>
+      <Link href={`/work/${project.slug}`} className="work-client-link focus-ring">
+        <span className="work-media">
+          <Image
+            src={project.hero.src}
+            alt={project.hero.alt}
+            width={CLIENT_IMAGE_WIDTH}
+            height={CLIENT_IMAGE_HEIGHT}
+            className="work-image"
+            sizes="(max-width: 1024px) 100vw, 72rem"
+            priority={project.number === "01"}
+          />
+        </span>
+        <span className="work-client-copy">
+          <span className="work-meta">
+            <span className="work-index" aria-hidden="true">
+              {project.number}
+            </span>
+            <span>{project.category}</span>
+            <ProjectStatusBadge status={project.status} />
+          </span>
+          <h3>{project.title}</h3>
+          <p className="work-summary">{project.summary}</p>
+          <span className="work-go">
+            View case study <span aria-hidden="true">→</span>
+          </span>
+        </span>
+      </Link>
+    </article>
   );
 }
 
@@ -82,7 +119,6 @@ function WorkPiece({
 }
 
 export default function WorkPage() {
-  const clientProjects = getClientProjects();
   const conceptProjects = getConceptProjects();
   const grouped = groupProjectsByCategory(conceptProjects);
   const total = conceptProjects.length;
@@ -117,24 +153,16 @@ export default function WorkPage() {
             Client projects
           </h2>
           <p className="work-lead">
-            Published work for real clients appears here with owner-approved
-            details. The repository does not currently include verified client
-            case studies to migrate.
+            Commissioned platforms, kept separate from the Concept Lab demos
+            below.
           </p>
-          {clientProjects.length === 0 ? (
-            <p className="work-empty" role="status">
-              No client projects are listed yet. Concept demos below are
-              illustrative builds hosted externally, not live client engagements.
-            </p>
-          ) : (
-            <ul className="work-group-list">
-              {clientProjects.map((project) => (
-                <li key={project.slug}>
-                  <WorkPiece project={project} />
-                </li>
-              ))}
-            </ul>
-          )}
+          <ul className="work-client-list">
+            {clientProjects.map((project, index) => (
+              <li key={project.slug}>
+                <ClientPiece project={project} flip={index % 2 === 1} />
+              </li>
+            ))}
+          </ul>
         </div>
       </section>
 
