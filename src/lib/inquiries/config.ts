@@ -19,6 +19,7 @@ export function createInquiryRuntime(env: NodeJS.ProcessEnv = process.env): Inqu
     allowDevelopmentOrigins: env.NODE_ENV === "development",
     rateLimitKeySecret: rateLimitSecret(env.INQUIRY_RATE_LIMIT_KEY_SECRET),
     rateLimiter: new UnavailableRateLimiter(),
+    // Credentials must not select a sender. Brevo stays unwired until rate limiting and a verified sender are ready.
     delivery: new UnavailableInquiryDelivery(),
   };
 }

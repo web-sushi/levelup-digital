@@ -98,6 +98,10 @@ export async function handleInquiryPost(request: Request, runtime: InquiryRuntim
       return errorResponse(503, "DELIVERY_UNAVAILABLE", messages.unavailable);
     }
 
+    if (delivery.confirmation) {
+      return inquiryJson(200, { ok: true, confirmation: delivery.confirmation });
+    }
+
     return inquiryJson(200, { ok: true });
   } catch {
     console.error("inquiry request failed");

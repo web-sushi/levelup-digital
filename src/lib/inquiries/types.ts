@@ -41,12 +41,34 @@ export type InquiryErrorBody = {
 
 export type InquirySuccessBody = {
   ok: true;
+  /**
+   * Present when the delivery adapter reports the customer confirmation separately.
+   * `accepted` means Brevo accepted the confirmation request. It does not prove inbox delivery.
+   */
+  confirmation?: "accepted" | "rejected" | "unknown";
 };
 
+export type DeliveryFailureCategory =
+  | "configuration"
+  | "authentication"
+  | "invalid_sender"
+  | "rejected"
+  | "rate_limited"
+  | "provider_error"
+  | "network"
+  | "timeout"
+  | "malformed_response";
+
 export type DeliveryResult =
-  | { status: "accepted" }
-  | { status: "unavailable" }
-  | { status: "rejected" };
+  | {
+      status: "accepted";
+      confirmation?: "accepted" | "rejected" | "unknown";
+      /** Internal only. The public response must not include this category. */
+      confirmationCategory?: DeliveryFailureCategory;
+    }
+  | { status: "unavailable"; category?: DeliveryFailureCategory }
+  | { status: "rejected"; category?: DeliveryFailureCategory }
+  | { status: "unknown"; category?: DeliveryFailureCategory };
 
 export interface InquiryDelivery {
   deliver(inquiry: ValidatedInquiry): Promise<DeliveryResult>;
