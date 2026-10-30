@@ -899,3 +899,211 @@ body {
   justify-content: center;
   margin-top: 1.75rem;
 }
+
+.page-link-button-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.75rem;
+  margin-top: 1.25rem;
+  padding: 0.625rem 1.125rem;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--color-accent-secondary);
+  background: transparent;
+  border: 1px solid color-mix(in srgb, var(--color-accent-secondary) 50%, transparent);
+}
+
+.concept-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.concept-card-actions .page-link-button,
+.concept-card-actions .page-link-button-secondary {
+  margin-top: 0.75rem;
+}
+
+.case-study-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  margin-bottom: 0.75rem;
+}
+
+.case-study-back {
+  color: var(--color-accent-primary);
+  text-decoration: none;
+}
+
+.case-study-disclaimer {
+  margin-top: 1rem;
+  max-width: 42rem;
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  line-height: 1.6;
+}
+
+.case-study-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.case-study-hero-actions .page-link-button,
+.case-study-hero-actions .page-link-button-secondary {
+  margin-top: 0;
+}
+
+.case-study-preview {
+  position: relative;
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background: color-mix(in srgb, var(--color-surface) 85%, black);
+  border: 1px solid color-mix(in srgb, var(--color-text-primary) 8%, transparent);
+}
+
+.case-study-preview-desktop {
+  margin: 0;
+}
+
+.case-study-preview-image {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.case-study-preview-mobile {
+  position: absolute;
+  right: 1.25rem;
+  bottom: 1.25rem;
+  width: min(28%, 9rem);
+  margin: 0;
+  border: 1px solid color-mix(in srgb, var(--color-text-primary) 15%, transparent);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  background: var(--color-background);
+}
+
+.case-study-block-list {
+  display: grid;
+  gap: 1rem;
+  margin: 1.25rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (min-width: 768px) {
+  .case-study-block-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.case-study-block-list .page-card h3 {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.case-study-block-list .page-card p {
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  line-height: 1.55;
+}
+
+.case-study-process {
+  margin: 1.25rem 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 1.25rem;
+}
+
+.case-study-process-step {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 1rem;
+  align-items: start;
+}
+
+.case-study-process-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--color-background);
+  background: var(--color-accent-primary);
+}
+
+.case-study-process-step h3 {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.case-study-process-step p {
+  margin-top: 0.35rem;
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  line-height: 1.55;
+}
+
+.case-study-prose p + p {
+  margin-top: 1rem;
+}
+
+.case-study-related-list {
+  display: grid;
+  gap: 1rem;
+  margin: 1.25rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (min-width: 768px) {
+  .case-study-related-list {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.case-study-related-card {
+  display: block;
+  height: 100%;
+  text-decoration: none;
+  color: inherit;
+}
+
+.case-study-related-card h3 {
+  margin-top: 0.5rem;
+  font-size: 1.0625rem;
+  font-weight: 600;
+}
+
+.case-study-related-card p {
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  line-height: 1.55;
+}
+
+.case-study-cta {
+  text-align: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .case-study-preview-mobile {
+    box-shadow: none;
+  }
+}

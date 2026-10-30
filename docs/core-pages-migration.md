@@ -31,11 +31,15 @@ Legacy HTML pricing is unchanged under `legacy/`.
 
 All eleven legacy demo URLs are in `portfolioProjects` with matching slugs.
 
+## Phase 01C-B (case studies + redirects)
+
+- `/work/[slug]` — eleven static concept case studies (`src/app/work/[slug]/page.tsx`)
+- Section content — `src/content/projects/case-study-details.ts` (from legacy `project-*.html`)
+- Eighteen permanent `.html` redirects — `next.config.ts` (see `docs/route-migration-plan.md`)
+
 ## Known gaps
 
 - Inquiry wizard + Brevo (`src/components/contact/InquiryWizard.tsx`) — not implemented
-- `.html` redirects — not enabled
-- Eleven `project-*.html` case study routes — Phase 01C-B
 - Sitemap / structured data — later phase
 - Privacy policy — owner/legal review required (Netlify → Brevo, emails, dates)
 

@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import type { PortfolioProject } from "@/content/projects/types";
 
 type ConceptProjectCardProps = {
@@ -33,7 +34,11 @@ export function ConceptProjectCard({ project }: ConceptProjectCardProps) {
           <span>{project.tier}</span>
           <span className="concept-badge">Concept</span>
         </p>
-        <h3 className="concept-card-title">{project.title}</h3>
+        <h3 className="concept-card-title">
+          <Link href={`/work/${project.slug}`} className="focus-ring">
+            {project.title}
+          </Link>
+        </h3>
         <p className="concept-card-summary">{project.summary}</p>
         {project.tags && project.tags.length > 0 ? (
           <ul className="concept-card-tags" aria-label="Demo themes">
@@ -42,14 +47,19 @@ export function ConceptProjectCard({ project }: ConceptProjectCardProps) {
             ))}
           </ul>
         ) : null}
-        <a
-          href={project.demoUrl}
-          className="page-link-button focus-ring"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          View live demo ↗
-        </a>
+        <div className="concept-card-actions">
+          <Link href={`/work/${project.slug}`} className="page-link-button focus-ring">
+            View case study
+          </Link>
+          <a
+            href={project.demoUrl}
+            className="page-link-button-secondary focus-ring"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Live demo ↗
+          </a>
+        </div>
       </div>
     </article>
   );

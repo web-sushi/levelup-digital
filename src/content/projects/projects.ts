@@ -1,4 +1,5 @@
-import type { PortfolioProject } from "@/content/projects/types";
+import { caseStudyDetails } from "@/content/projects/case-study-details";
+import type { CaseStudyDetail, PortfolioProject } from "@/content/projects/types";
 
 /** All eleven legacy demo sites are concept work (external GitHub Pages demos). */
 export const portfolioProjects: PortfolioProject[] = [
@@ -174,4 +175,39 @@ export function groupProjectsByCategory(projects: PortfolioProject[]) {
     acc[project.category].push(project);
     return acc;
   }, {});
+}
+
+export function getProjectBySlug(slug: string): PortfolioProject | undefined {
+  return portfolioProjects.find((p) => p.slug === slug && p.status === "published");
+}
+
+export function getCaseStudyDetail(slug: string): CaseStudyDetail | undefined {
+  return caseStudyDetails[slug];
+}
+
+export function getPublishedConceptSlugs(): string[] {
+  return portfolioProjects
+    .filter((p) => p.kind === "concept" && p.status === "published")
+    .map((p) => p.slug);
+}
+
+/** Same-category concept demos first, then others — stable slug order, excludes current. */
+export function getRelatedConceptProjects(
+  slug: string,
+  limit = 3,
+): PortfolioProject[] {
+  const current = getProjectBySlug(slug);
+  if (!current) {
+    return [];
+  }
+
+  const concepts = getConceptProjects().filter((p) => p.slug !== slug);
+  const sameCategory = concepts
+    .filter((p) => p.category === current.category)
+    .sort((a, b) => a.slug.localeCompare(b.slug));
+  const other = concepts
+    .filter((p) => p.category !== current.category)
+    .sort((a, b) => a.slug.localeCompare(b.slug));
+
+  return [...sameCategory, ...other].slice(0, limit);
 }

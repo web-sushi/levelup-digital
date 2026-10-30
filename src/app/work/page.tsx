@@ -57,8 +57,9 @@ export default function WorkPage() {
           <h2 className="page-section-title">Concept Lab</h2>
           <p className="page-section-intro">
             Eleven interactive demos across niches and build tiers (Basic,
-            Standard, Pro). Each opens on an external demo site maintained for
-            exploration — not a production client URL.
+            Standard, Pro). Open a case study for structure and details, then
+            follow through to the external GitHub Pages demo — not a production
+            client URL.
           </p>
           {Object.entries(grouped).map(([category, projects]) => (
             <div key={category} style={{ marginTop: "2.5rem" }}>
