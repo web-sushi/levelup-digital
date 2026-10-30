@@ -1,70 +1,99 @@
 import Image from "next/image";
 import Link from "next/link";
-import { homepageFeaturedProjectSlugs } from "@/content/homepage";
-import { getProjectBySlug } from "@/content/projects/projects";
+import { ProjectStatusBadge } from "@/components/portfolio/ProjectStatusBadge";
+import {
+  CLIENT_IMAGE_HEIGHT,
+  CLIENT_IMAGE_WIDTH,
+  clientProjects,
+  type ClientProject,
+} from "@/content/projects/client-work";
 
 export function HomeSelectedWork() {
-  const projects = homepageFeaturedProjectSlugs
-    .map((slug) => getProjectBySlug(slug))
-    .filter((project): project is NonNullable<typeof project> => Boolean(project));
-
-  const [featured, ...supporting] = projects;
-
-  if (!featured) {
-    return null;
-  }
-
   return (
     <section className="home-work" aria-labelledby="home-work-heading">
       <div className="site-container">
-        <h2 id="home-work-heading" className="home-section-title">
-          Selected work
-        </h2>
-        <p className="home-section-lead">
-          Concept projects are illustrative demos, not verified client engagements.
-          Open a case study, then the live demo.
-        </p>
-        <div className="home-work-stage">
-          <ProjectFeature project={featured} priority />
-          <div className="home-work-support">
-            {supporting.map((project) => (
-              <ProjectFeature key={project.slug} project={project} />
-            ))}
-          </div>
+        <div className="home-work-intro">
+          <p className="home-work-kicker">
+            Selected work <span aria-hidden="true">/ 2026</span>
+          </p>
+          <h2 id="home-work-heading" className="home-work-title">
+            <span>Real projects.</span>
+            <span className="home-work-accent">Real solutions.</span>
+          </h2>
+          <p>
+            LevelUp Digital builds websites and custom applications for real
+            businesses.
+          </p>
         </div>
-        <Link href="/work" className="page-inline-cta focus-ring">
-          View all concept demos
-        </Link>
+
+        <ol className="home-work-list">
+          {clientProjects.map((project, index) => (
+            <li key={project.slug}>
+              <ClientFeature project={project} flipped={index % 2 === 1} />
+            </li>
+          ))}
+        </ol>
+
+        <div className="home-work-lab">
+          <div>
+            <h3>Beyond client work.</h3>
+            <p>
+              Explore interface concepts and experimental website designs created
+              to demonstrate different approaches to digital experiences. These
+              pieces are concepts, not client work.
+            </p>
+          </div>
+          <Link href="/work#work-lab-heading" className="home-work-lab-link focus-ring">
+            Explore the Concept Lab <span aria-hidden="true">↗</span>
+          </Link>
+        </div>
       </div>
     </section>
   );
 }
 
-function ProjectFeature({
+function ClientFeature({
   project,
-  priority = false,
+  flipped,
 }: {
-  project: NonNullable<ReturnType<typeof getProjectBySlug>>;
-  priority?: boolean;
+  project: ClientProject;
+  flipped: boolean;
 }) {
   return (
-    <article className={priority ? "home-work-feature" : "home-work-item"}>
+    <article className={flipped ? "home-work-project home-work-project-flip" : "home-work-project"}>
       <Link href={`/work/${project.slug}`} className="home-work-link focus-ring">
-        <Image
-          src={project.imageDesktop}
-          alt={`${project.title} desktop concept preview`}
-          width={960}
-          height={454}
-          className="home-work-image"
-          sizes={priority ? "(max-width: 1024px) 100vw, 62vw" : "(max-width: 1024px) 100vw, 30vw"}
-          priority={priority}
-        />
-        <p className="home-work-kicker">
-          <span>{project.category}</span>
-          <span className="home-work-concept">Concept project</span>
-        </p>
-        <h3>{project.title}</h3>
-        <span className="home-work-go">View case study</span>
+        <span className="home-work-heading">
+          <span className="home-work-number" aria-hidden="true">
+            {project.number}
+          </span>
+          <span className="home-work-meta">
+            <span>{project.category}</span>
+            <ProjectStatusBadge status={project.status} />
+          </span>
+          <h3>{project.title}</h3>
+        </span>
+        <span className="home-work-body">
+          <p>{project.summary}</p>
+          <ul className="home-work-points">
+            {project.highlights.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </ul>
+          <span className="home-work-go">
+            View case study <span aria-hidden="true">→</span>
+          </span>
+        </span>
+        <span className="home-work-media">
+          <Image
+            src={project.hero.src}
+            alt={project.hero.alt}
+            width={CLIENT_IMAGE_WIDTH}
+            height={CLIENT_IMAGE_HEIGHT}
+            className="home-work-image"
+            sizes="(max-width: 1024px) 100vw, 58vw"
+            priority={project.number === "01"}
+          />
+        </span>
       </Link>
     </article>
   );

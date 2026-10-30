@@ -1,10 +1,3 @@
-/** Concept demos highlighted on the homepage — must exist in portfolioProjects. */
-export const homepageFeaturedProjectSlugs = [
-  "tour-standard",
-  "cafe-standard",
-  "photo-standard",
-] as const;
-
 export type HomepageServiceOverview = {
   title: string;
   description: string;

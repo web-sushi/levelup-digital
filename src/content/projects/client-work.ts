@@ -24,6 +24,7 @@ export type ClientProject = {
   category: string;
   status: "In development" | "Launched";
   summary: string;
+  highlights: string[];
   introduction: string;
   hero: ClientImage;
   overview: string[];
@@ -54,6 +55,14 @@ export const clientProjects: ClientProject[] = [
     status: "In development",
     summary:
       "A custom travel platform combining tour discovery, transfers, experiences, custom trip planning, booking workflows, enquiries, quotations, eSIM services, and administrative operations.",
+    highlights: [
+      "Tour discovery",
+      "Regional tour filters",
+      "Custom tour builder",
+      "Booking workflows",
+      "Enquiries and quotations",
+      "Operations dashboard",
+    ],
     introduction:
       "Enjoy Travel & Tours is a Japan travel platform in development. The public site introduces tours, experiences, transfers, vehicles, eSIM plans, and a custom tour builder. An operations console is being built alongside it for bookings, enquiries, quotations, and fulfillment.",
     hero: shot(
@@ -160,6 +169,15 @@ export const clientProjects: ClientProject[] = [
     status: "Launched",
     summary:
       "A custom booking platform for private tours and airport transfers, featuring vehicle selection, flexible payment options, online checkout, and administrative management tools.",
+    highlights: [
+      "Private tour discovery",
+      "Transfer services",
+      "Vehicle selection",
+      "Shopping cart",
+      "Flexible deposit payments",
+      "Stripe checkout",
+      "Admin management",
+    ],
     introduction:
       "Mark Maeda Travel & Tour is a launched booking platform for private tours and airport transfers. Travelers browse tours, choose places and a vehicle, and check out online. Staff manage the catalog from an admin area.",
     hero: shot(

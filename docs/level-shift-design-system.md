@@ -101,7 +101,7 @@ The homepage is five contrasting bands, then a footer signature. The Services pa
 
 1. Black editorial hero — two-line display headline, supporting service copy, two CTAs, and a five-bar geometric field.
 2. Charcoal services — four numbered rows from `homepageServiceOverview`, one link to `/services`.
-3. Black selected work — one large concept project and two supporting projects (`tour-standard`, `cafe-standard`, `photo-standard`).
+3. Black selected work — the two real client projects, then a separate invitation to the Concept Lab.
 4. Charcoal studio — cropped portrait, one cobalt vertical bar, link to `/about`.
 5. Full-width electric-green close — near-black type, near-black button with white text to `/contact`.
 
@@ -128,11 +128,11 @@ Each row is one link. Destinations:
 
 ### Project showcase
 
-At 1024px and up, the stage is 8 / 4. The featured title is larger than the two supporting titles. Screenshots stay at 960×454 and are not cropped. Each block is one link to `/work/[slug]` and always shows “Concept project” and “View case study”.
+Selected work leads with the two commissioned projects from `clientProjects`. Each block is one link to its case study, with an oversized number, the project category, a status badge, the existing summary, a short capability list, and the published homepage WebP at 1600×742. From 1024px, Enjoy Travel sits text-left and image-right. Mark Maeda reverses that. Below that, “Beyond client work.” links to `/work#work-lab-heading` and labels those pieces as concepts.
 
 ### Cobalt
 
-One vertical cobalt bar beside the studio portrait. A decorative `04` sits above the studio heading and is hidden from assistive technology. No other blue decoration on the homepage.
+One vertical cobalt bar beside the studio portrait. A decorative `04` sits above the studio heading and is hidden from assistive technology. The second homepage project uses a cobalt rule and cobalt ticks so the two client features are not identical.
 
 ### Footer signature
 
