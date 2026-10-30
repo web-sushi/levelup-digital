@@ -7,34 +7,34 @@ type ProjectPreviewProps = {
 
 export function ProjectPreview({ project }: ProjectPreviewProps) {
   return (
-    <section className="page-section" aria-labelledby="project-preview-heading">
+    <section className="concept-study-stage-wrap" aria-labelledby="project-preview-heading">
       <div className="site-container">
-        <h2 id="project-preview-heading" className="page-section-title">
+        <h2 id="project-preview-heading" className="concept-study-kicker">
           Demo preview
         </h2>
-        <p className="page-section-intro">
+        <p className="concept-study-stage-note">
           Desktop and mobile layouts from the migrated concept demo screenshots.
         </p>
-        <div className="case-study-preview">
-          <figure className="case-study-preview-desktop">
+        <div className="concept-study-stage">
+          <figure className="concept-study-desktop">
             <Image
               src={project.imageDesktop}
               alt={`${project.title} desktop layout preview`}
               width={960}
               height={454}
-              className="case-study-preview-image"
-              sizes="(max-width: 900px) 100vw, 960px"
+              className="concept-study-image"
+              sizes="(max-width: 1023px) 92vw, 68rem"
               priority
             />
           </figure>
-          <figure className="case-study-preview-mobile">
+          <figure className="concept-study-mobile">
             <Image
               src={project.imageMobile}
               alt={`${project.title} mobile layout preview`}
               width={320}
               height={420}
-              className="case-study-preview-image"
-              sizes="240px"
+              className="concept-study-image"
+              sizes="(max-width: 1023px) 70vw, 13rem"
             />
           </figure>
         </div>

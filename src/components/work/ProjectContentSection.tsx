@@ -6,6 +6,7 @@ type ProjectContentSectionProps = {
   intro?: string;
   items: ProjectContentBlock[];
   variant?: "default" | "surface";
+  shift?: boolean;
 };
 
 export function ProjectContentSection({
@@ -14,6 +15,7 @@ export function ProjectContentSection({
   intro,
   items,
   variant = "default",
+  shift = false,
 }: ProjectContentSectionProps) {
   if (items.length === 0) {
     return null;
@@ -22,23 +24,28 @@ export function ProjectContentSection({
   return (
     <section
       className={
-        variant === "surface" ? "page-section page-section-surface" : "page-section"
+        variant === "surface"
+          ? "concept-study-band concept-study-band-surface"
+          : "concept-study-band"
       }
       aria-labelledby={id}
     >
       <div className="site-container">
-        <h2 id={id} className="page-section-title">
+        <h2 id={id} className="concept-study-heading">
           {title}
         </h2>
-        {intro ? <p className="page-section-intro">{intro}</p> : null}
-        <ul className="case-study-block-list">
-          {items.map((item) => (
-            <li key={item.title} className="page-card">
+        {intro ? <p className="concept-study-lead">{intro}</p> : null}
+        <ol className={shift ? "concept-study-rows concept-study-rows-shift" : "concept-study-rows"}>
+          {items.map((item, index) => (
+            <li key={item.title}>
+              <span className="concept-study-index" aria-hidden="true">
+                {String(index + 1).padStart(2, "0")}
+              </span>
               <h3>{item.title}</h3>
               <p>{item.description}</p>
             </li>
           ))}
-        </ul>
+        </ol>
       </div>
     </section>
   );

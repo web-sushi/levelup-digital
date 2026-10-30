@@ -168,7 +168,7 @@ Hover only: service rule, arrow translate, case-study label color. No scroll ani
 - Each project is one link to its case study and shows the category, a visible “Concept project” label, and a decorative `01 / 11` index.
 - Screenshots stay at 960×454 through `next/image`. Hover scales the image slightly, moves the arrow, and turns the top rule and title green. `prefers-reduced-motion` removes those transforms.
 - The close is a charcoal band, not the homepage green field, and links to `/contact`.
-- Individual case-study pages are unchanged.
+- Concept case studies use the shared Level Shift template in Phase LS-07C. Real-client case studies stay on their own pages.
 
 ## About page (Phase LS-07B)
 
@@ -181,8 +181,19 @@ Hover only: service rule, arrow translate, case-study label color. No scroll ani
 - Approach: Understand, Design, Build, Refine & Launch, described as a usual way of working rather than a fixed contract. “Who I work best with” keeps the previous four points.
 - Close: near-black, with links to `/contact` and `/work`. Copy points to email, WhatsApp, and social channels.
 
+## Concept case studies (Phase LS-07C)
+
+All 11 concept routes use `src/app/work/[slug]/page.tsx` and the components in `src/components/work/`. Styles are prefixed `concept-study-`. Real-client pages are separate and unchanged.
+
+- The hero shows Concept Lab, the published project number, the category, the existing title and summary, and a visible “Concept project” label. The live demo URL is unchanged. “All work” returns to `/work`.
+- Desktop and mobile screenshots keep their original files and aspect ratios. From 1024px the phone sits beside the desktop image. Below that, they stack.
+- Overview, website sections, features, benefits, process, and customization still come from `case-study-details.ts`. Empty lists render nothing.
+- Related links stay inside the Concept Lab and use the same thumbnail treatment as the Work index.
+- The close links to `/contact` and `/work`. Copy treats the demos as possibilities, not products for sale.
+- Clinic Standard keeps its existing note that demo features are not verified HIPAA compliance or live healthcare integrations.
+
 ## Future considerations
 
-- Case studies and Contact still use the foundation type and buttons, not this homepage composition. About has its own editorial composition (Phase LS-07B).
+- Real-client case studies and Contact still use their existing compositions. Concept case studies use the shared template from Phase LS-07C. About has its own editorial composition (Phase LS-07B).
 - Do not add a motion library for the mark; it should read while static.
 - Favicon is still the previous mark.
