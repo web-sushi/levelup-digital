@@ -16,17 +16,19 @@ export function HomeServicesIntro() {
         </p>
         <ol className="home-service-list">
           {homepageServiceOverview.map((service, index) => (
-            <li key={service.title} className="home-service-row">
-              <span className="home-service-index" aria-hidden="true">
-                {String(index + 1).padStart(2, "0")}
-              </span>
-              <div className="home-service-copy">
-                <h3>{service.title}</h3>
-                <p>{service.description}</p>
-              </div>
-              <span className="home-service-arrow" aria-hidden="true">
-                →
-              </span>
+            <li key={service.title}>
+              <Link href={service.href} className="home-service-row focus-ring">
+                <span className="home-service-index" aria-hidden="true">
+                  {String(index + 1).padStart(2, "0")}
+                </span>
+                <div className="home-service-copy">
+                  <h3 className="home-service-title">{service.title}</h3>
+                  <p className="home-service-description">{service.description}</p>
+                </div>
+                <span className="home-service-arrow" aria-hidden="true">
+                  →
+                </span>
+              </Link>
             </li>
           ))}
         </ol>

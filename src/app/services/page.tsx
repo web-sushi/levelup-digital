@@ -74,7 +74,7 @@ export default function ServicesPage() {
         </div>
       </section>
 
-      <section className="page-section">
+      <section id="business-websites" className="page-section">
         <div className="site-container">
           <h2 className="page-section-title">Website build levels</h2>
           <p className="page-section-intro">
@@ -139,14 +139,14 @@ export default function ServicesPage() {
         </div>
       </section>
 
-      <section className="page-section page-section-surface">
+      <section id="custom-web-applications" className="page-section page-section-surface">
         <div className="site-container">
           <h2 className="page-section-title">Custom web applications</h2>
           <p className="page-section-intro">
             Separate from fixed website packages. Capabilities are scoped per
             project — not all items below are included in the Pro starting price.
           </p>
-          <ul className="page-prose">
+          <ul id="booking-and-payments" className="page-prose">
             <li>Business websites and product-style web experiences</li>
             <li>Custom web applications</li>
             <li>Booking and reservation systems</li>
@@ -186,7 +186,7 @@ export default function ServicesPage() {
         </div>
       </section>
 
-      <section className="page-section page-section-surface">
+      <section id="website-improvements" className="page-section page-section-surface">
         <div className="site-container">
           <h2 className="page-section-title">Optional add-ons</h2>
           <div className="page-grid-2">

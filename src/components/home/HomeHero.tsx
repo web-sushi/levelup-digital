@@ -22,7 +22,12 @@ export function HomeHero() {
     <section className="home-hero" aria-labelledby="home-hero-heading">
       <div className="site-container home-hero-grid">
         <h1 id="home-hero-heading" className="home-hero-title">
-          <span className="home-hero-line">We don&apos;t just build.</span>
+          <span className="home-hero-line">
+            We don&apos;t
+            <span className="home-hero-gap"> </span>
+            <br className="home-hero-br" />
+            just build.
+          </span>
           <span className="home-hero-line home-hero-line-accent">We level up.</span>
         </h1>
         <div className="home-hero-copy">

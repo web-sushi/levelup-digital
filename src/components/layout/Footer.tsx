@@ -1,12 +1,7 @@
 import Link from "next/link";
 import { Mail, MessageCircle } from "lucide-react";
 import { LevelMark } from "@/components/brand/LevelMark";
-import {
-  legacyFooterDescription,
-  primaryNavLinks,
-  projectCta,
-  verifiedContactLinks,
-} from "@/lib/nav";
+import { primaryNavLinks, projectCta, verifiedContactLinks } from "@/lib/nav";
 
 export function Footer() {
   const year = new Date().getFullYear();
@@ -22,7 +17,10 @@ export function Footer() {
               <span className="footer-logo-sub">Digital</span>
             </span>
           </p>
-          <p className="footer-description">{legacyFooterDescription}</p>
+          <p className="footer-description">
+            A studio for business websites, custom web applications, and booking
+            and payment-enabled digital solutions.
+          </p>
           <Link href={projectCta.href} className="footer-cta-link focus-ring">
             {projectCta.label}
             <span aria-hidden> ↗</span>
@@ -105,6 +103,9 @@ export function Footer() {
           </ul>
         </div>
       </div>
+      <p className="footer-signature" aria-hidden="true">
+        LEVELUP
+      </p>
       <div className="site-container footer-bottom">
         <p>© {year} LevelUp Digital. All rights reserved.</p>
       </div>

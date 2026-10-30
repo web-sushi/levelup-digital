@@ -91,9 +91,13 @@ The favicon is unchanged.
 - Decorative marks are hidden from assistive technology.
 - Do not set long text in `#00F050` on `#050505`.
 
-## Homepage composition (Phase 02C)
+## Creative balance
 
-The homepage is five contrasting bands. Section layouts on inner pages are unchanged.
+Level Shift is about 60% creative agency and 40% software studio. Display type, the five-bar field, and the green close carry the creative side. Service copy, concept-project labels, and the footer description carry the engineering side: websites, custom applications, and booking or payment systems, scoped in discovery.
+
+## Homepage composition (Phase 02C, refined in 02C.1)
+
+The homepage is five contrasting bands, then a footer signature. Inner page layouts are unchanged except stable Services anchors.
 
 1. Black editorial hero — two-line display headline, supporting service copy, two CTAs, and a five-bar geometric field.
 2. Charcoal services — four numbered rows from `homepageServiceOverview`, one link to `/services`.
@@ -105,19 +109,30 @@ The LevelMark motif appears as the hero artwork (five ascending slabs). It is no
 
 ### Hero
 
-Desktop is a two-column grid: type on the left, artwork aligned to the end on the right. The second line is green. The artwork is inline SVG, `aria-hidden`, flat fills only. Below 1024px the artwork sits under the copy at a smaller width.
+The headline spans the width. Copy and CTAs sit beside the five-bar artwork, without a full-viewport gap, so the primary CTA stays in the first desktop screen. Below 1200px the first line breaks after “don’t” so the type can stay large. The second line stays green. The artwork is inline SVG, `aria-hidden`, flat fills only.
 
 ### Service rows
 
-Ordered list. The index is visual; the list itself exposes order to assistive technology. Hover lengthens a green rule and shifts a decorative arrow. Rows are not links. Motion is a color and width transition covered by the global reduced-motion reset.
+Each row is one link. Destinations:
+
+- Business Websites → `/services#business-websites`
+- Custom Web Applications → `/services#custom-web-applications`
+- Booking & Payment Systems → `/services#booking-and-payments`
+- Website Improvements & Maintenance → `/services#website-improvements`
+
+`scroll-padding-top` on `html` clears the sticky header. Descriptions use `#C8C8C8` on the charcoal band. Hover and focus lengthen the green rule. There is one link per row.
 
 ### Project showcase
 
-At 1024px and up, the stage is 8 / 4. Below that, projects stack. Each block is one link to `/work/[slug]` and includes the words “Concept project” and “View case study”. Screenshots use `next/image` with intrinsic 960×454 so they are not stretched.
+At 1024px and up, the stage is 8 / 4. The featured title is larger than the two supporting titles. Screenshots stay at 960×454 and are not cropped. Each block is one link to `/work/[slug]` and always shows “Concept project” and “View case study”.
 
 ### Cobalt
 
-One vertical bar beside the studio portrait. No other blue decoration on the homepage.
+One vertical cobalt bar beside the studio portrait. A decorative `04` sits above the studio heading and is hidden from assistive technology. No other blue decoration on the homepage.
+
+### Footer signature
+
+The footer description names websites, custom applications, and booking or payment-enabled work. An oversized `LEVELUP` wordmark sits above the copyright line, `aria-hidden`, and is clipped so it does not create horizontal scroll. Contact, navigation, and privacy links are unchanged.
 
 ### Closing CTA
 

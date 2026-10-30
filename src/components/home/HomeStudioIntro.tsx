@@ -17,6 +17,9 @@ export function HomeStudioIntro() {
           />
         </div>
         <div className="home-studio-copy">
+          <p className="home-studio-index" aria-hidden="true">
+            04
+          </p>
           <h2 id="home-about-heading" className="home-section-title">
             A hands-on development studio
           </h2>
