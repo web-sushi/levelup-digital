@@ -97,7 +97,7 @@ Level Shift is about 60% creative agency and 40% software studio. Display type, 
 
 ## Homepage composition (Phase 02C, refined in 02C.1)
 
-The homepage is five contrasting bands, then a footer signature. Inner page layouts are unchanged except stable Services anchors.
+The homepage is five contrasting bands, then a footer signature. The Services page has its own editorial composition (Phase 02D). Other inner pages still use the foundation layout.
 
 1. Black editorial hero — two-line display headline, supporting service copy, two CTAs, and a five-bar geometric field.
 2. Charcoal services — four numbered rows from `homepageServiceOverview`, one link to `/services`.
@@ -146,8 +146,20 @@ Green field `#00F050`, near-black headline. The button is `#050505` with white t
 
 Hover only: service rule, arrow translate, case-study label color. No scroll animation and no animation library.
 
+## Services page (Phase 02D)
+
+`/services` uses the same tokens, type, and buttons. It does not reuse the homepage green close.
+
+- Hero: “Digital solutions.” in white, “Built to move you forward.” in green. The factual intro covers websites, custom applications, booking, payments, and scoped delivery.
+- Numbered bands: 01 Business websites (includes the three package columns), 02 Custom web applications, 03 Booking and payment systems, 04 Website improvements and maintenance.
+- Anchors stay `#business-websites`, `#custom-web-applications`, `#booking-and-payments`, and `#website-improvements`. `scroll-padding-top` on `html` clears the sticky header. No extra `scroll-margin` on these ids, so the offset is not doubled.
+- Prices stay From ¥50,000, From ¥100,000, and From ¥200,000. Package inclusions and the Pro quote note are unchanged. Booking and payment work stays outside those website packages.
+- Process steps stay Discovery, Build, Review, and Launch.
+- The closing band is near-black with a green button to `/contact`. Copy points to email or WhatsApp, not an inquiry form.
+- Styles are prefixed `services-` so shared page cards on other routes are unchanged.
+
 ## Future considerations
 
-- Inner pages still use the foundation type and buttons, not this homepage composition.
+- Work, case studies, About, and Contact still use the foundation type and buttons, not this homepage composition.
 - Do not add a motion library for the mark; it should read while static.
 - Favicon is still the previous mark.
