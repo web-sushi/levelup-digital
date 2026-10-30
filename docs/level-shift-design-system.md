@@ -97,7 +97,7 @@ Level Shift is about 60% creative agency and 40% software studio. Display type, 
 
 ## Homepage composition (Phase 02C, refined in 02C.1)
 
-The homepage is five contrasting bands, then a footer signature. The Services page has its own editorial composition (Phase 02D). Other inner pages still use the foundation layout.
+The homepage is five contrasting bands, then a footer signature. Services, Work, and About each have their own editorial composition. Contact still uses the foundation layout.
 
 1. Black editorial hero — two-line display headline, supporting service copy, two CTAs, and a five-bar geometric field.
 2. Charcoal services — four numbered rows from `homepageServiceOverview`, one link to `/services`.
@@ -170,8 +170,19 @@ Hover only: service rule, arrow translate, case-study label color. No scroll ani
 - The close is a charcoal band, not the homepage green field, and links to `/contact`.
 - Individual case-study pages are unchanged.
 
+## About page (Phase LS-07B)
+
+`/about` uses the same tokens, type, and buttons. Styles are prefixed `about-`. The page does not reuse the homepage green close or the five-bar hero artwork.
+
+- Hero: “Independent by design.” in white, “Built for real businesses.” in green. The label “2026” is decorative and hidden from assistive technology so it is not read as a founding date.
+- Founder: the existing portrait at `public/images/portrait.jpg` (704×1472), cropped with `object-fit: cover`. Biography, civil-engineering study, and the early music-quiz project stay as previously written. One cobalt bar sits on the portrait.
+- Philosophy: a two-line statement. The second line is cobalt and is sized as large display type. Clarity, reliability, and growth stay as values, set as type rather than cards.
+- Capabilities: four linked rows for business websites, custom applications, booking and payments, and business operations. The first three go to the matching Services anchors. Operations links to `/work`.
+- Approach: Understand, Design, Build, Refine & Launch, described as a usual way of working rather than a fixed contract. “Who I work best with” keeps the previous four points.
+- Close: near-black, with links to `/contact` and `/work`. Copy points to email, WhatsApp, and social channels.
+
 ## Future considerations
 
-- Case studies, About, and Contact still use the foundation type and buttons, not this homepage composition.
+- Case studies and Contact still use the foundation type and buttons, not this homepage composition. About has its own editorial composition (Phase LS-07B).
 - Do not add a motion library for the mark; it should read while static.
 - Favicon is still the previous mark.
