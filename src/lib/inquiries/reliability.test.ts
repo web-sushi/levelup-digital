@@ -13,6 +13,7 @@ import {
   UpstashInquiryIdempotency,
   UpstashInquiryRateLimiter,
   UpstashInquiryRedis,
+  upstashKeyScope,
 } from "@/lib/inquiries/redis-store";
 import type { InquiryDelivery, InquiryRuntime, ValidatedInquiry } from "@/lib/inquiries/types";
 
@@ -519,6 +520,32 @@ describe("Upstash adapter contract", () => {
     assert.equal(command.includes("604800"), true);
     assert.equal(command[4], "inquiry:ratelimit:v1:client-hash");
     assert.equal(calls[0]?.body.includes("example-token"), false);
+  });
+
+  it("writes a test namespace outside the production Redis prefixes", async () => {
+    const calls: string[] = [];
+    const fetchImpl = async (_url: string, init: RequestInit) => {
+      calls.push(String(init.body));
+      return new Response(JSON.stringify({ result: ["claimed"] }), { status: 200 });
+    };
+    const redis = new UpstashInquiryRedis(
+      "https://example.upstash.io",
+      "example-token",
+      fetchImpl,
+      upstashKeyScope("levelup:test:example:"),
+    );
+    const idempotency = new UpstashInquiryIdempotency(redis);
+    await idempotency.begin({
+      clientHash: "client-hash",
+      idempotencyHash: "a".repeat(64),
+      fingerprint: "b".repeat(64),
+      owner: "c".repeat(32),
+    });
+    const command = JSON.parse(calls[0] ?? "[]") as string[];
+    assert.equal(command[3], `levelup:test:example:idempotency:${"a".repeat(64)}`);
+    assert.equal(command[4], "levelup:test:example:ratelimit:client-hash");
+    assert.equal(command.some((part) => part.startsWith("inquiry:")), false);
+    assert.throws(() => upstashKeyScope("inquiry:ratelimit:v1"), /levelup:test:/);
   });
 
   it("fails closed for an HTTP Redis URL and reports unavailable storage", async () => {

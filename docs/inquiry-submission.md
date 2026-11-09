@@ -101,6 +101,8 @@ The public route still uses `UnavailableRateLimiter`. A Redis-backed limiter now
 
 The starting policy is 5 requests per hour for each client key. It is a fixed window, so a client can be allowed five times at the end of one window and five times at the start of the next. The check and increment run in one Redis `EVAL` script. That script reads Redis server time with `TIME`, builds the window id as `floor(server seconds / window seconds)`, then runs `INCR` and sets `EXPIRE` to the full window length when the counter is created. Expiration starts at the first hit. It is not aligned to a UTC hour boundary. The caller clock is not used for the live window or for the idempotency lease. The in-memory limiter used by unit tests still accepts an injected clock so those tests stay deterministic. It is not used by the route.
 
+Origin failures, malformed payloads, and honeypot hits are rejected before the limiter and before email. They cannot reach Brevo. An invalid idempotency key does consume one slot, so that header cannot be used for an unlimited probe. An accepted replay returns the stored result and does not consume another slot. Five requests an hour is a fixed window sized for a low-volume contact form. A client can still be allowed five times at the end of one window and five times at the start of the next. That burst is acceptable for this form, so the window was not replaced.
+
 Client keys come only from the first address in `x-vercel-forwarded-for`, and only when that address matches a simple IP character check. `x-forwarded-for` is ignored because a caller can set it. The address is HMAC-SHA256 hashed with `INQUIRY_RATE_LIMIT_KEY_SECRET` before it is passed to the limiter. Raw addresses are not logged.
 
 Automated tests use a small in-memory limiter inside the test file. That class is not used by the route.
@@ -172,7 +174,7 @@ A timeout, a network error, or an HTTP 201 body without a usable `messageId` is 
 
 ### Idempotency
 
-Phase LS-08C.1 adds a durable idempotency store. The public route does not call it yet. Until that store is attached, repeated clicks, browser retries, and a timeout after Brevo has accepted a message can still produce more than one business notification. The handler does not retry an unknown outcome by itself.
+Phase LS-08C.1 adds a durable idempotency store. The public route does not call it yet. The isolated handler harness does. Until the store is attached to the public route, repeated clicks, browser retries, and a timeout after Brevo has accepted a message can still produce more than one business notification. The handler does not retry an unknown outcome by itself.
 
 ### Remaining production prerequisites
 
@@ -274,7 +276,7 @@ The review step asks the visitor to acknowledge that LevelUp Digital will use th
 
 The honeypot is a visually hidden `companyWebsite` input outside the tab order. It is not the business-name field.
 
-`publicInquirySubmissionsAvailable` is `false`. The contact page passes that value into the wizard, so ordinary visitors see the review, the acknowledgment, and an email link, without a send button. Tests can inject a client and a true availability flag. There is no public query parameter that pretends a submission succeeded. Turning on the page later means changing that server value after the API flag, Redis, and Brevo are ready. The client cannot override the API.
+`publicInquirySubmissionsAvailable` is `false`. The contact page passes that value into the wizard, so ordinary visitors see the review, the acknowledgment, and an email link, without a send button. Tests can inject a client and a true availability flag. There is no public query parameter that pretends a submission succeeded. The browser value cannot authorize a submission: the handler ignores it. `assessInquiryActivation` can report that the server configuration is complete, and that report does not attach Redis or Brevo. `createInquiryRuntime` still builds the unavailable limiter and the unavailable delivery adapter. There is no environment switch for a mock delivery adapter. Turning the page on later requires a separate server change after the flag, trusted HTTPS origins, distinct HMAC secrets, Redis, and Brevo are all present and the adapters are intentionally attached.
 
 ## Security limitations
 
@@ -292,7 +294,28 @@ Public email links use `verifiedContactLinks.email`, which is `mailto:levelupdig
 
 The privacy policy matches the current system on these points: the inquiry fields, the purpose of replying to an inquiry, Brevo as an inactive mail processor, the Google Analytics measurement ID used in the layout, the business mailbox, and the statement that online submission is not enabled. It does not state a retention period. The 7 day Redis marker is not a published retention period, and that store is not attached to the public route.
 
-Owner or legal review is still required before launch for the privacy contact, analytics consent or regional notices, and any retention statement. The policy names Google Analytics and does not describe the cookies that service sets or an opt-out. This phase does not add a cookie banner or a legal retention claim.
+The root layout loads Google Analytics after the page becomes interactive. The tag uses the default `gtag('config', ...)` call. The site has no consent banner, no consent-mode flag, and no inquiry data in `localStorage` or `sessionStorage`. The inquiry client does not write browser storage.
+
+Owner or legal review is still required before launch for the privacy contact, analytics consent or regional notices, and any retention statement. The policy names Google Analytics and does not describe the cookies that service sets or an opt-out. This phase does not add a cookie banner or a legal retention claim. If that review requires consent before analytics, the follow-up is to keep `GoogleAnalytics` from loading until a stored choice allows it. That is a separate change from enabling inquiries.
+
+## Handler integration
+
+`npm run test:inquiry-pipeline` calls `handleInquiryPost` with the real Upstash rate limiter and idempotency adapter, and with a mock delivery adapter. It does not call Brevo, and it is not part of `npm test`. Redis keys stay under `levelup:test:ls08d2b:` plus a random suffix. The harness deletes only those keys.
+
+On 9 November 2026 that command passed:
+
+- A wizard-mapped synthetic inquiry was accepted once. The same key and payload replayed the stored `200` result and did not deliver again.
+- An untrusted or missing origin returned `403` `FORBIDDEN_ORIGIN`. A filled honeypot returned a generic `400`. An invalid email returned `422` and the wizard client mapped it onto the email field. A short idempotency key returned `400` `INVALID_IDEMPOTENCY_KEY`. A missing platform client address returned `503` `RATE_LIMIT_UNAVAILABLE`. None of those requests were delivered.
+- Five new submissions from one synthetic client were accepted. A sixth new key was `429` `RATE_LIMITED`. Replaying the first accepted key stayed `200` and did not use another delivery.
+- Two overlapping requests with the same key produced one `200` and one `409` `INQUIRY_PROCESSING`. Only one mock delivery ran. A later change of payload returned `409` `IDEMPOTENCY_CONFLICT`.
+- Business acceptance with confirmation `accepted`, `rejected`, or `unknown` was stored and replayed without a second delivery.
+- A rejected business notification and an unknown business outcome, including a timeout category, were stored and replayed as `503` without another delivery.
+- A Redis client that could not connect returned `503` `INQUIRY_STORAGE_UNAVAILABLE` before delivery. A lost finalize response returned `503` `IDEMPOTENCY_PERSISTENCE_FAILED`, and the repeat while the lease remained returned `409` `INQUIRY_PROCESSING` without another delivery.
+- Every checked response sent `Cache-Control: no-store`.
+
+The same run kept `publicInquirySubmissionsAvailable` false. A runtime built with the submissions flag, Redis credentials, and a synthetic Brevo configuration still used `UnavailableRateLimiter` and `UnavailableInquiryDelivery`.
+
+This is not exactly-once delivery. Redis and Brevo are separate systems. The handler does not retry when the outcome is accepted, rejected, unknown, or when finalization fails after delivery. A lost Redis record, or expiry after 7 days, can allow a later send.
 
 ## Local testing
 
@@ -302,10 +325,16 @@ Run the mocked unit tests:
 npm test
 ```
 
-Run the live Upstash checks only when `.env.local` contains the Redis REST URL, the REST token, and the two distinct HMAC secrets. This command is not part of `npm test`. It writes and deletes only its own `levelup:test:ls08d2a:` keys.
+Run the live Upstash script checks only when `.env.local` contains the Redis REST URL, the REST token, and the two distinct HMAC secrets. This command is not part of `npm test`. It writes and deletes only its own `levelup:test:ls08d2a:` keys.
 
 ```bash
 npm run test:upstash
+```
+
+Run the full handler check separately. It uses the same Redis credentials, a mock email adapter, and synthetic inquiry data. It does not send mail.
+
+```bash
+npm run test:inquiry-pipeline
 ```
 
 With the dev server running, a valid body still returns `503` because submissions are disabled:

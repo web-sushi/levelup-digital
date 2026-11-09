@@ -1,9 +1,10 @@
 import { SUGGESTED_RATE_LIMIT } from "@/lib/inquiries/schema";
 import {
   IDEMPOTENCY_LEASE_MS,
+  IDEMPOTENCY_PREFIX,
   IDEMPOTENCY_RETENTION_SECONDS,
+  RATE_LIMIT_PREFIX,
   idempotencyRedisKey,
-  rateLimitPrefix,
   rateWindowKey,
 } from "@/lib/inquiries/idempotency";
 import { BEGIN_SCRIPT, FINALIZE_SCRIPT, RATE_LIMIT_SCRIPT } from "@/lib/inquiries/redis-scripts";
@@ -291,15 +292,37 @@ export function createMemoryInquiryInfrastructure() {
 
 type FetchLike = (url: string, init: RequestInit) => Promise<Response>;
 
+export type UpstashKeyScope = {
+  ratePrefix: string;
+  idempotencyPrefix: string;
+};
+
+/** Production key names. A test harness must pass a `levelup:test:` scope instead. */
+export function upstashKeyScope(namespace?: string): UpstashKeyScope {
+  if (namespace === undefined) {
+    return { ratePrefix: RATE_LIMIT_PREFIX, idempotencyPrefix: IDEMPOTENCY_PREFIX };
+  }
+  const root = namespace.endsWith(":") ? namespace.slice(0, -1) : namespace;
+  if (!root.startsWith("levelup:test:")) {
+    throw new Error("A Redis test scope must start with levelup:test:");
+  }
+  return {
+    ratePrefix: `${root}:ratelimit`,
+    idempotencyPrefix: `${root}:idempotency`,
+  };
+}
+
 export class UpstashInquiryRedis {
   private readonly url: string;
   private readonly token: string;
   private readonly fetchImpl: FetchLike;
+  readonly scope: UpstashKeyScope;
 
-  constructor(url: string, token: string, fetchImpl: FetchLike = fetch) {
+  constructor(url: string, token: string, fetchImpl: FetchLike = fetch, scope: UpstashKeyScope = upstashKeyScope()) {
     this.url = url;
     this.token = token;
     this.fetchImpl = fetchImpl;
+    this.scope = scope;
   }
 
   async evaluate(script: string, keys: string[], args: string[]) {
@@ -333,7 +356,7 @@ export class UpstashInquiryRedis {
   }
 
   async consume(clientKey: string): Promise<RateLimitResult> {
-    const result = await this.evaluate(RATE_LIMIT_SCRIPT, [rateLimitPrefix(clientKey)], [
+    const result = await this.evaluate(RATE_LIMIT_SCRIPT, [`${this.scope.ratePrefix}:${clientKey}`], [
       String(SUGGESTED_RATE_LIMIT.limit),
       String(SUGGESTED_RATE_LIMIT.windowSeconds),
     ]);
@@ -396,7 +419,10 @@ export class UpstashInquiryIdempotency implements InquiryIdempotency {
     owner: string;
   }): Promise<IdempotencyBeginResult> {
     const now = Date.now();
-    const result = await this.redis.evaluate(BEGIN_SCRIPT, [idempotencyRedisKey(input.idempotencyHash), rateLimitPrefix(input.clientHash)], [
+    const result = await this.redis.evaluate(BEGIN_SCRIPT, [
+      `${this.redis.scope.idempotencyPrefix}:${input.idempotencyHash}`,
+      `${this.redis.scope.ratePrefix}:${input.clientHash}`,
+    ], [
       input.fingerprint,
       input.owner,
       String(now),
@@ -415,7 +441,7 @@ export class UpstashInquiryIdempotency implements InquiryIdempotency {
     confirmation: "accepted" | "rejected" | "unknown" | "-";
     category: string;
   }): Promise<IdempotencyFinalizeResult> {
-    const result = await this.redis.evaluate(FINALIZE_SCRIPT, [idempotencyRedisKey(input.idempotencyHash)], [
+    const result = await this.redis.evaluate(FINALIZE_SCRIPT, [`${this.redis.scope.idempotencyPrefix}:${input.idempotencyHash}`], [
       input.owner,
       input.state,
       CONFIRMATIONS.has(input.confirmation) ? input.confirmation : "-",
