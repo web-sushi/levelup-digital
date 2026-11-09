@@ -500,14 +500,19 @@ describe("live inquiry handler pipeline", { concurrency: 1 }, () => {
       BREVO_SENDER_NAME: env.BREVO_SENDER_NAME,
       INQUIRY_NOTIFICATION_EMAIL: env.INQUIRY_NOTIFICATION_EMAIL,
     });
-    assert.equal(local.state, "disabled");
+    assert.equal(local.state, "ready_for_controlled_testing");
+    assert.equal(local.activationGate, "testing");
+    assert.equal(local.submissionsEnabled, false);
+    assert.equal(local.configurationComplete, true);
+    assert.equal(env.INQUIRY_SUBMISSIONS_ENABLED, "false");
+    assert.equal(env.INQUIRY_ACTIVATION_GATE, "testing");
+    assert.equal(env.INQUIRY_TRUSTED_ORIGINS, "https://levelup-digital.dev");
     assert.equal(local.publicPageEnabled, false);
     assert.equal(local.publicRouteUsesLiveAdapters, false);
     assert.equal(local.brevoAuthenticationVerified, false);
     assert.equal(local.inboxDeliveryVerified, false);
-    assert.equal(local.missing.includes("INQUIRY_TRUSTED_ORIGINS"), true);
-    assert.equal(local.missing.includes("INQUIRY_ACTIVATION_GATE"), true);
-    assert.equal(local.missing.includes("BREVO_API_KEY"), false);
+    assert.deepEqual(local.missing, []);
+    assert.deepEqual(local.invalid, []);
     assert.equal(publicInquirySubmissionsAvailable, false);
 
     const runtime = createInquiryRuntime(preparedEnv());

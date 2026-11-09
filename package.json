@@ -10,7 +10,8 @@
     "typecheck": "tsc --noEmit",
     "test": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --import ./scripts/register-inquiry-tests.mjs --experimental-strip-types --test --test-reporter=spec src/lib/inquiries/*.test.ts",
     "test:upstash": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --import ./scripts/register-inquiry-tests.mjs --experimental-strip-types --test --test-reporter=spec scripts/verify-upstash-inquiry.ts",
-    "test:inquiry-pipeline": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --import ./scripts/register-inquiry-tests.mjs --experimental-strip-types --test --test-reporter=spec scripts/verify-inquiry-pipeline.ts"
+    "test:inquiry-pipeline": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --import ./scripts/register-inquiry-tests.mjs --experimental-strip-types --test --test-reporter=spec scripts/verify-inquiry-pipeline.ts",
+    "test:brevo": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --import ./scripts/register-inquiry-tests.mjs --experimental-strip-types scripts/verify-brevo-delivery.ts"
   },
   "dependencies": {
     "lucide-react": "^1.63.0",
