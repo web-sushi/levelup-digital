@@ -3,8 +3,9 @@ import { createPageMetadata } from "@/lib/metadata";
 
 export const metadata = createPageMetadata({
   title: "Thank You",
-  description: "Confirmation page for LevelUp Digital enquiries.",
+  description: "Confirmation page for LevelUp Digital enquiries. Visiting this page does not send a message.",
   path: "/thank-you",
+  index: false,
 });
 
 export default function ThankYouPage() {

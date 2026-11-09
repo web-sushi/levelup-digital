@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { JsonLd } from "@/components/seo/JsonLd";
 import { ProjectContentSection } from "@/components/work/ProjectContentSection";
 import { ProjectCTA } from "@/components/work/ProjectCTA";
 import { ProjectCustomization } from "@/components/work/ProjectCustomization";
@@ -14,8 +15,8 @@ import {
   getPublishedConceptSlugs,
   getRelatedConceptProjects,
 } from "@/content/projects/projects";
-
-const siteUrl = "https://levelup-digital.dev";
+import { createPageMetadata } from "@/lib/metadata";
+import { breadcrumbJsonLd } from "@/lib/seo";
 
 type CaseStudyPageProps = {
   params: Promise<{ slug: string }>;
@@ -33,32 +34,24 @@ export async function generateMetadata({
   const detail = getCaseStudyDetail(slug);
 
   if (!project || !detail) {
-    return { title: "Case study not found" };
+    return {
+      title: "Case study not found",
+      robots: { index: false, follow: false },
+    };
   }
 
   const path = `/work/${slug}` as const;
-  const title = `${project.title} | Concept case study`;
-  const description = detail.seoDescription;
 
-  return {
-    title,
-    description,
-    alternates: {
-      canonical: `${siteUrl}${path}`,
+  return createPageMetadata({
+    title: `${project.title} | Concept case study`,
+    description: detail.seoDescription,
+    path,
+    type: "article",
+    image: {
+      url: project.imageDesktop,
+      alt: `${project.title} desktop preview`,
     },
-    openGraph: {
-      title,
-      description,
-      url: `${siteUrl}${path}`,
-      type: "article",
-      images: [
-        {
-          url: `${siteUrl}${project.imageDesktop}`,
-          alt: `${project.title} desktop preview`,
-        },
-      ],
-    },
-  };
+  });
 }
 
 export default async function CaseStudyPage({ params }: CaseStudyPageProps) {
@@ -75,6 +68,13 @@ export default async function CaseStudyPage({ params }: CaseStudyPageProps) {
 
   return (
     <>
+      <JsonLd
+        data={breadcrumbJsonLd([
+          { name: "Home", path: "/" },
+          { name: "Work", path: "/work" },
+          { name: project.title, path: `/work/${slug}` },
+        ])}
+      />
       <ProjectHero project={project} projectNumber={projectNumber} />
       <ProjectPreview project={project} />
       <ProjectOverview

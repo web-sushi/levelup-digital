@@ -1,26 +1,37 @@
 import type { Metadata } from "next";
 import { ClientCaseStudy } from "@/components/portfolio/ClientCaseStudy";
-import { getClientProject } from "@/content/projects/client-work";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { CLIENT_IMAGE_HEIGHT, CLIENT_IMAGE_WIDTH, getClientProject } from "@/content/projects/client-work";
 import { createPageMetadata } from "@/lib/metadata";
+import { breadcrumbJsonLd } from "@/lib/seo";
 
 const project = getClientProject("mark-maeda-travel-and-tour");
 const path = `/work/${project.slug}` as const;
 
-export const metadata: Metadata = {
-  ...createPageMetadata({
-    title: project.title,
-    description: project.seoDescription,
-    path,
-  }),
-  openGraph: {
-    title: `${project.title} | LevelUp Digital`,
-    description: project.seoDescription,
-    url: path,
-    type: "article",
-    images: [{ url: project.hero.src, alt: project.hero.alt }],
+export const metadata: Metadata = createPageMetadata({
+  title: project.title,
+  description: project.seoDescription,
+  path,
+  type: "article",
+  image: {
+    url: project.hero.src,
+    alt: project.hero.alt,
+    width: CLIENT_IMAGE_WIDTH,
+    height: CLIENT_IMAGE_HEIGHT,
   },
-};
+});
 
 export default function MarkMaedaCaseStudyPage() {
-  return <ClientCaseStudy project={project} />;
+  return (
+    <>
+      <JsonLd
+        data={breadcrumbJsonLd([
+          { name: "Home", path: "/" },
+          { name: "Work", path: "/work" },
+          { name: project.title, path },
+        ])}
+      />
+      <ClientCaseStudy project={project} />
+    </>
+  );
 }

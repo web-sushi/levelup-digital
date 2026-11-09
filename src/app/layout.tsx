@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import { Geist, Space_Grotesk } from "next/font/google";
 import { ConsentManager } from "@/components/privacy/ConsentManager";
+import { JsonLd } from "@/components/seo/JsonLd";
 import { SiteShell } from "@/components/layout/SiteShell";
 import { SkipLink } from "@/components/layout/SkipLink";
+import { siteJsonLd } from "@/lib/seo";
 import "./globals.css";
 
 const geist = Geist({
@@ -35,6 +37,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${geist.variable} ${spaceGrotesk.variable}`}>
       <body className="min-h-screen overflow-x-hidden antialiased">
+        <JsonLd data={siteJsonLd()} />
         <SkipLink />
         <ConsentManager />
         <SiteShell>{children}</SiteShell>
