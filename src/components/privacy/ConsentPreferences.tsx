@@ -22,7 +22,6 @@ export function ConsentPreferences({
   onClose,
 }: ConsentPreferencesProps) {
   const dialogRef = useRef<HTMLDialogElement>(null);
-  const restoreFocus = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     const dialog = dialogRef.current;
@@ -30,13 +29,11 @@ export function ConsentPreferences({
       return;
     }
     if (open && !dialog.open) {
-      restoreFocus.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
       dialog.showModal();
       return;
     }
     if (!open && dialog.open) {
       dialog.close();
-      restoreFocus.current?.focus();
     }
   }, [open]);
 
@@ -52,10 +49,6 @@ export function ConsentPreferences({
       className="consent-dialog"
       aria-labelledby="privacy-preferences-title"
       aria-describedby="privacy-preferences-status"
-      onCancel={(event) => {
-        event.preventDefault();
-        onClose();
-      }}
       onClose={onClose}
     >
       <div className="consent-dialog-panel">

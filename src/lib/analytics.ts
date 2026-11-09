@@ -1,6 +1,10 @@
 /**
  * Google Analytics 4 measurement ID from the legacy site.
  * The script is installed only after the visitor accepts analytics.
+ *
+ * This module loads gtag once. trackPageView sends one page_view per pathname.
+ * GA4 enhanced measurement can send a second hit for the same history change.
+ * This module does not patch the History API.
  */
 export const GA_MEASUREMENT_ID = "G-8S5ZWSYC00";
 
@@ -13,8 +17,6 @@ export const GA_COOKIE_NAMES = [
   "_ga_8S5ZWSYC00",
   "_gat_gtag_G-8S5ZWSYC00",
 ] as const;
-
-const DUPLICATE_PAGEVIEW_MS = 50;
 
 type ScriptNode = {
   src: string;
@@ -35,17 +37,20 @@ export type AnalyticsEnvironment = {
   };
   dataLayer: unknown[];
   setDisabled: (disabled: boolean) => void;
-  releaseAutomaticHistoryPageViews?: () => void;
+};
+
+export type LandingPage = {
+  path: string;
+  href: string;
 };
 
 type AnalyticsRuntime = {
   initialized: boolean;
-  lastPath: string;
-  lastAt: number;
   dataLayer: unknown[];
 };
 
 let runtime: AnalyticsRuntime | null = null;
+let lastTrackedPath: string | null = null;
 
 /**
  * gtag.js processes dataLayer entries that are Arguments objects.
@@ -63,6 +68,7 @@ export function pushGtagCommand(dataLayer: unknown[], command: unknown[]) {
 
 export function resetAnalyticsState() {
   runtime = null;
+  lastTrackedPath = null;
 }
 
 export function isGoogleAnalyticsInitialized() {
@@ -80,12 +86,9 @@ export function initializeGoogleAnalytics(env: AnalyticsEnvironment) {
   pushGtagCommand(dataLayer, ["config", GA_MEASUREMENT_ID, { send_page_view: false }]);
   runtime = {
     initialized: true,
-    lastPath: "",
-    lastAt: 0,
     dataLayer,
   };
   if (existing) {
-    env.releaseAutomaticHistoryPageViews?.();
     return { createdScript: false };
   }
   const script = env.document.createElement("script");
@@ -95,18 +98,14 @@ export function initializeGoogleAnalytics(env: AnalyticsEnvironment) {
   return { createdScript: true };
 }
 
-export function trackPageView(path: string, href: string, now = Date.now()) {
-  if (!runtime?.initialized) {
+export function trackPageView(page: LandingPage) {
+  if (!runtime?.initialized || lastTrackedPath === page.path) {
     return false;
   }
-  if (runtime.lastPath === path && now - runtime.lastAt < DUPLICATE_PAGEVIEW_MS) {
-    return false;
-  }
-  runtime.lastPath = path;
-  runtime.lastAt = now;
+  lastTrackedPath = page.path;
   pushGtagCommand(runtime.dataLayer, ["event", "page_view", {
-    page_path: path,
-    page_location: href,
+    page_path: page.path,
+    page_location: page.href,
     send_to: GA_MEASUREMENT_ID,
   }]);
   return true;
@@ -140,6 +139,7 @@ export function revokeGoogleAnalytics(env: AnalyticsEnvironment) {
   env.setDisabled(true);
   clearGoogleAnalyticsCookies(env);
   runtime = null;
+  lastTrackedPath = null;
 }
 
 declare global {
@@ -163,13 +163,7 @@ export function browserAnalyticsEnvironment(): AnalyticsEnvironment {
       querySelector: (selector) => document.querySelector(selector),
       head: {
         appendChild: (node) => {
-          const script = node as unknown as HTMLScriptElement;
-          script.addEventListener("load", () => {
-            releaseAutomaticHistoryPageViews();
-            window.setTimeout(releaseAutomaticHistoryPageViews, 0);
-            window.setTimeout(releaseAutomaticHistoryPageViews, 1000);
-          });
-          document.head.appendChild(script);
+          document.head.appendChild(node as unknown as Node);
         },
       },
     },
@@ -183,13 +177,5 @@ export function browserAnalyticsEnvironment(): AnalyticsEnvironment {
     setDisabled: (disabled) => {
       flags[`ga-disable-${GA_MEASUREMENT_ID}`] = disabled;
     },
-    releaseAutomaticHistoryPageViews,
   };
-}
-
-function releaseAutomaticHistoryPageViews() {
-  // gtag.js wraps history and emits its own page_view on client navigations.
-  // This site already sends one page_view, so the native methods are restored.
-  history.pushState = History.prototype.pushState;
-  history.replaceState = History.prototype.replaceState;
 }
