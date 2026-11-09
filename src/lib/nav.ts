@@ -11,9 +11,9 @@ export const projectCta = {
   label: "Start a Project",
 } as const;
 
-/** Verified from legacy site footers (e.g. legacy/index.html). */
+/** Public business mailbox. WhatsApp and social profiles stay as published. */
 export const verifiedContactLinks = {
-  email: "mailto:atsushijunior.harada@gmail.com",
+  email: "mailto:levelupdigital.support@gmail.com",
   whatsApp: "https://wa.me/818074310125",
   linkedIn: "https://www.linkedin.com/in/atsushi-jr-harada",
   facebook: "https://www.facebook.com/atsushijr.harada",

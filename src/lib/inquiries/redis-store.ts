@@ -3,6 +3,7 @@ import {
   IDEMPOTENCY_LEASE_MS,
   IDEMPOTENCY_RETENTION_SECONDS,
   idempotencyRedisKey,
+  rateLimitPrefix,
   rateWindowKey,
 } from "@/lib/inquiries/idempotency";
 import { BEGIN_SCRIPT, FINALIZE_SCRIPT, RATE_LIMIT_SCRIPT } from "@/lib/inquiries/redis-scripts";
@@ -331,25 +332,28 @@ export class UpstashInquiryRedis {
     }
   }
 
-  async consume(clientKey: string, now = Date.now()): Promise<RateLimitResult> {
-    const key = rateWindowKey(clientKey, now, SUGGESTED_RATE_LIMIT.windowSeconds);
-    const result = await this.evaluate(RATE_LIMIT_SCRIPT, [key], [
+  async consume(clientKey: string): Promise<RateLimitResult> {
+    const result = await this.evaluate(RATE_LIMIT_SCRIPT, [rateLimitPrefix(clientKey)], [
       String(SUGGESTED_RATE_LIMIT.limit),
       String(SUGGESTED_RATE_LIMIT.windowSeconds),
     ]);
-    if (!Array.isArray(result) || result.length < 2) {
-      return { status: "unavailable" };
-    }
-    const allowed = Number(result[0]) === 1;
-    const ttl = Number(result[1]);
-    if (!allowed) {
-      return { status: "limited", retryAfterSeconds: retryAfter(ttl, SUGGESTED_RATE_LIMIT.windowSeconds) };
-    }
-    return { status: "allowed" };
+    return rateLimitResultFromEval(result);
   }
 }
 
-function beginFromEval(result: unknown, owner: string): IdempotencyBeginResult {
+export function rateLimitResultFromEval(result: unknown): RateLimitResult {
+  if (!Array.isArray(result) || result.length < 2) {
+    return { status: "unavailable" };
+  }
+  const allowed = Number(result[0]) === 1;
+  const ttl = Number(result[1]);
+  if (!allowed) {
+    return { status: "limited", retryAfterSeconds: retryAfter(ttl, SUGGESTED_RATE_LIMIT.windowSeconds) };
+  }
+  return { status: "allowed" };
+}
+
+export function idempotencyResultFromEval(result: unknown, owner: string): IdempotencyBeginResult {
   if (!Array.isArray(result) || typeof result[0] !== "string") {
     return { status: "unavailable" };
   }
@@ -392,7 +396,7 @@ export class UpstashInquiryIdempotency implements InquiryIdempotency {
     owner: string;
   }): Promise<IdempotencyBeginResult> {
     const now = Date.now();
-    const result = await this.redis.evaluate(BEGIN_SCRIPT, [idempotencyRedisKey(input.idempotencyHash), rateWindowKey(input.clientHash, now, SUGGESTED_RATE_LIMIT.windowSeconds)], [
+    const result = await this.redis.evaluate(BEGIN_SCRIPT, [idempotencyRedisKey(input.idempotencyHash), rateLimitPrefix(input.clientHash)], [
       input.fingerprint,
       input.owner,
       String(now),
@@ -401,7 +405,7 @@ export class UpstashInquiryIdempotency implements InquiryIdempotency {
       String(SUGGESTED_RATE_LIMIT.limit),
       String(SUGGESTED_RATE_LIMIT.windowSeconds),
     ]);
-    return beginFromEval(result, input.owner);
+    return idempotencyResultFromEval(result, input.owner);
   }
 
   async finalize(input: {

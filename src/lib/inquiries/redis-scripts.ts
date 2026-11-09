@@ -1,15 +1,21 @@
 /**
- * Lua is the Upstash execution path. The memory store mirrors these decisions in
- * TypeScript and is what the automated tests run. These scripts were not executed
- * against a live Redis server in this phase.
+ * Lua is the Upstash execution path. The memory store mirrors the decisions in
+ * TypeScript and is what `npm test` runs. Live execution is a separate harness.
+ *
+ * Rate-limit windows use Redis `TIME`, not the caller's clock. KEYS for the
+ * limiter is a prefix; the script appends the server-time window id.
  */
-export const RATE_LIMIT_SCRIPT = `local current = redis.call("INCR", KEYS[1])
+export const RATE_LIMIT_SCRIPT = `local time = redis.call("TIME")
+local now = tonumber(time[1])
+local window_seconds = tonumber(ARGV[2])
+local key = KEYS[1] .. ":" .. math.floor(now / window_seconds)
+local current = redis.call("INCR", key)
 if current == 1 then
-  redis.call("EXPIRE", KEYS[1], tonumber(ARGV[2]))
+  redis.call("EXPIRE", key, window_seconds)
 end
-local ttl = redis.call("TTL", KEYS[1])
+local ttl = redis.call("TTL", key)
 if ttl < 0 then
-  ttl = tonumber(ARGV[2])
+  ttl = window_seconds
 end
 if current > tonumber(ARGV[1]) then
   return {0, ttl}
@@ -23,21 +29,28 @@ export const BEGIN_SCRIPT = `local function parse(raw)
   end
   return state, fingerprint, owner, lease_until, confirmation, category
 end
+local function redis_now_ms()
+  local time = redis.call("TIME")
+  return tonumber(time[1]) * 1000 + math.floor(tonumber(time[2]) / 1000)
+end
 local function take_slot()
-  local current = redis.call("INCR", KEYS[2])
+  local time = redis.call("TIME")
+  local window_seconds = tonumber(ARGV[7])
+  local key = KEYS[2] .. ":" .. math.floor(tonumber(time[1]) / window_seconds)
+  local current = redis.call("INCR", key)
   if current == 1 then
-    redis.call("EXPIRE", KEYS[2], tonumber(ARGV[7]))
+    redis.call("EXPIRE", key, window_seconds)
   end
-  local ttl = redis.call("TTL", KEYS[2])
+  local ttl = redis.call("TTL", key)
   if ttl < 0 then
-    ttl = tonumber(ARGV[7])
+    ttl = window_seconds
   end
   if current > tonumber(ARGV[6]) then
     return false, ttl
   end
   return true, ttl
 end
-local now = tonumber(ARGV[3])
+local now = redis_now_ms()
 local retention = tonumber(ARGV[5])
 local raw = redis.call("GET", KEYS[1])
 if raw then

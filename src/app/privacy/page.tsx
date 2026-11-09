@@ -11,6 +11,7 @@ export const metadata = createPageMetadata({
 });
 
 export default function PrivacyPage() {
+  const businessEmail = verifiedContactLinks.email.replace(/^mailto:/, "");
   return (
     <>
       <PageHeader
@@ -21,7 +22,7 @@ export default function PrivacyPage() {
       <section className="page-section">
         <div className="site-container page-prose" style={{ maxWidth: "48rem" }}>
           <p>
-            <strong>Last updated:</strong> 30 October 2026
+            <strong>Last updated:</strong> 9 November 2026
           </p>
 
           <PolicyReviewNote>
@@ -100,10 +101,10 @@ export default function PrivacyPage() {
           <h2>Contact us</h2>
           <p>
             Questions about this policy can be sent to{" "}
-            <a href={verifiedContactLinks.email}>atsushijunior.harada@gmail.com</a>,
-            the address published on the contact page. An older draft listed
-            hello@levelupdigital.com. That address is not published on the current
-            site.
+            <a href={verifiedContactLinks.email}>{businessEmail}</a>, the
+            address published on the contact page. An older draft listed
+            hello@levelupdigital.com. That address is not published on the
+            current site.
           </p>
           <PolicyReviewNote>
             A legal review should confirm that this is the right privacy contact

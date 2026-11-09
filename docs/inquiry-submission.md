@@ -99,7 +99,7 @@ The production handler does not use an in-memory map. This site is intended for 
 
 The public route still uses `UnavailableRateLimiter`. A Redis-backed limiter now exists in `src/lib/inquiries/redis-store.ts`, and it is not attached to the route. Upstash credentials do not enable it. When submissions are enabled without that limiter, the handler still fails closed with `503`.
 
-The starting policy is 5 requests per hour for each client key. It is a fixed window, so a client can be allowed five times at the end of one hour and five times at the start of the next. The check and increment run in one Redis `EVAL` script: `INCR`, then `EXPIRE` when the counter is created. A separate in-memory limiter remains inside the older handler tests. It is not used by the route.
+The starting policy is 5 requests per hour for each client key. It is a fixed window, so a client can be allowed five times at the end of one window and five times at the start of the next. The check and increment run in one Redis `EVAL` script. That script reads Redis server time with `TIME`, builds the window id as `floor(server seconds / window seconds)`, then runs `INCR` and sets `EXPIRE` to the full window length when the counter is created. Expiration starts at the first hit. It is not aligned to a UTC hour boundary. The caller clock is not used for the live window or for the idempotency lease. The in-memory limiter used by unit tests still accepts an injected clock so those tests stay deterministic. It is not used by the route.
 
 Client keys come only from the first address in `x-vercel-forwarded-for`, and only when that address matches a simple IP character check. `x-forwarded-for` is ignored because a caller can set it. The address is HMAC-SHA256 hashed with `INQUIRY_RATE_LIMIT_KEY_SECRET` before it is passed to the limiter. Raw addresses are not logged.
 
@@ -143,7 +143,7 @@ Provider acceptance means Brevo accepted the API request. It does not mean the m
 
 The customer confirmation is addressed to the validated inquiry email. The business notification reply-to is that same customer address. None of these addresses are hardcoded in the adapter. The sender can later move to a mailbox on `levelup-digital.dev`, such as `support@levelup-digital.dev`, by changing `BREVO_SENDER_EMAIL`. That mailbox is not assumed to exist.
 
-The Gmail sender must be verified and permitted in Brevo before a live send. A Gmail address cannot publish the domain authentication that a mailbox on `levelup-digital.dev` can. SPF, DKIM, and DMARC for the site domain are the recommended long-term setup. Until then, Gmail filtering and alignment limits can reduce deliverability even after Brevo accepts the request.
+Brevo has verified the sender `levelupdigital.support@gmail.com`. That address is a free-email mailbox, and Brevo still shows DKIM and DMARC warnings for it. A Gmail address cannot publish the domain authentication that a mailbox on `levelup-digital.dev` can. SPF, DKIM, and DMARC for the site domain remain the recommended setup before launch. This phase did not send a live email.
 
 ### Templates
 
@@ -176,19 +176,31 @@ Phase LS-08C.1 adds a durable idempotency store. The public route does not call 
 
 ### Remaining production prerequisites
 
-- Keep `INQUIRY_SUBMISSIONS_ENABLED` false.
-- Verify `BREVO_SENDER_EMAIL` inside Brevo. Do not assume the Gmail sender is already verified.
-- Store `BREVO_API_KEY` only in the host environment.
-- Create an Upstash Redis database and set its REST URL and token only in the host environment. Adding a payment method moves a free database onto a paid plan.
+- Keep `INQUIRY_SUBMISSIONS_ENABLED` false until the adapters below are attached together.
+- Store `BREVO_API_KEY` only in the host environment. This phase did not require a real key, and no live email was sent.
+- The sender `levelupdigital.support@gmail.com` is verified in Brevo. DKIM and DMARC warnings remain because it is a free-email domain.
+- Keep the Upstash REST URL and token only in the host environment. Adding a payment method moves a free database onto a paid plan.
 - Attach the Redis rate limiter, the Redis idempotency store, and `createBrevoInquiryDelivery` together. Credentials alone must not enable sending.
 - Prefer a verified sender on `levelup-digital.dev` once that mailbox exists, with SPF, DKIM, and DMARC.
-- The wizard stays disconnected. There is no public test-send route.
+- The public wizard can prepare a request, and the public page still hides the send button. There is no public test-send route.
 
 ## Distributed storage
 
 Upstash Redis is the selected store for both the rate limit and the idempotency record. Its REST API works from a Vercel serverless function, and `EVAL` runs a Lua script as one atomic step. `SET` with `NX` and `EX` is also available. The scripts in `src/lib/inquiries/redis-scripts.ts` use `EVAL` so a claim is not a separate `GET` followed by `SET`.
 
-Pricing was read from Upstash's pricing and billing pages on 30 October 2026. The free tier listed 250 MB, 500,000 commands per month, and 10 GB of bandwidth, with no credit card. Pay as you go was listed at $0.20 per 100,000 commands. An `EVAL` script is billed as one command plus one command for each `redis.call`. Those figures can change. No Upstash account was created for this phase, and the Lua scripts were not executed on a live Redis server. The automated tests run the same decisions against an in-memory map and check that the Upstash client sends one `EVAL` request. That does not prove live atomicity.
+Pricing was read from Upstash's pricing and billing pages on 30 October 2026. The free tier listed 250 MB, 500,000 commands per month, and 10 GB of bandwidth, with no credit card. Pay as you go was listed at $0.20 per 100,000 commands. An `EVAL` script is billed as one command plus one command for each `redis.call`. Those figures can change.
+
+The owner created an Upstash Redis database for local verification. `npm test` still uses the in-memory limiter and a mocked `fetch`. It does not contact Upstash. Live checks are a separate command, `npm run test:upstash`, and they read `.env.local` only inside that process. On 9 November 2026 that command passed against the real REST endpoint:
+
+- `PING` returned `PONG`, `TIME` returned a server clock, and `RATE_LIMIT_SCRIPT` ran through `EVAL`.
+- Five serial attempts were allowed and the sixth was limited. The counter key used the Redis server window, and its TTL was greater than 0 and at most 3600 seconds.
+- Eight concurrent attempts allowed exactly five and limited three. One counter key was created.
+- Two concurrent claims with the same fingerprint produced one `claimed` result and one `processing` result. A different fingerprint returned `conflict` and left the original record in place.
+- A mismatched owner token returned `not_owner` and did not change the record. The real owner could finalize `accepted`, `rejected`, and `unknown`. A later begin replayed that outcome and did not create a new claim.
+- A 4 second processing lease became `replay_unknown` after it expired. A second begin after that expiry stayed `replay_unknown`. A separate record written with the 7 day retention constant had a TTL inside the last 30 seconds of 604800 seconds. The harness deleted that key. It did not wait seven days.
+- A live `EVAL` that returned a string was treated as unavailable storage. A Lua syntax error returned no result. A client pointed at `https://127.0.0.1:9` with a dummy token returned unavailable. The real token was not sent to that address.
+
+The harness used the namespace `levelup:test:ls08d2a:` plus a random suffix, synthetic fingerprints, and synthetic owner tokens. It did not flush the database. Cleanup used `SCAN` and `DEL` only for keys under that namespace. The public route was not used, and no email was sent. Mocked unit tests still do not prove live atomicity. The live suite above is the evidence for Lua compatibility and for these concurrent cases.
 
 Low inquiry volume, on the order of a few submissions an hour, stays far inside the free command allowance.
 
@@ -228,7 +240,13 @@ A different payload with the same key returns `409` `IDEMPOTENCY_CONFLICT` and d
 
 The processing lease is 120 seconds. The Redis key itself is kept for 7 days, which is longer than the 24 hour minimum. Lease expiry does not allow a second email. The next request turns an expired processing record into `unknown` and refreshes the 7 day retention. If the key then expires, a later request can claim it again. That is not exactly-once delivery.
 
-Redis and Brevo are not one transaction. If Brevo accepts the business notification and the finalize script fails, the response is `503` `IDEMPOTENCY_PERSISTENCE_FAILED`. It does not say the inquiry was rejected, and it does not send the email again. Until the lease expires, a duplicate receives `INQUIRY_PROCESSING`. After that, the record becomes `unknown` if Redis still has it. If Redis lost the key, a later request can send another email. That residual risk remains until the real database is tested.
+Redis and Brevo are not one transaction. If Brevo accepts the business notification and the finalize script fails, the response is `503` `IDEMPOTENCY_PERSISTENCE_FAILED`. It does not say the inquiry was rejected, and it does not send the email again. Until the lease expires, a duplicate receives `INQUIRY_PROCESSING`. After that, the record becomes `unknown` if Redis still has it. The live Redis checks confirmed that an accepted, rejected, or unknown marker is replayed instead of claimed again, including after a short lease expires. No path in the handler sends another email while one of those markers remains.
+
+Residual risks stay:
+
+- A timeout or process stop before delivery does not send mail. A timeout after Brevo has accepted mail, while the finalize response is lost, can leave either a finalized marker or an expired lease. The handler does not retry that send. If Redis evicts the key or the 7 day retention ends, a later request can send again. That is not exactly-once delivery.
+- The live suite inspected the 7 day TTL. It did not wait for expiry, and it did not call Brevo.
+- The public route still does not inject this store, so these protections apply only after the production adapters are attached.
 
 Storage errors before delivery return `503` `INQUIRY_STORAGE_UNAVAILABLE` and do not send mail. Responses stay generic. They do not include Redis keys, fingerprints, IP hashes, tokens, or provider bodies. Every response still sends `Cache-Control: no-store`.
 
@@ -268,12 +286,26 @@ The honeypot is a visually hidden `companyWebsite` input outside the tab order. 
 - Honeypot hits use the same generic `400` body as other bad requests. They are not stored.
 - The public contact page does not offer a working send button. The wizard client can call this route only when a later phase turns on the server availability value. This phase does not add a database or enable the public route to send mail.
 
+## Public contact and privacy
+
+Public email links use `verifiedContactLinks.email`, which is `mailto:levelupdigital.support@gmail.com`. The contact page, inquiry fallback, footer, and privacy policy read that value. WhatsApp and the social profiles are unchanged. `legacy/` still contains the earlier personal address and was not edited.
+
+The privacy policy matches the current system on these points: the inquiry fields, the purpose of replying to an inquiry, Brevo as an inactive mail processor, the Google Analytics measurement ID used in the layout, the business mailbox, and the statement that online submission is not enabled. It does not state a retention period. The 7 day Redis marker is not a published retention period, and that store is not attached to the public route.
+
+Owner or legal review is still required before launch for the privacy contact, analytics consent or regional notices, and any retention statement. The policy names Google Analytics and does not describe the cookies that service sets or an opt-out. This phase does not add a cookie banner or a legal retention claim.
+
 ## Local testing
 
-Run the automated tests:
+Run the mocked unit tests:
 
 ```bash
 npm test
+```
+
+Run the live Upstash checks only when `.env.local` contains the Redis REST URL, the REST token, and the two distinct HMAC secrets. This command is not part of `npm test`. It writes and deletes only its own `levelup:test:ls08d2a:` keys.
+
+```bash
+npm run test:upstash
 ```
 
 With the dev server running, a valid body still returns `503` because submissions are disabled:

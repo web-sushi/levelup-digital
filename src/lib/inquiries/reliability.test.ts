@@ -493,6 +493,8 @@ describe("Upstash adapter contract", () => {
     assert.equal(BEGIN_SCRIPT.includes('redis.call("INCR"'), true);
     assert.equal(FINALIZE_SCRIPT.includes('owner ~= ARGV[1]'), true);
     assert.equal(RATE_LIMIT_SCRIPT.includes('redis.call("INCR"'), true);
+    assert.equal(BEGIN_SCRIPT.includes('redis.call("TIME"'), true);
+    assert.equal(RATE_LIMIT_SCRIPT.includes('redis.call("TIME"'), true);
     assert.equal(BEGIN_SCRIPT.includes("math.random"), false);
     const calls: Array<{ url: string; body: string }> = [];
     const fetchImpl = async (url: string, init: RequestInit) => {
@@ -513,6 +515,9 @@ describe("Upstash adapter contract", () => {
     const command = JSON.parse(calls[0]?.body ?? "[]") as string[];
     assert.equal(command[0], "EVAL");
     assert.equal(command[2], "2");
+    assert.equal(command.includes("120000"), true);
+    assert.equal(command.includes("604800"), true);
+    assert.equal(command[4], "inquiry:ratelimit:v1:client-hash");
     assert.equal(calls[0]?.body.includes("example-token"), false);
   });
 

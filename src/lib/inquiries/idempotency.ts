@@ -32,9 +32,13 @@ export function hashIdempotencyKey(key: string, secret: string) {
   return createHmac("sha256", secret).update(key).digest("hex");
 }
 
+export function rateLimitPrefix(clientHash: string) {
+  return `${RATE_LIMIT_PREFIX}:${clientHash}`;
+}
+
 export function rateWindowKey(clientHash: string, now: number, windowSeconds: number) {
   const windowId = Math.floor(now / 1000 / windowSeconds);
-  return `${RATE_LIMIT_PREFIX}:${clientHash}:${windowId}`;
+  return `${rateLimitPrefix(clientHash)}:${windowId}`;
 }
 
 export function idempotencyRedisKey(idempotencyHash: string) {

@@ -68,4 +68,4 @@ UI: selectable cards, progress indicator, accessible transitions. Final submit m
 
 ## Phase LS-08B
 
-`POST /api/inquiries` is a separate, disabled Next.js contract. It is documented in `docs/inquiry-submission.md`. It does not replace the legacy Netlify field names above, and the current wizard does not post to it.
+`POST /api/inquiries` is a separate, disabled Next.js contract. It is documented in `docs/inquiry-submission.md`. It does not replace the legacy Netlify field names above. The current public wizard does not send a request while submissions stay unavailable.
