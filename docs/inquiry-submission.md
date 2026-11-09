@@ -178,11 +178,12 @@ Phase LS-08C.1 adds a durable idempotency store. The public route does not call 
 
 ### Remaining production prerequisites
 
-- Keep `INQUIRY_SUBMISSIONS_ENABLED` false until the adapters below are attached together.
-- Store `BREVO_API_KEY` only in the host environment. This phase did not require a real key, and no live email was sent.
+- Keep `INQUIRY_SUBMISSIONS_ENABLED` false and `INQUIRY_ACTIVATION_GATE` at `disabled` until a later phase changes both deliberately.
+- Store `BREVO_API_KEY` only in the host environment. This phase does not send a live email. A present API key does not prove DKIM, DMARC, or inbox delivery.
 - The sender `levelupdigital.support@gmail.com` is verified in Brevo. DKIM and DMARC warnings remain because it is a free-email domain.
+- Set `INQUIRY_TRUSTED_ORIGINS` to `https://levelup-digital.dev`. Do not add localhost, a wildcard, or every Vercel preview domain.
 - Keep the Upstash REST URL and token only in the host environment. Adding a payment method moves a free database onto a paid plan.
-- Attach the Redis rate limiter, the Redis idempotency store, and `createBrevoInquiryDelivery` together. Credentials alone must not enable sending.
+- A future phase can call `createPreparedInquiryRuntime` from the public route. Credentials alone must not enable sending.
 - Prefer a verified sender on `levelup-digital.dev` once that mailbox exists, with SPF, DKIM, and DMARC.
 - The public wizard can prepare a request, and the public page still hides the send button. There is no public test-send route.
 
@@ -276,7 +277,27 @@ The review step asks the visitor to acknowledge that LevelUp Digital will use th
 
 The honeypot is a visually hidden `companyWebsite` input outside the tab order. It is not the business-name field.
 
-`publicInquirySubmissionsAvailable` is `false`. The contact page passes that value into the wizard, so ordinary visitors see the review, the acknowledgment, and an email link, without a send button. Tests can inject a client and a true availability flag. There is no public query parameter that pretends a submission succeeded. The browser value cannot authorize a submission: the handler ignores it. `assessInquiryActivation` can report that the server configuration is complete, and that report does not attach Redis or Brevo. `createInquiryRuntime` still builds the unavailable limiter and the unavailable delivery adapter. There is no environment switch for a mock delivery adapter. Turning the page on later requires a separate server change after the flag, trusted HTTPS origins, distinct HMAC secrets, Redis, and Brevo are all present and the adapters are intentionally attached.
+`publicInquirySubmissionsAvailable` is `false`. The contact page asks `resolvePublicInquirySubmissionsAvailable()` for that value, so ordinary visitors see the review, the acknowledgment, and an email link, without a send button. The resolver stays false while the hardcoded flag is false, including when the launch gate and the submissions flag are both set. Tests can inject a client and a true availability flag. There is no public query parameter, cookie, or header that reveals the send button.
+
+`createInquiryRuntime` is the public route factory. It always uses the unavailable rate limiter and the unavailable delivery adapter. Redis credentials, Brevo credentials, and `INQUIRY_ACTIVATION_GATE` do not change that factory.
+
+`createPreparedInquiryRuntime` is the server-only composition for a later phase. It builds the Upstash rate limiter, the Upstash idempotency store, and the Brevo adapter only when the readiness state is `ready_for_controlled_testing` or `ready_for_launch_review`. Any other state returns the same closed runtime. A test may inject a mock delivery or a namespaced Redis client as a function argument. No environment variable selects a mock. The public route does not call this function.
+
+`assessInquiryActivation` reports one state:
+
+| State | Meaning |
+| --- | --- |
+| `misconfigured` | A present value is invalid. Examples: a short or reused HMAC secret, an HTTP or wildcard origin, localhost in the trusted list, or an unknown activation gate. |
+| `disabled` | The gates are off, or required values are still missing. |
+| `configured` | Every required value is present and valid, submissions are explicitly false, and the activation gate is explicitly `disabled`. |
+| `ready_for_controlled_testing` | Configuration is complete and the gate is explicitly `testing`. This does not send mail by itself. |
+| `ready_for_launch_review` | Configuration is complete, the gate is explicitly `launch`, and submissions are explicitly true. The public page still stays closed in this phase. Brevo authentication and inbox delivery are not verified by this state. |
+
+The assessment does not contact Redis or Brevo. An API key is not evidence that the sender is authenticated or that a message reached an inbox. The sender `levelupdigital.support@gmail.com` is verified in Brevo, and DKIM and DMARC warnings remain because it is a free-email domain.
+
+Trusted origins are an explicit HTTPS list. The canonical origin is `https://levelup-digital.dev`. The matcher does not accept wildcards, forwarded host headers, or every Vercel preview domain. Localhost stays on the development-only list.
+
+A future controlled email test has to set `INQUIRY_ACTIVATION_GATE=testing` in a server-only environment, keep the public page closed, and use a named recipient. This phase does not send that message. Launch still requires attaching the prepared runtime to the public route in a separate change, setting the submissions flag, and reviewing privacy and sender authentication.
 
 ## Security limitations
 
@@ -313,7 +334,7 @@ On 9 November 2026 that command passed:
 - A Redis client that could not connect returned `503` `INQUIRY_STORAGE_UNAVAILABLE` before delivery. A lost finalize response returned `503` `IDEMPOTENCY_PERSISTENCE_FAILED`, and the repeat while the lease remained returned `409` `INQUIRY_PROCESSING` without another delivery.
 - Every checked response sent `Cache-Control: no-store`.
 
-The same run kept `publicInquirySubmissionsAvailable` false. A runtime built with the submissions flag, Redis credentials, and a synthetic Brevo configuration still used `UnavailableRateLimiter` and `UnavailableInquiryDelivery`.
+The same run kept `publicInquirySubmissionsAvailable` false. The handler calls in that suite go through `createPreparedInquiryRuntime` with the testing gate, a synthetic Brevo key, and a mock delivery. The public factory, given the same testing configuration, still uses `UnavailableRateLimiter` and `UnavailableInquiryDelivery`. No request was sent to `api.brevo.com`.
 
 This is not exactly-once delivery. Redis and Brevo are separate systems. The handler does not retry when the outcome is accepted, rejected, unknown, or when finalization fails after delivery. A lost Redis record, or expiry after 7 days, can allow a later send.
 

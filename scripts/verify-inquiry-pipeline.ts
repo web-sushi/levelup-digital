@@ -5,7 +5,7 @@ import { after, describe, it } from "node:test";
 import { createInquiryDraft, type InquiryDraft } from "@/components/contact/inquiry-model";
 import { UnavailableRateLimiter } from "@/lib/inquiries/abuse-protection";
 import { interpretInquiryResponse, toInquiryRequest, validateInquiryDraft } from "@/lib/inquiries/client";
-import { createInquiryRuntime } from "@/lib/inquiries/config";
+import { createInquiryRuntime, createPreparedInquiryRuntime } from "@/lib/inquiries/config";
 import { UnavailableInquiryDelivery } from "@/lib/inquiries/delivery";
 import { handleInquiryPost } from "@/lib/inquiries/handler";
 import { publicInquirySubmissionsAvailable } from "@/lib/inquiries/public-availability";
@@ -13,8 +13,6 @@ import { assessInquiryActivation } from "@/lib/inquiries/readiness";
 import { FINALIZE_SCRIPT } from "@/lib/inquiries/redis-scripts";
 import {
   upstashKeyScope,
-  UpstashInquiryIdempotency,
-  UpstashInquiryRateLimiter,
   UpstashInquiryRedis,
 } from "@/lib/inquiries/redis-store";
 import type { DeliveryResult, InquiryDelivery, InquiryRuntime, ValidatedInquiry } from "@/lib/inquiries/types";
@@ -150,17 +148,25 @@ function redisClient(failFinalize = false) {
   return new UpstashInquiryRedis(redisUrl, redisToken, redisFetch(failFinalize), upstashKeyScope(NAMESPACE));
 }
 
-function runtimeFor(redis: UpstashInquiryRedis, delivery: InquiryDelivery): InquiryRuntime {
+function preparedEnv(): NodeJS.ProcessEnv {
   return {
-    submissionsEnabled: true,
-    trustedOrigins: [ORIGIN],
-    allowDevelopmentOrigins: false,
-    rateLimitKeySecret: rateSecret,
-    idempotencyKeySecret: idempotencySecret,
-    rateLimiter: new UpstashInquiryRateLimiter(redis),
-    idempotency: new UpstashInquiryIdempotency(redis),
-    delivery,
+    NODE_ENV: "production",
+    INQUIRY_SUBMISSIONS_ENABLED: "true",
+    INQUIRY_ACTIVATION_GATE: "testing",
+    INQUIRY_TRUSTED_ORIGINS: ORIGIN,
+    INQUIRY_RATE_LIMIT_KEY_SECRET: rateSecret,
+    INQUIRY_IDEMPOTENCY_KEY_SECRET: idempotencySecret,
+    UPSTASH_REDIS_REST_URL: redisUrl,
+    UPSTASH_REDIS_REST_TOKEN: redisToken,
+    BREVO_API_KEY: "synthetic-brevo-key-value",
+    BREVO_SENDER_EMAIL: "levelupdigital.support@gmail.com",
+    BREVO_SENDER_NAME: "LevelUp Digital",
+    INQUIRY_NOTIFICATION_EMAIL: "levelupdigital.support@gmail.com",
   };
+}
+
+function runtimeFor(redis: UpstashInquiryRedis, delivery: InquiryDelivery): InquiryRuntime {
+  return createPreparedInquiryRuntime(preparedEnv(), { redis, delivery });
 }
 
 function key() {
@@ -480,9 +486,10 @@ describe("live inquiry handler pipeline", { concurrency: 1 }, () => {
   });
 
   it("keeps the public route closed when Redis and Brevo configuration are present", () => {
-    const assessment = assessInquiryActivation({
+    const local = assessInquiryActivation({
       NODE_ENV: "production",
       INQUIRY_SUBMISSIONS_ENABLED: env.INQUIRY_SUBMISSIONS_ENABLED,
+      INQUIRY_ACTIVATION_GATE: env.INQUIRY_ACTIVATION_GATE,
       INQUIRY_TRUSTED_ORIGINS: env.INQUIRY_TRUSTED_ORIGINS,
       INQUIRY_RATE_LIMIT_KEY_SECRET: env.INQUIRY_RATE_LIMIT_KEY_SECRET,
       INQUIRY_IDEMPOTENCY_KEY_SECRET: env.INQUIRY_IDEMPOTENCY_KEY_SECRET,
@@ -493,26 +500,25 @@ describe("live inquiry handler pipeline", { concurrency: 1 }, () => {
       BREVO_SENDER_NAME: env.BREVO_SENDER_NAME,
       INQUIRY_NOTIFICATION_EMAIL: env.INQUIRY_NOTIFICATION_EMAIL,
     });
-    assert.equal(assessment.publicPageEnabled, false);
-    assert.equal(assessment.adaptersAttached, false);
-    assert.equal(assessment.serverConfigured, false);
+    assert.equal(local.state, "disabled");
+    assert.equal(local.publicPageEnabled, false);
+    assert.equal(local.publicRouteUsesLiveAdapters, false);
+    assert.equal(local.brevoAuthenticationVerified, false);
+    assert.equal(local.inboxDeliveryVerified, false);
+    assert.equal(local.missing.includes("INQUIRY_TRUSTED_ORIGINS"), true);
+    assert.equal(local.missing.includes("INQUIRY_ACTIVATION_GATE"), true);
+    assert.equal(local.missing.includes("BREVO_API_KEY"), false);
     assert.equal(publicInquirySubmissionsAvailable, false);
 
-    const runtime = createInquiryRuntime({
-      NODE_ENV: "production",
-      INQUIRY_SUBMISSIONS_ENABLED: "true",
-      INQUIRY_TRUSTED_ORIGINS: ORIGIN,
-      INQUIRY_RATE_LIMIT_KEY_SECRET: rateSecret,
-      INQUIRY_IDEMPOTENCY_KEY_SECRET: idempotencySecret,
-      UPSTASH_REDIS_REST_URL: redisUrl,
-      UPSTASH_REDIS_REST_TOKEN: redisToken,
-      BREVO_API_KEY: "synthetic-brevo-key-value",
-      BREVO_SENDER_EMAIL: "levelupdigital.support@gmail.com",
-      BREVO_SENDER_NAME: "LevelUp Digital",
-      INQUIRY_NOTIFICATION_EMAIL: "levelupdigital.support@gmail.com",
-    });
+    const runtime = createInquiryRuntime(preparedEnv());
     assert.equal(runtime.idempotency ?? null, null);
     assert.equal(runtime.delivery instanceof UnavailableInquiryDelivery, true);
     assert.equal(runtime.rateLimiter instanceof UnavailableRateLimiter, true);
+    const prepared = createPreparedInquiryRuntime({
+      ...preparedEnv(),
+      INQUIRY_ACTIVATION_GATE: "disabled",
+    });
+    assert.equal(prepared.delivery instanceof UnavailableInquiryDelivery, true);
+    assert.equal(brevoCalls, 0);
   });
 });

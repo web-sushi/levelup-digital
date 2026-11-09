@@ -322,7 +322,7 @@ export class UpstashInquiryRedis {
     this.url = url;
     this.token = token;
     this.fetchImpl = fetchImpl;
-    this.scope = scope;
+    this.scope = scope ?? upstashKeyScope();
   }
 
   async evaluate(script: string, keys: string[], args: string[]) {

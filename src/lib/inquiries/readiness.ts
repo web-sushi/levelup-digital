@@ -1,92 +1,191 @@
-import { normalizeOrigin, rateLimitSecret, UnavailableRateLimiter } from "@/lib/inquiries/abuse-protection";
+import { rateLimitSecret, readTrustedHttpsOrigins } from "@/lib/inquiries/abuse-protection";
 import { readBrevoMailConfig } from "@/lib/inquiries/brevo-delivery";
-import { createInquiryRuntime } from "@/lib/inquiries/config";
-import { UnavailableInquiryDelivery } from "@/lib/inquiries/delivery";
 import { publicInquirySubmissionsAvailable } from "@/lib/inquiries/public-availability";
 import { readUpstashConfig } from "@/lib/inquiries/redis-store";
 
 export const EXPECTED_BREVO_SENDER_EMAIL = "levelupdigital.support@gmail.com";
 export const EXPECTED_BREVO_SENDER_NAME = "LevelUp Digital";
 export const EXPECTED_BREVO_NOTIFICATION_EMAIL = "levelupdigital.support@gmail.com";
+export const CANONICAL_SITE_ORIGIN = "https://levelup-digital.dev";
 
-export type InquiryActivationBlocker =
-  | "submissions_disabled"
-  | "trusted_origins"
-  | "rate_limit_secret"
-  | "idempotency_secret"
-  | "secrets_not_distinct"
-  | "redis"
-  | "brevo";
+export const ACTIVATION_GATE_VALUES = ["disabled", "testing", "launch"] as const;
 
-export type InquiryActivationAssessment = {
-  /**
-   * Every server prerequisite is present.
-   * This does not attach adapters or authorize a public submission.
-   */
-  serverConfigured: boolean;
-  missing: InquiryActivationBlocker[];
+export type InquiryActivationGate = (typeof ACTIVATION_GATE_VALUES)[number] | "missing" | "invalid";
+
+export type InquiryReadinessState =
+  | "misconfigured"
+  | "disabled"
+  | "configured"
+  | "ready_for_controlled_testing"
+  | "ready_for_launch_review";
+
+export type InquiryReadiness = {
+  state: InquiryReadinessState;
+  /** Present, valid configuration. This does not mean Redis or Brevo was contacted. */
+  configurationComplete: boolean;
+  missing: string[];
+  invalid: string[];
+  submissionsEnabled: boolean;
+  activationGate: InquiryActivationGate;
   publicPageEnabled: boolean;
-  adaptersAttached: boolean;
+  /** The public route factory does not attach live adapters in this phase. */
+  publicRouteUsesLiveAdapters: false;
+  brevoAuthenticationVerified: false;
+  inboxDeliveryVerified: false;
 };
 
-function httpsOrigins(value: string | undefined) {
-  return (value ?? "")
-    .split(",")
-    .map((item) => item.trim())
-    .filter((item) => {
-      const origin = normalizeOrigin(item);
-      return origin !== null && origin.startsWith("https://");
-    });
+function submissionsFlag(value: string | undefined) {
+  if (value === undefined || value.trim().length === 0) {
+    return "missing" as const;
+  }
+  if (value === "true") {
+    return "enabled" as const;
+  }
+  if (value === "false") {
+    return "disabled" as const;
+  }
+  return "invalid" as const;
+}
+
+export function readActivationGate(value: string | undefined): InquiryActivationGate {
+  if (value === undefined || value.trim().length === 0) {
+    return "missing";
+  }
+  const token = value.trim();
+  if (token === "disabled" || token === "testing" || token === "launch") {
+    return token;
+  }
+  return "invalid";
+}
+
+function pushUnique(list: string[], name: string) {
+  if (!list.includes(name)) {
+    list.push(name);
+  }
 }
 
 /**
- * Reports whether a future activation would have the required server configuration.
- * `createInquiryRuntime` remains fail-closed regardless of this result.
+ * Classifies local configuration. It does not open Redis or Brevo.
+ * An API key does not prove sender authentication or inbox delivery.
  */
-export function assessInquiryActivation(env: NodeJS.ProcessEnv = process.env): InquiryActivationAssessment {
-  const missing: InquiryActivationBlocker[] = [];
-  if (env.INQUIRY_SUBMISSIONS_ENABLED !== "true") {
-    missing.push("submissions_disabled");
+export function assessInquiryActivation(env: NodeJS.ProcessEnv = process.env): InquiryReadiness {
+  const missing: string[] = [];
+  const invalid: string[] = [];
+  const flag = submissionsFlag(env.INQUIRY_SUBMISSIONS_ENABLED);
+  if (flag === "missing") {
+    pushUnique(missing, "INQUIRY_SUBMISSIONS_ENABLED");
+  } else if (flag === "invalid") {
+    pushUnique(invalid, "INQUIRY_SUBMISSIONS_ENABLED");
   }
-  if (httpsOrigins(env.INQUIRY_TRUSTED_ORIGINS).length === 0) {
-    missing.push("trusted_origins");
+
+  const gate = readActivationGate(env.INQUIRY_ACTIVATION_GATE);
+  if (gate === "missing") {
+    pushUnique(missing, "INQUIRY_ACTIVATION_GATE");
+  } else if (gate === "invalid") {
+    pushUnique(invalid, "INQUIRY_ACTIVATION_GATE");
   }
+
+  if (env.INQUIRY_TRUSTED_ORIGINS === undefined || env.INQUIRY_TRUSTED_ORIGINS.trim().length === 0) {
+    pushUnique(missing, "INQUIRY_TRUSTED_ORIGINS");
+  } else {
+    const trusted = readTrustedHttpsOrigins(env.INQUIRY_TRUSTED_ORIGINS);
+    if (trusted.invalid || trusted.origins.length === 0) {
+      pushUnique(invalid, "INQUIRY_TRUSTED_ORIGINS");
+    }
+  }
+
   const rateSecret = rateLimitSecret(env.INQUIRY_RATE_LIMIT_KEY_SECRET);
   const idempotencySecret = rateLimitSecret(env.INQUIRY_IDEMPOTENCY_KEY_SECRET);
-  if (!rateSecret) {
-    missing.push("rate_limit_secret");
+  if (env.INQUIRY_RATE_LIMIT_KEY_SECRET === undefined || env.INQUIRY_RATE_LIMIT_KEY_SECRET.trim().length === 0) {
+    pushUnique(missing, "INQUIRY_RATE_LIMIT_KEY_SECRET");
+  } else if (!rateSecret) {
+    pushUnique(invalid, "INQUIRY_RATE_LIMIT_KEY_SECRET");
   }
-  if (!idempotencySecret) {
-    missing.push("idempotency_secret");
+  if (env.INQUIRY_IDEMPOTENCY_KEY_SECRET === undefined || env.INQUIRY_IDEMPOTENCY_KEY_SECRET.trim().length === 0) {
+    pushUnique(missing, "INQUIRY_IDEMPOTENCY_KEY_SECRET");
+  } else if (!idempotencySecret) {
+    pushUnique(invalid, "INQUIRY_IDEMPOTENCY_KEY_SECRET");
   } else if (rateSecret && idempotencySecret === rateSecret) {
-    missing.push("secrets_not_distinct");
+    pushUnique(invalid, "INQUIRY_IDEMPOTENCY_KEY_SECRET");
   }
-  if (!readUpstashConfig({
-    UPSTASH_REDIS_REST_URL: env.UPSTASH_REDIS_REST_URL,
-    UPSTASH_REDIS_REST_TOKEN: env.UPSTASH_REDIS_REST_TOKEN,
+
+  const redisUrl = env.UPSTASH_REDIS_REST_URL;
+  const redisToken = env.UPSTASH_REDIS_REST_TOKEN;
+  if (redisUrl === undefined || redisUrl.trim().length === 0) {
+    pushUnique(missing, "UPSTASH_REDIS_REST_URL");
+  }
+  if (redisToken === undefined || redisToken.trim().length === 0) {
+    pushUnique(missing, "UPSTASH_REDIS_REST_TOKEN");
+  }
+  if (redisUrl && redisUrl.trim() && redisToken && redisToken.trim() && !readUpstashConfig({
+    UPSTASH_REDIS_REST_URL: redisUrl,
+    UPSTASH_REDIS_REST_TOKEN: redisToken,
   })) {
-    missing.push("redis");
+    pushUnique(invalid, "UPSTASH_REDIS_REST_URL");
   }
-  if (!readBrevoMailConfig({
+
+  const brevo = readBrevoMailConfig({
     BREVO_API_KEY: env.BREVO_API_KEY,
     BREVO_SENDER_EMAIL: env.BREVO_SENDER_EMAIL,
     BREVO_SENDER_NAME: env.BREVO_SENDER_NAME,
     INQUIRY_NOTIFICATION_EMAIL: env.INQUIRY_NOTIFICATION_EMAIL,
-  }).ok) {
-    missing.push("brevo");
+  });
+  if (!brevo.ok) {
+    const names = {
+      apiKey: "BREVO_API_KEY",
+      senderEmail: "BREVO_SENDER_EMAIL",
+      senderName: "BREVO_SENDER_NAME",
+      notificationEmail: "INQUIRY_NOTIFICATION_EMAIL",
+    } as const;
+    for (const issue of brevo.issues) {
+      pushUnique(issue.problem === "missing" ? missing : invalid, names[issue.field]);
+    }
+  } else {
+    if (brevo.config.senderEmail !== EXPECTED_BREVO_SENDER_EMAIL) {
+      pushUnique(invalid, "BREVO_SENDER_EMAIL");
+    }
+    if (brevo.config.senderName !== EXPECTED_BREVO_SENDER_NAME) {
+      pushUnique(invalid, "BREVO_SENDER_NAME");
+    }
+    if (brevo.config.notificationEmail !== EXPECTED_BREVO_NOTIFICATION_EMAIL) {
+      pushUnique(invalid, "INQUIRY_NOTIFICATION_EMAIL");
+    }
   }
 
-  const runtime = createInquiryRuntime(env);
-  const adaptersAttached = !(
-    runtime.rateLimiter instanceof UnavailableRateLimiter &&
-    runtime.delivery instanceof UnavailableInquiryDelivery &&
-    (runtime.idempotency === null || runtime.idempotency === undefined)
-  );
+  const configurationComplete = missing.length === 0 && invalid.length === 0;
+  let state: InquiryReadinessState = "disabled";
+  if (invalid.length > 0) {
+    state = "misconfigured";
+  } else if (configurationComplete && gate === "launch" && flag === "enabled") {
+    state = "ready_for_launch_review";
+  } else if (configurationComplete && gate === "testing") {
+    state = "ready_for_controlled_testing";
+  } else if (configurationComplete && gate === "disabled" && flag === "disabled") {
+    state = "configured";
+  }
 
   return {
-    serverConfigured: missing.length === 0,
+    state,
+    configurationComplete,
     missing,
-    publicPageEnabled: publicInquirySubmissionsAvailable,
-    adaptersAttached,
+    invalid,
+    submissionsEnabled: flag === "enabled",
+    activationGate: gate,
+    publicPageEnabled: resolvePublicInquirySubmissionsAvailable(env),
+    publicRouteUsesLiveAdapters: false,
+    brevoAuthenticationVerified: false,
+    inboxDeliveryVerified: false,
   };
+}
+
+/**
+ * The contact page uses this value. The hardcoded flag stays false, so the
+ * Send button cannot appear in this phase even if the launch gate is set.
+ */
+export function resolvePublicInquirySubmissionsAvailable(env: NodeJS.ProcessEnv = process.env) {
+  if (!publicInquirySubmissionsAvailable) {
+    return false;
+  }
+  const gate = readActivationGate(env.INQUIRY_ACTIVATION_GATE);
+  return gate === "launch" && env.INQUIRY_SUBMISSIONS_ENABLED === "true";
 }

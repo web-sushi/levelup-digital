@@ -7,13 +7,50 @@ const MIN_RATE_LIMIT_SECRET_LENGTH = 16;
 export function normalizeOrigin(value: string) {
   try {
     const url = new URL(value);
-    if (url.origin === "null") {
+    if (url.origin === "null" || url.username || url.password) {
       return null;
     }
     return url.origin;
   } catch {
     return null;
   }
+}
+
+const LOCAL_ORIGIN_HOSTS = new Set(["localhost", "127.0.0.1", "::1", "[::1]"]);
+
+/**
+ * Explicit HTTPS origins only. Localhost and wildcards are rejected.
+ * Development localhost access stays on the separate development list.
+ */
+export function readTrustedHttpsOrigins(value: string | undefined) {
+  const origins: string[] = [];
+  let invalid = false;
+  if (!value || value.trim().length === 0) {
+    return { origins, invalid };
+  }
+  for (const item of value.split(",")) {
+    const trimmed = item.trim();
+    if (!trimmed) {
+      continue;
+    }
+    if (trimmed.includes("*")) {
+      invalid = true;
+      continue;
+    }
+    let url: URL;
+    try {
+      url = new URL(trimmed);
+    } catch {
+      invalid = true;
+      continue;
+    }
+    if (url.protocol !== "https:" || url.username || url.password || LOCAL_ORIGIN_HOSTS.has(url.hostname)) {
+      invalid = true;
+      continue;
+    }
+    origins.push(url.origin);
+  }
+  return { origins, invalid };
 }
 
 export function isOriginAllowed(

@@ -1,5 +1,5 @@
 import { ProjectInquiryWizard } from "@/components/contact/ProjectInquiryWizard";
-import { publicInquirySubmissionsAvailable } from "@/lib/inquiries/public-availability";
+import { resolvePublicInquirySubmissionsAvailable } from "@/lib/inquiries/readiness";
 
 export function ContactProjectIntro() {
   return (
@@ -16,7 +16,7 @@ export function ContactProjectIntro() {
           </p>
         </div>
         <div className="contact-inquiry-slot">
-          <ProjectInquiryWizard submissionsAvailable={publicInquirySubmissionsAvailable} />
+          <ProjectInquiryWizard submissionsAvailable={resolvePublicInquirySubmissionsAvailable()} />
         </div>
       </div>
     </section>
