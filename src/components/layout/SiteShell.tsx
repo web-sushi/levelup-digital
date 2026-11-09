@@ -9,7 +9,7 @@ export function SiteShell({ children }: SiteShellProps) {
   return (
     <div className="site-shell">
       <Header />
-      <main id="main-content" className="site-main">
+      <main id="main-content" className="site-main" tabIndex={-1}>
         {children}
       </main>
       <Footer />
