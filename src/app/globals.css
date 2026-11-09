@@ -4016,3 +4016,148 @@ body {
     margin-top: 0;
   }
 }
+
+/* ——— Privacy consent ——— */
+.consent-footer-button {
+  border: 0;
+  padding: 0;
+  background: none;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.consent-banner {
+  position: fixed;
+  z-index: 80;
+  right: 0.75rem;
+  bottom: 0.75rem;
+  left: 0.75rem;
+  max-height: min(70vh, 28rem);
+  overflow: auto;
+  border: 1px solid var(--color-border-strong);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
+}
+
+.has-consent-banner .site-shell {
+  padding-bottom: 18rem;
+}
+
+.consent-dialog {
+  width: min(36rem, calc(100vw - 1.5rem));
+  max-height: min(70vh, 32rem);
+  padding: 0;
+  border: 1px solid var(--color-border-strong);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+}
+
+.consent-dialog::backdrop {
+  background: rgba(5, 5, 5, 0.72);
+}
+
+.consent-dialog-panel,
+.consent-banner {
+  padding: 1.25rem;
+}
+
+.consent-dialog-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.consent-close {
+  border: 0;
+  background: none;
+  color: var(--color-text-primary);
+  font: inherit;
+  font-size: 0.9375rem;
+  cursor: pointer;
+}
+
+.consent-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+}
+
+.consent-status,
+.consent-text,
+.consent-note {
+  margin: 0.75rem 0 0;
+  max-width: 62ch;
+  color: var(--color-text-muted);
+  font-size: 0.9375rem;
+  line-height: 1.5;
+}
+
+.consent-note {
+  color: var(--color-text-primary);
+}
+
+.consent-actions {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+}
+
+.consent-button {
+  min-height: 2.75rem;
+  padding: 0.75rem 1rem;
+  font: inherit;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.consent-button-reject {
+  border: 1px solid var(--color-border-strong);
+  background: transparent;
+  color: var(--color-text-primary);
+}
+
+.consent-button-accept {
+  border: 1px solid var(--color-accent-primary);
+  background: var(--color-accent-primary);
+  color: var(--color-on-accent);
+}
+
+.consent-policy-link {
+  justify-self: start;
+  color: var(--color-text-primary);
+  font-size: 0.9375rem;
+}
+
+@media (min-width: 768px) {
+  .consent-banner {
+    left: auto;
+    width: min(36rem, calc(100vw - 3rem));
+  }
+
+  .has-consent-banner .site-shell {
+    padding-bottom: 14rem;
+  }
+
+  .consent-actions {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .consent-policy-link {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .consent-banner,
+  .consent-dialog,
+  .consent-button {
+    transition: none;
+  }
+}

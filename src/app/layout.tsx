@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Space_Grotesk } from "next/font/google";
-import { GoogleAnalytics } from "@/components/analytics/GoogleAnalytics";
+import { ConsentManager } from "@/components/privacy/ConsentManager";
 import { SiteShell } from "@/components/layout/SiteShell";
 import { SkipLink } from "@/components/layout/SkipLink";
 import "./globals.css";
@@ -36,7 +36,7 @@ export default function RootLayout({
     <html lang="en" className={`${geist.variable} ${spaceGrotesk.variable}`}>
       <body className="min-h-screen overflow-x-hidden antialiased">
         <SkipLink />
-        <GoogleAnalytics />
+        <ConsentManager />
         <SiteShell>{children}</SiteShell>
       </body>
     </html>

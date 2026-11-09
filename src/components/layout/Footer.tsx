@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Mail, MessageCircle } from "lucide-react";
 import { LevelMark } from "@/components/brand/LevelMark";
+import { PrivacyPreferencesButton } from "@/components/privacy/PrivacyPreferencesButton";
 import { primaryNavLinks, projectCta, verifiedContactLinks } from "@/lib/nav";
 
 export function Footer() {
@@ -41,6 +42,9 @@ export function Footer() {
               <Link href="/privacy" className="footer-link focus-ring">
                 Privacy Policy
               </Link>
+            </li>
+            <li>
+              <PrivacyPreferencesButton />
             </li>
           </ul>
         </div>

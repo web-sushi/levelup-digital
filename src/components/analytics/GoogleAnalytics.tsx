@@ -1,21 +1,13 @@
-import Script from "next/script";
-import { GA_MEASUREMENT_ID } from "@/lib/analytics";
+"use client";
 
-export function GoogleAnalytics() {
-  return (
-    <>
-      <Script
-        src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
-        strategy="afterInteractive"
-      />
-      <Script id="google-analytics" strategy="afterInteractive">
-        {`
-          window.dataLayer = window.dataLayer || [];
-          function gtag(){dataLayer.push(arguments);}
-          gtag('js', new Date());
-          gtag('config', '${GA_MEASUREMENT_ID}');
-        `}
-      </Script>
-    </>
-  );
+import { useEffect } from "react";
+import { browserAnalyticsEnvironment, initializeGoogleAnalytics, trackPageView } from "@/lib/analytics";
+
+export function GoogleAnalytics({ pathname }: { pathname: string }) {
+  useEffect(() => {
+    initializeGoogleAnalytics(browserAnalyticsEnvironment());
+    trackPageView(pathname, window.location.href);
+  }, [pathname]);
+
+  return null;
 }
