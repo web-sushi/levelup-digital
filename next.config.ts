@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { previewRobotsTagHeaders } from "./src/lib/preview-indexing";
 
 const legacyHtmlRedirects = [
   { source: "/index.html", destination: "/", permanent: true },
@@ -36,6 +37,9 @@ const legacyHtmlRedirects = [
 const nextConfig: NextConfig = {
   async redirects() {
     return [...legacyHtmlRedirects];
+  },
+  async headers() {
+    return previewRobotsTagHeaders(process.env.VERCEL_ENV);
   },
 };
 

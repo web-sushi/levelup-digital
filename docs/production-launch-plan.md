@@ -81,10 +81,23 @@ Keep one straightforward production setup:
 Proposed production shape:
 
 - Vercel project, Pro or Enterprise, Node.js runtime for the App Router.
+- Framework preset Next.js. Install with npm because `package-lock.json` is present. Build command `npm run build` (`next build`). No `vercel.json` and no custom output directory.
 - Production domain `https://levelup-digital.dev`, no trailing slash. This matches `trailingSlash: false` and the canonical URLs already emitted by the app.
 - No separate database, queue, or email service for the website-only launch.
 - Upstash Redis and Brevo remain unwired from the public route until the activation checklist in section 9 is complete.
 - Google Analytics 4 stays in the existing consent flow. The measurement ID `G-8S5ZWSYC00` is in source. It is not an environment variable. The script does not load before consent.
+
+### Vercel staging requirements
+
+Reviewed from Vercel’s published docs on 9 November 2026. No project was linked and no plan was purchased.
+
+- **Commercial plan.** Pro or Enterprise. Hobby remains unsuitable for this agency site.
+- **Node.js.** This repository was verified on Node.js 22.19.0. It does not set `engines.node`. Vercel’s current choices are 22.x, 24.x, and 26.x, and a new project defaults to 26.x. Select 22.x for the first staging project so the runtime matches this verification. 26.x was not executed here.
+- **Build.** `next build` produces static pages plus two Node.js routes: `POST /api/inquiries` and `GET /og`. The Open Graph route reads `src/assets/fonts/SpaceGrotesk-Medium.ttf` at request time. The first staging check should request `/og` and confirm a 1200×630 PNG.
+- **Images.** `next/image` uses Vercel image optimization with no extra service and no custom loader. It is available on Pro. Transformations are usage-priced. Do not switch the image-billing option during staging.
+- **Preview protection.** Use Standard Protection with Vercel Authentication so preview URLs and deployment URLs require a Vercel login, while the production domain stays public. Do not choose “All Deployments,” which would also lock the production domain. Password Protection is a separate Pro charge and is not required.
+- **Environment separation.** Create Preview and Production variables separately. Omit the inquiry secrets from both until activation. Do not copy `.env.local`. Preview must not send customer email.
+- **Indexing.** See the preview header below. Protection limits who can open a preview. `noindex` tells crawlers not to index it. Use both.
 
 Preview deployments must stay off the production domain, must not receive production Redis or Brevo credentials unless a specific controlled test justifies it, and must not send customer email.
 
@@ -158,7 +171,9 @@ Do this only after the owner approves the production release. DNS changes are no
 | `/project-clinic-basic.html` | `/work/clinic-basic` |
 | `/project-clinic-standard.html` | `/work/clinic-standard` |
 
-Next.js keeps the query string on these redirects. `/contact.html?project=photo-basic` would become `/contact?project=photo-basic`. The inquiry wizard does not read that query, so the old project hint is not applied. Mapping those query values into the wizard would be a separate product decision. It is not implemented.
+**HTTP check, 9 November 2026.** Against the local production server, all 18 redirects returned **308** to the destination in the table. Each destination then returned **200**. None redirected again, so there is no loop. `/contact.html?project=tour-basic` returned `308` to `/contact?project=tour-basic`, so the query string is kept.
+
+The 11 legacy concept pages link to `contact.html?project=` with these values: `tour-basic`, `tour-standard`, `tour-pro`, `cafe-basic`, `cafe-standard`, `photo-basic`, `photo-standard`, `home-service-basic`, `home-service-standard`, `clinic-basic`, and `clinic-standard`. The redesigned contact page does not read `project`. The hint survives the redirect and is not applied to the wizard. Whether to honor it is an owner decision. No mapping was added.
 
 Not redirected, because no replacement URL was confirmed:
 
@@ -198,10 +213,16 @@ At cutover, the old Netlify form stops receiving submissions because the redesig
 - The 18 legacy HTML redirects above are the migration map for URLs the old static site exposed.
 - Internal links use the new routes. Client project links point at the two live client sites. Concept Lab links point at the existing demo URLs.
 
+### Preview indexing
+
+**Verified from Vercel’s response-header docs on 9 November 2026.** Vercel adds `x-robots-tag: noindex` automatically to preview deployments, and to a production deployment when it is requested through its unique deployment URL. Vercel does not add that header when a preview is served from a custom domain assigned to a Git branch.
+
+The app now supplies that missing case. `previewRobotsTagHeaders` returns `X-Robots-Tag: noindex` for `/:path*` only when `VERCEL_ENV` is exactly `preview`. `production`, `development`, and an unset value return no header. The production build’s route manifest has an empty header list, and the local production server did not send `X-Robots-Tag`. `/robots.txt` still allows `/` and points at the production sitemap. The production domain is not `noindex`.
+
 ### Visibility risks
 
-- Preview URLs are not separately marked `noindex`. Production `robots.txt` allows `/`. A shared Vercel preview could be indexed if it is linked. Before sharing a preview, add a host check that sends `X-Robots-Tag: noindex` for every host other than `levelup-digital.dev`, and confirm the production host does not receive that header. That change is not in this commit, because a mistaken rule could noindex production.
-- The first homepage Lighthouse run was a cold start and looked much slower than a repeat. Use field data after launch rather than that first lab run. See the performance section.
+- A preview on a `*.vercel.app` URL gets Vercel’s automatic header. A custom preview domain gets the app header only if that deployment was built with `VERCEL_ENV=preview`. Confirm both with `curl -I` on the first preview.
+- The repeated homepage Lighthouse runs settle at performance 0.97. The first run in a series is slower. See the performance section.
 - Permanent redirects are strong. They should be in place before the domain is switched, which they already are in this app. They do nothing for the current Netlify site until the domain points at the redesign.
 
 ### After launch, in Google Search Console
@@ -362,7 +383,8 @@ The rollback target is the current Netlify site. Do not delete that site, its de
 - When DNS may change, and whether `www` should exist.
 - Whether the website launches while inquiries stay disabled. This plan says yes, that is the safe order.
 - Inquiry retention, hosting disclosure, privacy contact, international visitors, analytics regions, and access or deletion handling.
-- Whether `/contact?project=` should preselect a wizard project. It does not today.
+- Whether `/contact?project=` should preselect a wizard project. The redirect keeps the query. The wizard does not read it.
+- Which Node.js version the Vercel project should use. 22.x matches this verification. The new-project default, 26.x, was not run here.
 - When the privacy-page review note can come off.
 
 ---
@@ -374,10 +396,10 @@ The rollback target is the current Netlify site. Do not delete that site, its de
 | Hobby plan used for a commercial site | Do not launch on Hobby. Owner approves Pro or Enterprise first. |
 | DNS cutover is hard to undo quickly | Keep the Netlify site. Record live DNS first. Switch only after preview checks. |
 | Old Netlify form disappears at cutover | Launch with submissions disabled and with email plus WhatsApp visible. Say so on the contact and privacy pages, which they already do. |
-| Preview URL gets indexed | Add `noindex` for non-production hosts before sharing the preview. Confirm production does not send that header. |
+| Preview URL gets indexed | Vercel noindexes preview deployment URLs. The app also sends `X-Robots-Tag: noindex` when `VERCEL_ENV=preview`, which covers a custom preview domain. Production responses do not send it. |
 | Inquiry switches flipped too early | The public route still uses unavailable adapters, and the Send button is hardcoded off. Both must be changed on purpose. |
 | Secrets copied from a laptop into production | Create production secrets in the host. Do not commit `.env.local`. |
-| Homepage lab score looks poor | The first local Lighthouse run was a cold start. The repeat did not justify a homepage change. Re-measure on the preview. |
+| Homepage lab score looks poor | Four controlled runs on one production server: the first scored 0.76 and the next three scored 0.97. Transfer size did not change. No homepage optimization was added. Re-measure on the preview. |
 | Legacy image and CSS URLs 404 | Accepted. Page redirects exist. Asset redirects were not invented. |
 | LinkedIn may block automated checks | An earlier check got HTTP 999, which is a bot response, not proof the profile URL is wrong. Leave the link. |
 
@@ -385,45 +407,42 @@ The rollback target is the current Netlify site. Do not delete that site, its de
 
 ## Measured performance
 
-Environment: local `next start` on port 3013, production build of the commit before the skip-link focus change, Lighthouse 12.8.2, headless Chrome for Testing, mobile form factor, simulated slow 4G, 4× CPU. One run per page, plus a second homepage run. This is a lab result on a laptop, not field data from the production domain. No score below was estimated.
+Environment for the LS-10B runs: local `next start` on `127.0.0.1:3013`, production build, Lighthouse 12, headless Chrome for Testing, mobile, simulated slow 4G, 4× CPU. Four homepage runs were made in a row on the same server, then one Tour Basic run. This is a lab result on a laptop, not field data. No score below was estimated.
 
-The homepage was the first URL, while Lighthouse was still starting, and it is not the representative result. The repeat is.
+An earlier single cold homepage run scored 0.58 with 4.76 s of blocking time. That result did not repeat.
 
-| Page | Performance | Accessibility | LCP | CLS | TBT | Transfer |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| Homepage, first run | 0.58 | 0.96 | 3.40 s | 0 | 4.76 s | 431 KiB |
-| Homepage, repeat | 0.98 | not rerun | 2.43 s | 0 | 0.06 s | not rerun |
-| Services | 0.94 | 0.96 | 1.42 s | 0 | 0.30 s | 394 KiB |
-| Work | 0.98 | 0.96 | 1.68 s | 0 | 0.16 s | 527 KiB |
-| Contact | 0.86 | 0.96 | 1.94 s | 0 | 0.52 s | 393 KiB |
-| Enjoy Travel case study | 0.94 | 0.96 | 2.82 s | 0 | 0.14 s | 503 KiB |
-| Tour Basic concept | 0.92 | 0.96 | 2.50 s | 0 | 0.28 s | 446 KiB |
+| Run | Performance | LCP | CLS | TBT | FCP | TTFB | Transfer |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Homepage 1 | 0.76 | 3.68 s | 0 | 516 ms | 0.78 s | 16 ms | 420 KiB |
+| Homepage 2 | 0.97 | 2.60 s | 0 | 28 ms | 0.77 s | 10 ms | 420 KiB |
+| Homepage 3 | 0.97 | 2.61 s | 0 | 24 ms | 0.78 s | 10 ms | 420 KiB |
+| Homepage 4 | 0.97 | 2.58 s | 0 | 16 ms | 0.77 s | 8 ms | 420 KiB |
+| Tour Basic | 0.96 | 2.63 s | 0 | 103 ms | 0.79 s | 33 ms | 446 KiB |
 
-On the first pass, every page transferred about 288 KiB of JavaScript, 14 KiB of CSS, and 51 KiB of fonts. Image transfer was 0 KiB on Services and Contact, 36 KiB on the homepage, 126 KiB on Work, 106 KiB on the Enjoy Travel study, and 48 KiB on Tour Basic. `next/image` is doing that resizing. Fonts use `font-display: swap`, and the font-display audit passed. Google Analytics was not loaded, because the runs did not accept consent.
+Every homepage run transferred the same resources: about 288 KiB of JavaScript, 14 KiB of CSS, 51 KiB of fonts, and 26 KiB of images. Tour Basic transferred 48 KiB of images. Google Analytics was not loaded.
 
-The first homepage run spent most of its main-thread time in an unattributable task categorized as “Other,” with script evaluation under one second. The repeat’s longest task was 128 ms. That pattern fits a cold local server, not a stable homepage defect. No homepage change was made.
+The first homepage run’s extra cost was main-thread time, not the network. Its server response was 16 ms, against 8–10 ms on the later runs. Largest Contentful Paint was text, and most of that time was render delay: 3.22 s on the first run and 2.14 s on the second. The first run had one unattributable long task of 608 ms. The second run’s longest task was 105 ms. Runs 2–4 stayed within 0.03 s of LCP and 12 ms of blocking time.
 
-Lighthouse accessibility was 0.96 on all six first-run pages because of contrast on decorative text. See below. These scores are not a WCAG conformance claim.
+No resource changed between runs, so the gap is first-load CPU work under the lab throttle, not a missing preload or an oversized file. No performance code change was made.
+
+Tour Basic accessibility was 0.96. The only failing audit was the footer wordmark. The concept numbers were not flagged.
 
 ---
 
 ## Accessibility findings
 
-Checked in Chromium against the local dev server after the focus fix, and against the local production server for the consent flow.
+### Concept Lab numbers
 
-Verified:
+The numbers convey order. The lists use `list-style: none`, so the visible `01` labels are the sequence cue for sighted visitors. At 16 px and weight 600 they need a 4.5:1 contrast ratio.
 
-- The skip link is the first Tab stop. Enter moves focus to `main#main-content` and shows a 2px accent outline. Before this change, the hash changed and focus stayed on `body`, because the target was not focusable.
-- The mobile menu opens after hydration. Escape removes it and returns focus to “Open menu.”
-- An empty Continue on the inquiry wizard shows “Choose a project type to continue.” and marks one field `aria-invalid`. An earlier failure was a click before hydration.
-- Contact has no Send button and shows “Nothing you type is sent.”
-- The privacy banner can be rejected. The choice is stored. Footer preferences open a native dialog named “Privacy preferences.” Escape restores focus to the footer button.
-- No Google Analytics resource is requested before consent.
-- The stylesheet shortens animation and transition durations and sets `scroll-behavior: auto` under `prefers-reduced-motion: reduce`. The browser check confirmed the media query matches. Individual animations were not filmed one by one.
+Rendered before the change, 42% white measured about 4.00:1 on `#050505` and 4.08:1 on `#151515`. The color is now 50% white. Rendered after the change, the labels are `color(srgb 1 1 1 / 0.5)`. Composited, that is 5.30:1 on the page background `#050505` and 5.29:1 on the surface `#151515`. The large step numbers use the same color and clear both the 3:1 large-text bar and the 4.5:1 bar. The first step number is the accent green, at 11.81:1 on `#151515`. Lighthouse no longer lists these labels.
 
-Remaining, and not changed, because they are intentional low-contrast decoration:
+### Footer wordmark
 
-- The footer wordmark (`.footer-signature`, `aria-hidden`) measured about 1.4:1, `#313131` on `#151515`. Lighthouse still flags it. It is a watermark, and raising it would change the design.
-- Concept study index numbers (`.concept-study-index`, `aria-hidden`) measured about 3.99:1 and 4.07:1, below the 4.5:1 Lighthouse expects for that text size.
+`LEVELUP` is `aria-hidden`. The same name is in the header mark and in the copyright line. The wordmark does not add information. Rendered size was 70.2 px on a 390 px viewport, weight 600, on footer background `#151515`. Lighthouse reports 1.40:1 (`#313131` on `#151515`) and asks for 3:1 because the type is large.
 
-Automated contrast checks and a keyboard pass are not a full WCAG audit. Screen readers were not used.
+That 3:1 floor would apply if the wordmark were meaningful text. It is a watermark, so the contrast exception for pure decoration applies. Raising it to 3:1 needs about 34% white and would turn the watermark into a much stronger line of type. It was left at 12% white. Lighthouse will keep reporting it. That is the remaining automated contrast finding.
+
+The same 42% mix is still used by the About capability index at 1.15 rem. That label is meaningful small text and calculates to about 4.00:1 on `#050505`. It was not part of the Lighthouse sample and was not restyled in this pass.
+
+Earlier keyboard checks still stand: the skip link focuses `main`, the mobile menu closes with Escape, and an empty Continue explains which choice is missing. The production contact page shows “Nothing you type is sent” and has no Send button. These checks are not a WCAG conformance claim.

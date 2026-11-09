@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import { getPublishedConceptSlugs } from "@/content/projects/projects";
 import { publicInquirySubmissionsAvailable } from "@/lib/inquiries/public-availability";
+import { previewRobotsTagHeaders } from "@/lib/preview-indexing";
 import {
   SITE_ORIGIN,
   breadcrumbJsonLd,
@@ -86,5 +87,17 @@ describe("search metadata", () => {
     assert.equal(crumbs.itemListElement.length, 3);
     assert.equal(crumbs.itemListElement[2]?.item, `${SITE_ORIGIN}/work/tour-basic`);
     assert.equal(publicInquirySubmissionsAvailable, false);
+  });
+
+  it("adds a preview noindex header without changing production indexing", () => {
+    assert.deepEqual(previewRobotsTagHeaders(undefined), []);
+    assert.deepEqual(previewRobotsTagHeaders("production"), []);
+    assert.deepEqual(previewRobotsTagHeaders("development"), []);
+    assert.deepEqual(previewRobotsTagHeaders("preview"), [
+      {
+        source: "/:path*",
+        headers: [{ key: "X-Robots-Tag", value: "noindex" }],
+      },
+    ]);
   });
 });

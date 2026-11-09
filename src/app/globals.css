@@ -2764,7 +2764,7 @@ body {
   font-weight: 600;
   letter-spacing: -0.05em;
   line-height: 0.9;
-  color: color-mix(in srgb, var(--color-text-primary) 42%, transparent);
+  color: color-mix(in srgb, var(--color-text-primary) 50%, transparent);
 }
 
 .concept-study-index {
