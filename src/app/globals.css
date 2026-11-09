@@ -3154,6 +3154,7 @@ body {
 .about-index {
   padding-top: 0.2rem;
   font-size: 1.15rem;
+  color: color-mix(in srgb, var(--color-text-primary) 50%, transparent);
 }
 
 .about-step-index {

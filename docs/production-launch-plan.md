@@ -173,7 +173,7 @@ Do this only after the owner approves the production release. DNS changes are no
 
 **HTTP check, 9 November 2026.** Against the local production server, all 18 redirects returned **308** to the destination in the table. Each destination then returned **200**. None redirected again, so there is no loop. `/contact.html?project=tour-basic` returned `308` to `/contact?project=tour-basic`, so the query string is kept.
 
-The 11 legacy concept pages link to `contact.html?project=` with these values: `tour-basic`, `tour-standard`, `tour-pro`, `cafe-basic`, `cafe-standard`, `photo-basic`, `photo-standard`, `home-service-basic`, `home-service-standard`, `clinic-basic`, and `clinic-standard`. The redesigned contact page does not read `project`. The hint survives the redirect and is not applied to the wizard. Whether to honor it is an owner decision. No mapping was added.
+The 11 legacy concept pages link to `contact.html?project=` with these values: `tour-basic`, `tour-standard`, `tour-pro`, `cafe-basic`, `cafe-standard`, `photo-basic`, `photo-standard`, `home-service-basic`, `home-service-standard`, `clinic-basic`, and `clinic-standard`. Those values are portfolio slugs, not wizard project types. A known published slug shows the project title and a link to its case study. It does not preselect a project type, and it is not copied into the inquiry fields. Any other value, including a URL, is ignored.
 
 Not redirected, because no replacement URL was confirmed:
 
@@ -383,7 +383,7 @@ The rollback target is the current Netlify site. Do not delete that site, its de
 - When DNS may change, and whether `www` should exist.
 - Whether the website launches while inquiries stay disabled. This plan says yes, that is the safe order.
 - Inquiry retention, hosting disclosure, privacy contact, international visitors, analytics regions, and access or deletion handling.
-- Whether `/contact?project=` should preselect a wizard project. The redirect keeps the query. The wizard does not read it.
+- A known `/contact?project=` slug now names that portfolio piece without choosing a wizard project type. Unknown values are ignored.
 - Which Node.js version the Vercel project should use. 22.x matches this verification. The new-project default, 26.x, was not run here.
 - When the privacy-page review note can come off.
 
@@ -443,6 +443,6 @@ Rendered before the change, 42% white measured about 4.00:1 on `#050505` and 4.0
 
 That 3:1 floor would apply if the wordmark were meaningful text. It is a watermark, so the contrast exception for pure decoration applies. Raising it to 3:1 needs about 34% white and would turn the watermark into a much stronger line of type. It was left at 12% white. Lighthouse will keep reporting it. That is the remaining automated contrast finding.
 
-The same 42% mix is still used by the About capability index at 1.15 rem. That label is meaningful small text and calculates to about 4.00:1 on `#050505`. It was not part of the Lighthouse sample and was not restyled in this pass.
+The About capability numbers sit on `#151515` and use the same 50% white treatment. Rendered at 18.4 px, that is 5.29:1. The larger About step numbers remain on the quieter 42% mix, which already clears the 3:1 large-text bar.
 
 Earlier keyboard checks still stand: the skip link focuses `main`, the mobile menu closes with Escape, and an empty Continue explains which choice is missing. The production contact page shows “Nothing you type is sent” and has no Send button. These checks are not a WCAG conformance claim.

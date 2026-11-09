@@ -1,7 +1,13 @@
+import Link from "next/link";
 import { ProjectInquiryWizard } from "@/components/contact/ProjectInquiryWizard";
 import { resolvePublicInquirySubmissionsAvailable } from "@/lib/inquiries/readiness";
+import type { PortfolioReference } from "@/lib/portfolio-reference";
 
-export function ContactProjectIntro() {
+type ContactProjectIntroProps = {
+  reference?: PortfolioReference | null;
+};
+
+export function ContactProjectIntro({ reference = null }: ContactProjectIntroProps) {
   return (
     <section className="contact-band contact-band-surface" aria-labelledby="contact-project-heading">
       <div className="site-container contact-project">
@@ -14,6 +20,15 @@ export function ContactProjectIntro() {
             saved. Email, WhatsApp, and the social links further down the page
             still work if you would rather write directly.
           </p>
+          {reference ? (
+            <p className="contact-lead">
+              You were looking at{" "}
+              <Link href={reference.path} className="focus-ring">
+                {reference.title}
+              </Link>
+              . Choose the project type that fits what you want to build.
+            </p>
+          ) : null}
         </div>
         <div className="contact-inquiry-slot">
           <ProjectInquiryWizard submissionsAvailable={resolvePublicInquirySubmissionsAvailable()} />

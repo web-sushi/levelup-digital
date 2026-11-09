@@ -4,6 +4,7 @@ import { ContactHero } from "@/components/contact/ContactHero";
 import { ContactProcess } from "@/components/contact/ContactProcess";
 import { ContactProjectIntro } from "@/components/contact/ContactProjectIntro";
 import { createPageMetadata } from "@/lib/metadata";
+import { portfolioReferenceFromQuery } from "@/lib/portfolio-reference";
 
 export const metadata = createPageMetadata({
   title: "Contact",
@@ -12,11 +13,18 @@ export const metadata = createPageMetadata({
   path: "/contact",
 });
 
-export default function ContactPage() {
+type ContactPageProps = {
+  searchParams: Promise<{ project?: string | string[] }>;
+};
+
+export default async function ContactPage({ searchParams }: ContactPageProps) {
+  const params = await searchParams;
+  const reference = portfolioReferenceFromQuery(params.project);
+
   return (
     <>
       <ContactHero />
-      <ContactProjectIntro />
+      <ContactProjectIntro reference={reference} />
       <ContactChannels />
       <ContactProcess />
       <ContactCTA />
