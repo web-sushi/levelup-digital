@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import { getPublishedConceptSlugs } from "@/content/projects/projects";
 import { publicInquirySubmissionsAvailable } from "@/lib/inquiries/public-availability";
-import { previewRobotsTagHeaders } from "@/lib/preview-indexing";
+import { previewRobotsTagHeaders, temporaryHostRobotsTag } from "@/lib/preview-indexing";
 import {
   SITE_ORIGIN,
   breadcrumbJsonLd,
@@ -99,5 +99,14 @@ describe("search metadata", () => {
         headers: [{ key: "X-Robots-Tag", value: "noindex" }],
       },
     ]);
+    assert.equal(temporaryHostRobotsTag("levelup-digital.dev"), null);
+    assert.equal(temporaryHostRobotsTag("www.levelup-digital.dev"), null);
+    assert.equal(temporaryHostRobotsTag(" LEVELUP-DIGITAL.DEV:443 "), null);
+    assert.equal(temporaryHostRobotsTag("levelup-digital-redesign.vercel.app"), "noindex");
+    assert.equal(temporaryHostRobotsTag("localhost:3000"), "noindex");
+    assert.equal(temporaryHostRobotsTag("levelup-digital.dev.evil.example"), "noindex");
+    assert.equal(temporaryHostRobotsTag("example.com"), "noindex");
+    assert.equal(temporaryHostRobotsTag(""), "noindex");
+    assert.equal(temporaryHostRobotsTag(null), "noindex");
   });
 });

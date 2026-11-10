@@ -35,6 +35,11 @@ const legacyHtmlRedirects = [
 ] as const;
 
 const nextConfig: NextConfig = {
+  images: {
+    // The LevelUp Digital Hobby team is past its included Image Optimization
+    // allowance, so /_next/image returns HTTP 402. Serve the committed files.
+    unoptimized: true,
+  },
   async redirects() {
     return [...legacyHtmlRedirects];
   },

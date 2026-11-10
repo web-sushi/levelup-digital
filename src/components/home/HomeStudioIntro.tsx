@@ -8,7 +8,7 @@ export function HomeStudioIntro() {
         <div className="home-studio-portrait">
           <span className="home-studio-cobalt" aria-hidden="true" />
           <Image
-            src="/images/portrait.jpg"
+            src="/images/portrait.webp"
             alt="Portrait of Atsushi Junior Harada, founder of LevelUp Digital"
             width={704}
             height={1472}

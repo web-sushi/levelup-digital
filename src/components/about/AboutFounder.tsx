@@ -10,7 +10,7 @@ export function AboutFounder() {
         <div className="about-founder-portrait">
           <span className="about-founder-cobalt" aria-hidden="true" />
           <Image
-            src="/images/portrait.jpg"
+            src="/images/portrait.webp"
             alt="Portrait of Atsushi Junior Harada, founder of LevelUp Digital"
             width={704}
             height={1472}

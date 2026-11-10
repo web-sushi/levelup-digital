@@ -1,8 +1,8 @@
 # LevelUp Digital production launch plan
 
-Prepared 9 November 2026 on branch `redesign/levelup-creative-agency`.
+Prepared 9 November 2026 on branch `redesign/levelup-creative-agency`. Updated the same day after the protected staging audit and the image-delivery hardening in LS-10E.
 
-This is a readiness plan. It does not deploy the site, change DNS, change production environment variables, or enable public inquiry submissions.
+This is a readiness plan. It does not deploy the site, change DNS, change the live Vercel project settings, or enable public inquiry submissions.
 
 ## How to read this document
 
@@ -18,14 +18,14 @@ No secret values are recorded here. Local credentials were not copied into any d
 
 **Recommendation, pending owner approval: host the redesigned Next.js application on Vercel, on a Pro or Enterprise plan. Do not use the Hobby plan for this site.**
 
-This was not purchased, upgraded, or linked. The owner’s Vercel account was not inspected. There is no `vercel.json`, no Netlify config, and no GitHub Actions workflow in this repository, and no Vercel project is linked from the repo.
+This was not purchased or upgraded. A staging project now exists and was inspected read-only: `levelupdigital/levelup-digital-redesign`, team plan Hobby. The repository still has no `vercel.json`, no Netlify config, and no GitHub Actions workflow. Section 15 records the image, Node.js, Git, and protection findings from that project.
 
 ### Why Vercel fits this application
 
 Verified from the repository:
 
 - The redesign is a Next.js 16 App Router application. Public pages are statically generated. Two routes are dynamic: `POST /api/inquiries` (Node.js) and `GET /og` (Node.js, reads a font at request time and returns a 1200×630 PNG).
-- Images use `next/image`. There is no custom image-optimization override in `next.config.ts`, so the host’s Next.js image optimizer is part of the intended runtime.
+- Images use `next/image`. `images.unoptimized` is now true, so the pages request the committed files instead of `/_next/image`. Section 15 explains why.
 - Later inquiry activation, if approved, trusts only the first address in `x-vercel-forwarded-for`. `x-forwarded-for` is ignored because a caller can set it. The address is HMAC-SHA256 hashed and is not logged. A website-only launch does not need that header. An inquiry launch on a host that does not set `x-vercel-forwarded-for` would fail closed for rate limiting.
 
 ### Why Hobby is not the production plan
@@ -92,9 +92,9 @@ Proposed production shape:
 Reviewed from Vercel’s published docs on 9 November 2026. No project was linked and no plan was purchased.
 
 - **Commercial plan.** Pro or Enterprise. Hobby remains unsuitable for this agency site.
-- **Node.js.** This repository was verified on Node.js 22.19.0. It does not set `engines.node`. Vercel’s current choices are 22.x, 24.x, and 26.x, and a new project defaults to 26.x. Select 22.x for the first staging project so the runtime matches this verification. 26.x was not executed here.
-- **Build.** `next build` produces static pages plus two Node.js routes: `POST /api/inquiries` and `GET /og`. The Open Graph route reads `src/assets/fonts/SpaceGrotesk-Medium.ttf` at request time. The first staging check should request `/og` and confirm a 1200×630 PNG.
-- **Images.** `next/image` uses Vercel image optimization with no extra service and no custom loader. It is available on Pro. Transformations are usage-priced. Do not switch the image-billing option during staging.
+- **Node.js.** Local verification used Node.js 22.19.0. `package.json` now sets `engines.node` to `22.x`. The staging project setting is still 26.x, and that dashboard setting overrides `engines` until the owner changes it. The existing deployment was built on 26.x and succeeded. A new deployment is required before either the image change or a Node change can run on Vercel. Do not change the project setting without owner approval.
+- **Build.** `next build` produces static pages plus two Node.js routes: `POST /api/inquiries` and `GET /og`. The Open Graph route reads `src/assets/fonts/SpaceGrotesk-Medium.ttf` at request time. The staging check confirmed `/og` is a 1200×630 PNG.
+- **Images.** Hobby includes 5,000 image transformations a month for the whole team, then new `/_next/image` requests return HTTP 402. Pro bills further transformations on demand, starting at $0.05 per 1,000. The current site serves committed image files and does not depend on that allowance. See section 15.
 - **Preview protection.** Use Standard Protection with Vercel Authentication so preview URLs and deployment URLs require a Vercel login, while the production domain stays public. Do not choose “All Deployments,” which would also lock the production domain. Password Protection is a separate Pro charge and is not required.
 - **Environment separation.** Create Preview and Production variables separately. Omit the inquiry secrets from both until activation. Do not copy `.env.local`. Preview must not send customer email.
 - **Indexing.** See the preview header below. Protection limits who can open a preview. `noindex` tells crawlers not to index it. Use both.
@@ -307,7 +307,7 @@ If a future activation misbehaves:
 
 ## 10. Staging verification
 
-Plan only. Do not create the project in this phase.
+The staging project exists. Do not create another deployment from this document.
 
 ### Stage A — local, completed for this commit
 
@@ -384,7 +384,7 @@ The rollback target is the current Netlify site. Do not delete that site, its de
 - Whether the website launches while inquiries stay disabled. This plan says yes, that is the safe order.
 - Inquiry retention, hosting disclosure, privacy contact, international visitors, analytics regions, and access or deletion handling.
 - A known `/contact?project=` slug now names that portfolio piece without choosing a wizard project type. Unknown values are ignored.
-- Which Node.js version the Vercel project should use. 22.x matches this verification. The new-project default, 26.x, was not run here.
+- Whether to change the Vercel project’s Node.js setting from 26.x to 22.x before the next deployment. The repository now requests 22.x. The current deployment already built on 26.x.
 - When the privacy-page review note can come off.
 
 ---
@@ -396,7 +396,7 @@ The rollback target is the current Netlify site. Do not delete that site, its de
 | Hobby plan used for a commercial site | Do not launch on Hobby. Owner approves Pro or Enterprise first. |
 | DNS cutover is hard to undo quickly | Keep the Netlify site. Record live DNS first. Switch only after preview checks. |
 | Old Netlify form disappears at cutover | Launch with submissions disabled and with email plus WhatsApp visible. Say so on the contact and privacy pages, which they already do. |
-| Preview URL gets indexed | Vercel noindexes preview deployment URLs. The app also sends `X-Robots-Tag: noindex` when `VERCEL_ENV=preview`, which covers a custom preview domain. Production responses do not send it. |
+| Preview or temporary hostname gets indexed | Vercel noindexes preview deployment URLs and unique deployment URLs. The app also sends `X-Robots-Tag: noindex` when `VERCEL_ENV=preview`. A proxy sends the same tag for every host other than `levelup-digital.dev` and `www.levelup-digital.dev`, including the production `*.vercel.app` alias. The public domain does not receive it. Vercel Authentication remains on and was not disabled. |
 | Inquiry switches flipped too early | The public route still uses unavailable adapters, and the Send button is hardcoded off. Both must be changed on purpose. |
 | Secrets copied from a laptop into production | Create production secrets in the host. Do not commit `.env.local`. |
 | Homepage lab score looks poor | Four controlled runs on one production server: the first scored 0.76 and the next three scored 0.97. Transfer size did not change. No homepage optimization was added. Re-measure on the preview. |
@@ -446,3 +446,57 @@ That 3:1 floor would apply if the wordmark were meaningful text. It is a waterma
 The About capability numbers sit on `#151515` and use the same 50% white treatment. Rendered at 18.4 px, that is 5.29:1. The larger About step numbers remain on the quieter 42% mix, which already clears the 3:1 large-text bar.
 
 Earlier keyboard checks still stand: the skip link focuses `main`, the mobile menu closes with Escape, and an empty Continue explains which choice is missing. The production contact page shows “Nothing you type is sent” and has no Send button. These checks are not a WCAG conformance claim.
+
+---
+
+## 15. Image delivery, runtime, and a clean deployment
+
+Verified against the staging project `levelupdigital/levelup-digital-redesign` on 9 November 2026. No plan was purchased, no deployment was created, and the project settings were not changed.
+
+### Image Optimization 402
+
+Hobby includes 5,000 image transformations, 300,000 image cache reads, and 100,000 image cache writes per month for the whole team. Published Vercel pricing says new transformations after that allowance return HTTP 402. Previously cached variants keep working. Hobby is not billed for the overage. Pro continues past the included amount and charges on demand, from $0.05 per 1,000 transformations, plus cache reads and writes.
+
+On the staging alias, the original files return 200. `/_next/image` returns 402 with `x-vercel-error: OPTIMIZED_IMAGE_REQUEST_PAYMENT_REQUIRED` and a body of `Payment required`. The first checked optimizer request was already a cache miss and a 402, so this deployment had not filled the allowance by itself. The team also hosts other projects, and the allowance is shared. The usage total could not be read: the metrics query requires Observability Plus, which the Hobby team does not have. Billing details were also outside the available access. An upgrade is the documented way to make new optimizer requests succeed, and it is still required for commercial use, but this audit did not see the team’s spend controls, so an upgrade is not recorded here as a measured guarantee.
+
+`next/image` stays in the components. `images.unoptimized` is true, so the browser requests the file in `src` and does not call `/_next/image`. Alt text, width, height, `priority`, and lazy loading stay on the component. `sizes` no longer selects a generated variant, because there is no optimizer srcset.
+
+The client portfolio WebP files were already 1,600×742 and 23–111 KB. They are unchanged. The portrait and Concept Lab screenshots were large JPEGs, so smaller WebP copies are what the pages now use:
+
+| Source | Served file | Served size |
+| --- | --- | ---: |
+| `portrait.jpg`, 704×1472, 1,358,526 bytes | `portrait.webp`, same pixels | 44,938 bytes |
+| Concept desktop JPEGs, about 2,880 px wide, 299–575 KB | WebP at 2,200 px wide, aspect ratio kept | 52–105 KB each |
+| Concept mobile JPEGs, about 1,000 px wide, 160–228 KB | WebP at 720 px wide, aspect ratio kept | 28–42 KB each |
+
+A phone still downloads the one served file rather than a smaller srcset. That file is the 720 px mobile concept image, the 2,200 px desktop concept image, the existing client WebP, or the 45 KB portrait. The desktop width covers the widest concept card on a 2x display. The original JPEGs remain in `public/images` and are not referenced. Turning `images.unoptimized` back to false is only useful after the team can complete optimizer requests again.
+
+### Node.js
+
+`package.json` requests Node.js 22.x, matching the local 22.19.0 verification. That `engines` field does not change the Vercel project runtime, and it does not prove the dashboard setting has been changed. The Vercel project is still set to 26.x. That setting wins over `engines` until the owner changes it. The current deployment was built on 26.x and is Ready, so 26.x can build this app. The next deployment is what would pick up 22.x, and only after the project setting is changed. This phase did not change it.
+
+### Git production source
+
+The project is linked to `web-sushi/levelup-digital`. Its Git production branch is `main`. Automatic Git deployments are disabled. The current production deployment is CLI upload `dpl_9meDH2Rq5nZdRPgUipLxJwXqhrpB` from commit `569e16ca`, with `gitDirty` set. The upload included files that are not part of a clean commit: `AGENTS.md`, gitignored `next-env.d.ts` and `tsconfig.tsbuildinfo`, and the gitignored `portfolio-source/` originals. It did not include `.env.local`, `.DS_Store`, or `.vercel`. `.vercelignore` now excludes those local and generated paths so a later CLI upload from a dirty tree does not repeat that.
+
+Recommended source, after owner approval: merge `redesign/levelup-creative-agency` into `main`, leave automatic production deployments disabled, and deploy that clean `main` commit manually. Promoting the redesign branch to the production source would leave `main` behind the configured production branch. A temporary release branch adds another ref without making the configured production branch match the public site. Do not push, merge, or enable automatic deployments in this phase.
+
+### Authentication and indexing
+
+Vercel Authentication is set to all deployments, so the production alias and any future custom domain require a Vercel login. That stays on. Before a public cutover, change it to Standard Protection: preview deployments and deployment URLs stay protected, and the production custom domain can be public. Do not attach `levelup-digital.dev` while the current “all deployments” setting is on.
+
+The proxy adds `X-Robots-Tag: noindex` for every host except `levelup-digital.dev` and `www.levelup-digital.dev`. The production `*.vercel.app` alias is therefore not indexable once this code is deployed, even though its environment is production. Unique deployment URLs already receive Vercel’s own noindex header. The public domain does not receive the app’s temporary-host tag.
+
+### Clean deployment procedure
+
+1. Confirm the worktree is clean apart from files ignored by Git and `.vercelignore`.
+2. Confirm `publicInquirySubmissionsAvailable` is false and the Vercel project still has no inquiry environment variables.
+3. With owner approval, change the project Node.js version to 22.x if that is the accepted runtime.
+4. With owner approval, merge the reviewed redesign into `main`. Do not enable automatic deployments.
+5. Deploy that `main` commit manually. Do not deploy a dirty working tree.
+6. Check the new protected URL: images load from `/images/...`, `/_next/image` is absent, the inquiry route still fails closed, and a non-production host sends `X-Robots-Tag: noindex`.
+7. Only in a later approved cutover, switch protection to Standard Protection and then attach the domain.
+
+### Rollback
+
+The live site remains Netlify. If the next Vercel deployment misbehaves, leave the current deployment `dpl_9meDH2Rq5nZdRPgUipLxJwXqhrpB` in place and do not promote the new one. DNS stays unchanged, so visitors remain on Netlify. Reverting the image change means setting `images.unoptimized` back to false and pointing the portrait and concept paths at the original JPEGs, which are still in `public/images`. That revert needs its own deployment and does not restore optimizer requests while the Hobby allowance is exhausted.

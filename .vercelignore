@@ -1,0 +1,12 @@
+.vercel
+.git
+node_modules
+.next
+coverage
+.env*
+!.env.example
+.DS_Store
+AGENTS.md
+portfolio-source
+next-env.d.ts
+*.tsbuildinfo
