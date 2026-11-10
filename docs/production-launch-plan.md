@@ -1,6 +1,6 @@
 # LevelUp Digital production launch plan
 
-Prepared 9 November 2026 on branch `redesign/levelup-creative-agency`. Updated the same day after the protected staging audit and the image-delivery hardening in LS-10E.
+Prepared 9 November 2026 on branch `redesign/levelup-creative-agency`. Updated on 10 November 2026 after the verified preview `dpl_4LQuvodmPCyzB7aTjgMghWYKg2N8` and the cutover plan in section 16.
 
 This is a readiness plan. It does not deploy the site, change DNS, change the live Vercel project settings, or enable public inquiry submissions.
 
@@ -56,7 +56,7 @@ A self-hosted Node server would also run `next start`, including the image optim
 | HTTP response | A read-only header request returned HTTP/2 200 with `server: Netlify` and `x-nf-request-id`. A later body request failed inside the audit sandbox. That failure is not evidence that the live site is down. |
 | Application | The live site is the previous static website. `legacy/` in this repo contains 18 HTML pages, `legacy/style.css`, and image assets. Those files were not modified. |
 | Contact form | Legacy contact markup uses Netlify Forms attributes (`netlify`, `data-netlify`, `netlify-honeypot`). The redesign does not use Netlify Forms. |
-| DNS | Apex nameservers are `dns1.p09.nsone.net` through `dns4.p09.nsone.net`. Apex A records observed: `13.215.239.219` and `52.74.6.109`. A CNAME query for `www.levelup-digital.dev` returned no record in this check. |
+| DNS | Re-checked 10 November 2026. Nameservers are `dns1.p09.nsone.net` through `dns4.p09.nsone.net`. The SOA mailbox is `domains+netlify.netlify.com`. Apex and `www` both answer with A records `13.215.239.219` and `52.74.6.109`. No AAAA, MX, TXT, or www CNAME was present. Section 16 is the rollback copy. |
 | Repository remote | `https://github.com/web-sushi/levelup-digital.git` |
 | Deployment config in the redesign | None. No `vercel.json`, `netlify.toml`, or `.github/workflows`. |
 
@@ -92,7 +92,7 @@ Proposed production shape:
 Reviewed from Vercel’s published docs on 9 November 2026. No project was linked and no plan was purchased.
 
 - **Commercial plan.** Pro or Enterprise. Hobby remains unsuitable for this agency site.
-- **Node.js.** Local verification used Node.js 22.19.0. `package.json` now sets `engines.node` to `22.x`. The staging project setting is still 26.x, and that dashboard setting overrides `engines` until the owner changes it. The existing deployment was built on 26.x and succeeded. A new deployment is required before either the image change or a Node change can run on Vercel. Do not change the project setting without owner approval.
+- **Node.js.** Local verification used Node.js 22.19.0, and `package.json` requests `22.x`. On 10 November 2026 the Vercel project setting was also 22.x. The verified preview `dpl_4LQuvodmPCyzB7aTjgMghWYKg2N8` was built with that setting. The older production deployment `dpl_9meDH2Rq5nZdRPgUipLxJwXqhrpB` was built earlier, while the project was on 26.x.
 - **Build.** `next build` produces static pages plus two Node.js routes: `POST /api/inquiries` and `GET /og`. The Open Graph route reads `src/assets/fonts/SpaceGrotesk-Medium.ttf` at request time. The staging check confirmed `/og` is a 1200×630 PNG.
 - **Images.** Hobby includes 5,000 image transformations a month for the whole team, then new `/_next/image` requests return HTTP 402. Pro bills further transformations on demand, starting at $0.05 per 1,000. The current site serves committed image files and does not depend on that allowance. See section 15.
 - **Preview protection.** Use Standard Protection with Vercel Authentication so preview URLs and deployment URLs require a Vercel login, while the production domain stays public. Do not choose “All Deployments,” which would also lock the production domain. Password Protection is a separate Pro charge and is not required.
@@ -473,7 +473,7 @@ A phone still downloads the one served file rather than a smaller srcset. That f
 
 ### Node.js
 
-`package.json` requests Node.js 22.x, matching the local 22.19.0 verification. That `engines` field does not change the Vercel project runtime, and it does not prove the dashboard setting has been changed. The Vercel project is still set to 26.x. That setting wins over `engines` until the owner changes it. The current deployment was built on 26.x and is Ready, so 26.x can build this app. The next deployment is what would pick up 22.x, and only after the project setting is changed. This phase did not change it.
+`package.json` requests Node.js 22.x. That field does not by itself change the dashboard. On 10 November 2026 the project setting was already 22.x, and the verified preview was built on 22.x. The older production deployment remains the 9 November build. Do not change the Node setting again for the cutover.
 
 ### Git production source
 
@@ -500,3 +500,99 @@ The proxy adds `X-Robots-Tag: noindex` for every host except `levelup-digital.de
 ### Rollback
 
 The live site remains Netlify. If the next Vercel deployment misbehaves, leave the current deployment `dpl_9meDH2Rq5nZdRPgUipLxJwXqhrpB` in place and do not promote the new one. DNS stays unchanged, so visitors remain on Netlify. Reverting the image change means setting `images.unoptimized` back to false and pointing the portrait and concept paths at the original JPEGs, which are still in `public/images`. That revert needs its own deployment and does not restore optimizer requests while the Hobby allowance is exhausted.
+
+---
+
+## 16. Production cutover checklist
+
+Read-only review on 10 November 2026. Nothing in this section was executed. The public site stayed on Netlify.
+
+### Release source
+
+`main` is `ee70ff0` and is the Vercel production branch. It is 33 commits behind `redesign/levelup-creative-agency` at `400c9501712af3f3015ad67e0dcfe449db303a66`. Automatic Git deployments are disabled. Deploying `main` would publish the old site.
+
+After the owner approves the release, merge that redesign branch into `main` and leave automatic deployments disabled. The merge makes the configured production branch match the verified commit. Do not change the production branch to the redesign branch, and do not open a temporary release branch. A later update follows the same path: merge to `main`, then deploy that commit by hand.
+
+Deploy from a clean checkout of `400c950`. `.gitignore` and `.vercelignore` exclude `.env*`, `.DS_Store`, `AGENTS.md`, `portfolio-source`, and build artifacts. The verified preview was a CLI upload of that commit with `gitDirty` set, because the working tree still had `.DS_Store` and `AGENTS.md`. Those files were not in the upload. The production deployment should still come from a clean tree so its source identity does not repeat that flag.
+
+### Commercial plan
+
+The LevelUp Digital team, `levelupdigital`, is on Hobby. This agency site is commercial use. The owner action is to open that team’s billing page and upgrade it to Pro, or to Enterprise if a contract is required. Do not start the upgrade from the repository. The public domain should not be attached while the team remains on Hobby.
+
+### Which deployment becomes production
+
+Do not promote `dpl_4LQuvodmPCyzB7aTjgMghWYKg2N8`. Promotion would keep the already tested build, including its dirty-upload metadata, and would make that build the production deployment without compiling it again.
+
+Create one new production deployment from the clean `400c950` checkout while Vercel Authentication still covers every deployment. The project is already on Node.js 22.x, which is the runtime used for the verified preview. Check that deployment behind authentication before any DNS change. `autoAssignCustomDomains` is true, so a domain added later attaches to whatever is production at that moment. The current production deployment, `dpl_9meDH2Rq5nZdRPgUipLxJwXqhrpB`, is the 9 November upload and is the wrong release.
+
+### Protection, then domain
+
+Keep “All Deployments” until the approved release is the production deployment and has been checked behind login. Switching to Standard Protection first would make `https://levelup-digital-redesign.vercel.app` public while it still serves the 9 November build. That build does not send the temporary-host `noindex` header.
+
+After the new production deployment passes the protected checks, switch to Standard Protection. Preview deployments and unique deployment URLs stay behind Vercel Authentication. The production custom domain can then be public. The production `*.vercel.app` alias also becomes reachable, and the proxy on this release sends `X-Robots-Tag: noindex` for every host other than `levelup-digital.dev` and `www.levelup-digital.dev`.
+
+The project currently has only `levelup-digital-redesign.vercel.app`. It does not have `levelup-digital.dev`, so Vercel has not issued an ownership TXT record yet. Add the apex and `www` only after Standard Protection is on. Set `www` to redirect to the apex, because the canonical origin is `https://levelup-digital.dev`. Read the TXT challenge Vercel shows at that moment. Do not invent one.
+
+### DNS records observed
+
+Public resolution on 10 November 2026:
+
+| Record | Value |
+| --- | --- |
+| NS | `dns1.p09.nsone.net`, `dns2.p09.nsone.net`, `dns3.p09.nsone.net`, `dns4.p09.nsone.net` |
+| SOA | `dns1.p01.nsone.net`, mailbox `domains+netlify.netlify.com` |
+| Apex A | `13.215.239.219`, `52.74.6.109` |
+| `www` A | `13.215.239.219`, `52.74.6.109` |
+| AAAA, MX, TXT, www CNAME | None |
+
+Nameserver answers were cached for 3600 seconds. The apex and `www` answers were already near expiry, so their configured TTL is short. Copy the TTL from the Netlify DNS editor before changing anything.
+
+`GET /v6/domains/levelup-digital.dev/config` for this team returned a different pair of current A values, `52.52.192.191` and `13.52.188.95`. That lookup is not the rollback copy. The rollback copy is the Netlify zone, which matched the public answers above. The same API returned the records Vercel wants once the domain is added:
+
+- Apex A record: `76.76.21.21`
+- Recommended CNAME target: `cname.vercel-dns.com.`
+
+Use those values for `www` as a CNAME. Keep the existing NS1 nameservers. Re-read the Vercel config response immediately before the change, because the recommended targets can change. The team also has unrelated domains. Do not edit them.
+
+The public response from `https://levelup-digital.dev` is HTTP 200 from Netlify. The response did not include a Netlify deploy ID. Before cutover, copy the current production deploy ID from the Netlify dashboard.
+
+### Order of operations
+
+1. Owner approves the Pro or Enterprise upgrade and completes it.
+2. Owner approves merging `400c950` into `main` with automatic deployments still disabled.
+3. From a clean checkout, create the production deployment. Do not attach the domain.
+4. Behind Vercel Authentication, run the checks below.
+5. Owner approves Standard Protection. Switch it on.
+6. Owner approves the domain. Add the apex and `www`, redirect `www` to the apex, and publish the TXT value Vercel displays.
+7. In Netlify DNS, replace the apex A records with the Vercel A record and point `www` at the Vercel CNAME. Leave the nameservers in place.
+8. Wait for the certificate, then run the public checks. Keep the Netlify site deployed.
+
+### Protected checks, then public checks
+
+Behind authentication, on the new production deployment:
+
+- Images on the homepage, about page, work index, both client studies, Tour Guide Basic, and Cafe Basic return 200, decode, and do not request `/_next/image`.
+- No horizontal overflow at 375 px and 1440 px.
+- Desktop and mobile navigation reach an internal page.
+- The inquiry review step has no Send button and makes no POST.
+- Analytics does not load before consent. Reject keeps it off. Accept loads it. Withdrawal stops it.
+- The deployment host sends `X-Robots-Tag: noindex`.
+- Canonicals use `https://levelup-digital.dev`.
+
+After DNS:
+
+- `https://levelup-digital.dev` and `https://www.levelup-digital.dev` serve the new site over a valid certificate. `www` redirects to the apex.
+- These 19 indexable routes return 200: `/`, `/services`, `/work`, `/about`, `/contact`, `/privacy`, `/work/enjoy-travel-and-tours`, `/work/mark-maeda-travel-and-tour`, `/work/tour-basic`, `/work/tour-standard`, `/work/tour-pro`, `/work/cafe-basic`, `/work/cafe-standard`, `/work/photo-basic`, `/work/photo-standard`, `/work/home-service-basic`, `/work/home-service-standard`, `/work/clinic-basic`, `/work/clinic-standard`.
+- The 18 legacy HTML paths in `next.config.ts` redirect with 308 to those routes.
+- `/robots.txt` allows `/`, disallows `/api/` and `/thank-you`, and points to `https://levelup-digital.dev/sitemap.xml`. The sitemap lists the 19 routes.
+- `/og` is the 1200×630 image. The apex and `www` responses do not send `X-Robots-Tag: noindex`. The `*.vercel.app` production alias still does.
+- `/api/inquiries` does not accept a public submission. Email remains `mailto:levelupdigital.support@gmail.com`. WhatsApp remains `https://wa.me/818074310125`.
+- Preview and unique deployment URLs still require Vercel Authentication.
+
+### Rollback
+
+Visitors return to Netlify when the apex and `www` A records are restored to `13.215.239.219` and `52.74.6.109`, or to whatever the Netlify DNS editor shows if those addresses have changed. Keep the four `dns*.p09.nsone.net` nameservers. Do not delete the Netlify site. A short TTL means the public answers can change within minutes. Nameserver changes would take longer, so this plan does not use them.
+
+On Vercel, roll the production alias back to `dpl_9meDH2Rq5nZdRPgUipLxJwXqhrpB` only if the Vercel production URL itself must leave the new build. That deployment is not the public website. The public restoration is the DNS change.
+
+If the new site is wrong, restore DNS first, confirm `https://levelup-digital.dev` returns `server: Netlify`, and then tell the owner. Leave inquiry delivery disabled throughout.
