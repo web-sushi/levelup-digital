@@ -468,6 +468,36 @@ describe("inquiry abuse controls", () => {
     );
     assert.equal(response.status, 403);
     assert.equal(trustedClientAddress(new Headers({ "x-forwarded-for": "203.0.113.10" })), null);
+    assert.equal(trustedClientAddress(new Headers({
+      "x-real-ip": "203.0.113.10",
+      "x-forwarded-for": "203.0.113.10",
+    })), null);
+    assert.equal(trustedClientAddress(new Headers({
+      "x-vercel-forwarded-for": "198.51.100.5, 203.0.113.10",
+    })), null);
+    assert.equal(trustedClientAddress(new Headers({
+      "x-forwarded-for": "198.51.100.5",
+      "x-vercel-forwarded-for": "203.0.113.10",
+    })), "203.0.113.10");
+  });
+
+  it("does not spend a rate-limit slot on a forged address list", async () => {
+    const limiter = new MemoryLimiter();
+    const delivery = new RecordingDelivery("accepted");
+    const response = await handleInquiryPost(
+      inquiryRequest(validInquiry(), {
+        headers: {
+          "x-forwarded-for": "203.0.113.10",
+          "x-real-ip": "203.0.113.10",
+          "x-vercel-forwarded-for": "198.51.100.5, 203.0.113.10",
+        },
+      }),
+      runtime({ submissionsEnabled: true, rateLimiter: limiter, delivery }),
+    );
+    const body = await readJson(response);
+    assert.equal(response.status, 503);
+    assert.equal(body.code, "RATE_LIMIT_UNAVAILABLE");
+    assert.equal(delivery.calls, 0);
   });
 
   it("returns a generic non-success response for a filled honeypot", async () => {

@@ -83,19 +83,23 @@ export function honeypotField() {
 }
 
 /**
- * Uses the platform-set Vercel client IP header only.
- * `x-forwarded-for` is not accepted because a caller can supply it.
+ * Vercel overwrites `x-forwarded-for` and does not forward a caller-supplied
+ * address. `x-vercel-forwarded-for` carries that same platform address and
+ * remains usable if a proxy later rewrites `x-forwarded-for`.
+ * `x-forwarded-for` and `x-real-ip` are ignored. A comma-separated list is
+ * rejected so a caller cannot choose the rate-limit bucket by prefixing an
+ * address. A missing or unusable address fails closed.
  */
 export function trustedClientAddress(headers: Headers) {
   const header = headers.get("x-vercel-forwarded-for");
-  if (!header) {
+  if (!header || header.includes(",")) {
     return null;
   }
-  const first = header.split(",")[0]?.trim() ?? "";
-  if (!first || first.length > 128 || !/^[0-9a-fA-F:.]+$/.test(first)) {
+  const address = header.trim();
+  if (!address || address.length > 128 || !/^[0-9a-fA-F:.]+$/.test(address)) {
     return null;
   }
-  return first;
+  return address;
 }
 
 export function rateLimitSecret(value: string | null | undefined) {

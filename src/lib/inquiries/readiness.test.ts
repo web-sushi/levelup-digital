@@ -14,7 +14,8 @@ import {
 } from "@/lib/inquiries/readiness";
 import { BrevoInquiryDelivery } from "@/lib/inquiries/brevo-delivery";
 import { UnavailableRateLimiter } from "@/lib/inquiries/abuse-protection";
-import { UpstashInquiryIdempotency, UpstashInquiryRateLimiter } from "@/lib/inquiries/redis-store";
+import { handleInquiryPost } from "@/lib/inquiries/handler";
+import { UpstashInquiryIdempotency, UpstashInquiryRateLimiter, UpstashInquiryRedis } from "@/lib/inquiries/redis-store";
 
 const SECRETS = {
   INQUIRY_RATE_LIMIT_KEY_SECRET: "rate-limit-secret-value",
@@ -204,5 +205,172 @@ describe("prepared inquiry runtime", () => {
     assert.equal(runtime.delivery instanceof UnavailableInquiryDelivery, true);
     assert.equal(delivered, 0);
     assert.equal(runtime.idempotency ?? null, null);
+  });
+});
+
+class ScriptedRedis extends UpstashInquiryRedis {
+  calls = 0;
+  private readonly results: unknown[];
+
+  constructor(results: unknown[]) {
+    super("https://example.upstash.io", "example-token", async () => {
+      throw new Error("redis network disabled");
+    });
+    this.results = results;
+  }
+
+  async evaluate() {
+    this.calls += 1;
+    return this.results.shift() ?? null;
+  }
+}
+
+function launchRequest(body: Record<string, string> = {}) {
+  return new Request("https://levelup-digital.dev/api/inquiries", {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+      origin: CANONICAL_SITE_ORIGIN,
+      "idempotency-key": "activation-key-0001",
+      "x-vercel-forwarded-for": "203.0.113.10",
+    },
+    body: JSON.stringify({
+      projectType: "website",
+      budget: "range-100",
+      timeline: "month",
+      name: "Ada Lovelace",
+      email: "ada@example.com",
+      companyWebsite: "",
+      ...body,
+    }),
+  });
+}
+
+describe("public inquiry runtime selection", () => {
+  const launchEnv = env({
+    INQUIRY_ACTIVATION_GATE: "launch",
+    INQUIRY_SUBMISSIONS_ENABLED: "true",
+  });
+
+  it("keeps a complete launch configuration closed while the source gate is false", () => {
+    let fetches = 0;
+    const runtime = createInquiryRuntime(launchEnv, {
+      fetchImpl: async () => {
+        fetches += 1;
+        throw new Error("Brevo must not be called");
+      },
+    });
+    assert.equal(publicInquirySubmissionsAvailable, false);
+    assert.equal(runtime.submissionsEnabled, false);
+    assert.equal(runtime.delivery instanceof UnavailableInquiryDelivery, true);
+    assert.equal(runtime.idempotency ?? null, null);
+    assert.equal(runtime.rateLimiter instanceof UnavailableRateLimiter, true);
+    assert.equal(fetches, 0);
+  });
+
+  it("attaches the tested adapters only for an explicit owner launch review", () => {
+    let fetches = 0;
+    const runtime = createInquiryRuntime(launchEnv, {
+      ownerActivation: true,
+      fetchImpl: async () => {
+        fetches += 1;
+        return new Response(JSON.stringify({ messageId: "<synthetic@example.com>" }), { status: 201 });
+      },
+    });
+    assert.equal(fetches, 0);
+    assert.equal(runtime.submissionsEnabled, true);
+    assert.equal(runtime.delivery instanceof BrevoInquiryDelivery, true);
+    assert.equal(runtime.idempotency instanceof UpstashInquiryIdempotency, true);
+    assert.equal(runtime.rateLimiter instanceof UpstashInquiryRateLimiter, true);
+    assert.deepEqual([...runtime.trustedOrigins], [CANONICAL_SITE_ORIGIN]);
+  });
+
+  it("fails closed for the testing gate, a missing canonical origin, and a disabled submission flag", () => {
+    const testing = createInquiryRuntime(env({
+      INQUIRY_ACTIVATION_GATE: "testing",
+      INQUIRY_SUBMISSIONS_ENABLED: "true",
+    }), { ownerActivation: true });
+    assert.equal(testing.delivery instanceof UnavailableInquiryDelivery, true);
+    assert.equal(testing.submissionsEnabled, false);
+
+    const previewOrigin = createInquiryRuntime(env({
+      INQUIRY_ACTIVATION_GATE: "launch",
+      INQUIRY_SUBMISSIONS_ENABLED: "true",
+      INQUIRY_TRUSTED_ORIGINS: "https://preview.example",
+    }), { ownerActivation: true });
+    assert.equal(previewOrigin.delivery instanceof UnavailableInquiryDelivery, true);
+
+    const disabled = createInquiryRuntime(env({
+      INQUIRY_ACTIVATION_GATE: "launch",
+      INQUIRY_SUBMISSIONS_ENABLED: "false",
+    }), { ownerActivation: true });
+    assert.equal(disabled.submissionsEnabled, false);
+    assert.equal(disabled.delivery instanceof UnavailableInquiryDelivery, true);
+
+    const wrongSender = createInquiryRuntime(env({
+      INQUIRY_ACTIVATION_GATE: "launch",
+      INQUIRY_SUBMISSIONS_ENABLED: "true",
+      BREVO_SENDER_EMAIL: "other@example.com",
+    }), { ownerActivation: true });
+    assert.equal(wrongSender.delivery instanceof UnavailableInquiryDelivery, true);
+  });
+
+  it("does not deliver when Redis cannot reserve the request", async () => {
+    let deliveries = 0;
+    const redis = new ScriptedRedis([]);
+    const runtime = createInquiryRuntime(launchEnv, {
+      ownerActivation: true,
+      redis,
+      delivery: {
+        async deliver() {
+          deliveries += 1;
+          return { status: "accepted" as const, confirmation: "accepted" as const };
+        },
+      },
+    });
+    const response = await handleInquiryPost(launchRequest(), runtime);
+    const body = await response.json() as { ok: boolean; code?: string };
+    assert.equal(response.status, 503);
+    assert.equal(body.ok, false);
+    assert.equal(body.code, "INQUIRY_STORAGE_UNAVAILABLE");
+    assert.equal(deliveries, 0);
+    assert.equal(redis.calls, 1);
+  });
+
+  it("does not report success when the business notification outcome is unknown", async () => {
+    let deliveries = 0;
+    const redis = new ScriptedRedis([["claimed"], ["finalized"]]);
+    const runtime = createInquiryRuntime(launchEnv, {
+      ownerActivation: true,
+      redis,
+      delivery: {
+        async deliver() {
+          deliveries += 1;
+          return { status: "unknown" as const, category: "timeout" as const };
+        },
+      },
+    });
+    const response = await handleInquiryPost(launchRequest(), runtime);
+    const body = await response.json() as { ok: boolean; code?: string };
+    assert.equal(response.status, 503);
+    assert.equal(body.ok, false);
+    assert.equal(body.code, "DELIVERY_OUTCOME_UNKNOWN");
+    assert.equal(deliveries, 1);
+    assert.equal(redis.calls, 2);
+
+    const replay = await handleInquiryPost(launchRequest(), createInquiryRuntime(launchEnv, {
+      ownerActivation: true,
+      redis: new ScriptedRedis([["unknown"]]),
+      delivery: {
+        async deliver() {
+          deliveries += 1;
+          return { status: "accepted" as const };
+        },
+      },
+    }));
+    const replayBody = await replay.json() as { ok: boolean; code?: string };
+    assert.equal(replay.status, 503);
+    assert.equal(replayBody.code, "DELIVERY_OUTCOME_UNKNOWN");
+    assert.equal(deliveries, 1);
   });
 });

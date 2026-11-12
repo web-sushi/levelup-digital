@@ -420,7 +420,7 @@ describe("Brevo delivery safety", () => {
       INQUIRY_NOTIFICATION_EMAIL: NOTIFICATION_EMAIL,
     });
     assert.equal(created.delivery instanceof UnavailableInquiryDelivery, true);
-    assert.equal(created.submissionsEnabled, true);
+    assert.equal(created.submissionsEnabled, false);
   });
 
   it("does not let the public route send mail or report success", async () => {

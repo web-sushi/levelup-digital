@@ -28,7 +28,7 @@ export type InquiryReadiness = {
   submissionsEnabled: boolean;
   activationGate: InquiryActivationGate;
   publicPageEnabled: boolean;
-  /** The public route factory does not attach live adapters in this phase. */
+  /** The shipped source gate is false, so this assessment does not attach live adapters. */
   publicRouteUsesLiveAdapters: false;
   brevoAuthenticationVerified: false;
   inboxDeliveryVerified: false;

@@ -22,7 +22,7 @@ export default function PrivacyPage() {
       <section className="page-section">
         <div className="site-container page-prose" style={{ maxWidth: "48rem" }}>
           <p>
-            <strong>Last updated:</strong> 9 November 2026
+            <strong>Last updated:</strong> 10 November 2026
           </p>
 
           <PolicyReviewNote>
@@ -54,7 +54,8 @@ export default function PrivacyPage() {
             site. If you email or message us, we use that message to reply about
             the project. The form also asks you to acknowledge that a future
             submission would be used to reply. That acknowledgment is not consent
-            for marketing email.
+            for marketing email, and it is separate from the analytics choice in
+            the footer.
           </p>
 
           <h2>Inquiry delivery</h2>
@@ -67,6 +68,15 @@ export default function PrivacyPage() {
             check was not a customer inquiry and did not turn the public form on.
           </p>
           <p>
+            If submissions are enabled later, the server is built to notify the
+            business mailbox first and then send the visitor a transactional
+            acknowledgement. The site can tell the visitor the inquiry was
+            accepted only after Brevo accepts the business notification. A timeout
+            or lost response is not treated as a second send and is not described
+            as delivered. The acknowledgement is a reply to the inquiry. It does
+            not add the visitor to a marketing list.
+          </p>
+          <p>
             This policy does not set a retention period for inquiry emails. Brevo
             and the mailbox provider may keep messages under their own settings.
             Those periods are an owner decision and are not stated here.
@@ -76,10 +86,15 @@ export default function PrivacyPage() {
           <p>
             The server code includes a rate limit and an idempotency marker stored
             in Upstash Redis. The public form does not use them while submissions
-            are off. The marker is designed to store a hash of a client address and
-            a hash of the submission, not the name, email address, or message, and
-            to expire after seven days. That period applies to the marker only. It
-            is not a retention period for emails or other inquiry information.
+            are off. The limit is five attempts an hour for one client. The client
+            identity is the platform-supplied address, stored only as a hash. The
+            inquiry handler does not write the raw address, the name, the email
+            address, or the message to its logs. If that platform address is
+            missing, the request is refused. The marker is designed to store that
+            hash and a hash of the submission, not the name, email address, or
+            message, and to expire after seven days. That period applies to the
+            marker only. It is not a retention period for emails or other inquiry
+            information.
           </p>
 
           <h2>Analytics</h2>

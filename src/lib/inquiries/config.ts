@@ -1,7 +1,8 @@
 import { rateLimitSecret, readTrustedHttpsOrigins, UnavailableRateLimiter } from "@/lib/inquiries/abuse-protection";
 import { createBrevoInquiryDelivery, type BrevoFetch } from "@/lib/inquiries/brevo-delivery";
 import { UnavailableInquiryDelivery } from "@/lib/inquiries/delivery";
-import { assessInquiryActivation } from "@/lib/inquiries/readiness";
+import { publicInquirySubmissionsAvailable } from "@/lib/inquiries/public-availability";
+import { assessInquiryActivation, CANONICAL_SITE_ORIGIN } from "@/lib/inquiries/readiness";
 import {
   readUpstashConfig,
   UpstashInquiryIdempotency,
@@ -20,6 +21,11 @@ export type PreparedRuntimeOptions = {
   keyScope?: UpstashKeyScope;
 };
 
+export type PublicRuntimeOptions = PreparedRuntimeOptions & {
+  /** Test-only stand-in for the source activation constant. The public route does not pass this. */
+  ownerActivation?: boolean;
+};
+
 function closedRuntime(env: NodeJS.ProcessEnv): InquiryRuntime {
   const trusted = readTrustedHttpsOrigins(env.INQUIRY_TRUSTED_ORIGINS);
   return {
@@ -34,26 +40,23 @@ function closedRuntime(env: NodeJS.ProcessEnv): InquiryRuntime {
   };
 }
 
-/**
- * Public route runtime. Credentials and the activation gate do not attach live adapters.
- */
-export function createInquiryRuntime(env: NodeJS.ProcessEnv = process.env): InquiryRuntime {
-  return closedRuntime(env);
+function publicClosedRuntime(env: NodeJS.ProcessEnv): InquiryRuntime {
+  return {
+    ...closedRuntime(env),
+    submissionsEnabled: false,
+  };
+}
+
+function canonicalOriginListed(env: NodeJS.ProcessEnv) {
+  const trusted = readTrustedHttpsOrigins(env.INQUIRY_TRUSTED_ORIGINS);
+  return !trusted.invalid && trusted.origins.includes(CANONICAL_SITE_ORIGIN);
 }
 
 /**
- * Builds Redis and Brevo adapters only for an explicit testing or launch gate
- * with complete configuration. The public route does not call this function.
+ * Attaches the tested Redis and Brevo adapters. Construction does not call either service.
+ * Returns the closed runtime when the configuration cannot support them.
  */
-export function createPreparedInquiryRuntime(
-  env: NodeJS.ProcessEnv = process.env,
-  options: PreparedRuntimeOptions = {},
-): InquiryRuntime {
-  const assessment = assessInquiryActivation(env);
-  const gateOpen = assessment.state === "ready_for_controlled_testing" || assessment.state === "ready_for_launch_review";
-  if (!gateOpen) {
-    return closedRuntime(env);
-  }
+function attachLiveAdapters(env: NodeJS.ProcessEnv, options: PreparedRuntimeOptions): InquiryRuntime {
   const upstash = readUpstashConfig({
     UPSTASH_REDIS_REST_URL: env.UPSTASH_REDIS_REST_URL,
     UPSTASH_REDIS_REST_TOKEN: env.UPSTASH_REDIS_REST_TOKEN,
@@ -85,4 +88,46 @@ export function createPreparedInquiryRuntime(
       INQUIRY_NOTIFICATION_EMAIL: env.INQUIRY_NOTIFICATION_EMAIL,
     }, { fetchImpl: options.fetchImpl }),
   };
+}
+
+/**
+ * Public route runtime.
+ * Live adapters attach only when the source activation constant is true, the
+ * launch gate and submission flag are set, and Redis, Brevo, secrets, and the
+ * canonical origin are valid. Environment variables alone stay closed.
+ * The default argument reads configuration per request. It does not run at import.
+ */
+export function createInquiryRuntime(
+  env: NodeJS.ProcessEnv = process.env,
+  options: PublicRuntimeOptions = {},
+): InquiryRuntime {
+  const ownerActivation = options.ownerActivation ?? publicInquirySubmissionsAvailable;
+  if (!ownerActivation) {
+    return publicClosedRuntime(env);
+  }
+  const assessment = assessInquiryActivation(env);
+  if (assessment.state !== "ready_for_launch_review" || !canonicalOriginListed(env)) {
+    return publicClosedRuntime(env);
+  }
+  const runtime = attachLiveAdapters(env, options);
+  if (!runtime.submissionsEnabled || runtime.idempotency === null) {
+    return publicClosedRuntime(env);
+  }
+  return runtime;
+}
+
+/**
+ * Builds Redis and Brevo adapters only for an explicit testing or launch gate
+ * with complete configuration. The public route does not call this function.
+ */
+export function createPreparedInquiryRuntime(
+  env: NodeJS.ProcessEnv = process.env,
+  options: PreparedRuntimeOptions = {},
+): InquiryRuntime {
+  const assessment = assessInquiryActivation(env);
+  const gateOpen = assessment.state === "ready_for_controlled_testing" || assessment.state === "ready_for_launch_review";
+  if (!gateOpen) {
+    return closedRuntime(env);
+  }
+  return attachLiveAdapters(env, options);
 }
