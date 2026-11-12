@@ -186,9 +186,15 @@ A protected Preview confirmed that behavior without enabling delivery. The tempo
 
 ## Redis and Brevo verification
 
-The unit suite covers atomic rate-limit and idempotency behavior, five attempts per hour, the seven-day marker, concurrent claims, repeated keys, a different body with the same key, storage failure, and uncertain delivery. No isolated Upstash database was available, so live Redis is unverified.
+An empty Upstash REST database, present only in local configuration and absent from the Vercel project, accepted the isolated checks. It contained no `inquiry:` keys before the run. Every test key used a `levelup:test:` prefix, and the database was empty again afterward.
 
-Brevo tests use mocked responses for an accepted business notification, a rejected business notification, a timeout, an unknown outcome, and a failed customer acknowledgement. The adapter does not retry. No email was sent. A later live check needs a separate approval and must name the verified sender, the business recipient, and the expected message count before it runs.
+The live Redis script confirmed HTTPS authentication, atomic `EVAL`, five allowed attempts and a sixth rejection inside one hour, eight concurrent attempts resolving to five allowed and three limited, one winner for a concurrent claim, a payload conflict that preserved the first fingerprint, owner-only finalization, replay of accepted, rejected, and unknown outcomes, and a reported TTL inside the seven-day marker window. The TTL was read immediately. The test did not wait seven days. A malformed result and a closed network connection both failed closed.
+
+The handler pipeline used that same database with a mock delivery adapter. It checked the production origin, rejected an untrusted origin, reserved a rate-limit slot, claimed an idempotency key, replayed the stored result, and did not call Brevo. A lost finalization returned `IDEMPOTENCY_PERSISTENCE_FAILED` and a repeat returned `INQUIRY_PROCESSING` without a second delivery. The public route stayed closed. These results matched the mock contracts for the cases above.
+
+The Brevo dry-run made two read requests and zero send requests. The account authenticated, transactional relay was enabled, and the sender `levelupdigital.support@gmail.com` with the name `LevelUp Digital` was listed and active. The account has two sender records. Inbox delivery was not verified. No email was sent.
+
+The existing controlled send, which still needs a separate owner approval, sends one transactional verification message to that same mailbox. It does not send a customer acknowledgement and it does not use the public site. Approval to continue provider testing is not approval to send that message.
 
 ## Owner decisions before activation
 
@@ -206,9 +212,9 @@ The seven-day Redis TTL remains the marker lifetime only.
 ## Remaining launch blockers
 
 - `publicInquirySubmissionsAvailable` is false, so the live route and the Send button stay off.
-- Production env for Brevo and Upstash is not part of this phase and must be configured separately.
-- The privacy decisions above are unresolved.
+- Production env for Brevo and Upstash is not part of this phase and must be configured separately. The local Upstash database and Brevo account used for this check are not production environment variables.
+- The privacy decisions above are unresolved. Brevo and Upstash retention periods and data regions were not read from those accounts.
 - `git.deploymentEnabled` is false only on this feature branch. Do not push to `main` until that safeguard is part of the approved release.
-- The earlier controlled Brevo check is not repeated here and is not fresh evidence that the sender is still verified.
+- The fresh Brevo check is a dry-run. It verifies sender authentication only. It is not evidence that a message reached the inbox.
 - No CAPTCHA is added. The origin allow-list, honeypot, rate limit, and idempotency remain the controls. Add a CAPTCHA only if abuse after activation shows those are insufficient.
 - CSRF: the endpoint has no session cookie. The trusted `Origin` check is the cross-site control for this stateless JSON post. A browser page on another origin cannot pass it.
