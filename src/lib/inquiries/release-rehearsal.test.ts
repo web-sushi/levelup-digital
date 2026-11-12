@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { describe, it } from "node:test";
 import type { InquiryDraft } from "@/components/contact/inquiry-model";
 import { hashClientKey, trustedClientAddress } from "@/lib/inquiries/abuse-protection";
@@ -118,6 +118,8 @@ describe("release safeguard configuration", () => {
     };
     assert.equal(config.git?.deploymentEnabled, false);
     assert.equal(publicInquirySubmissionsAvailable, false);
+    assert.equal(existsSync("src/app/api/inquiries/forwarding-check/route.ts"), false);
+    assert.equal(existsSync("src/lib/inquiries/forwarding-diagnostic.ts"), false);
   });
 });
 

@@ -174,15 +174,15 @@ The setting is committed only on `feature/inquiry-production-activation`. `main`
 
 ## Origin validation
 
-`POST /api/inquiries` checks `Origin` before it checks whether submissions are enabled. The Preview and production project have no `INQUIRY_TRUSTED_ORIGINS` value, so the trusted list is empty. A request with `Origin: https://levelup-digital.dev` therefore returns 403 `FORBIDDEN_ORIGIN` even though that origin is the intended site. The disabled source gate is not the cause of that 403.
+`POST /api/inquiries` checks `Origin` before it checks whether submissions are enabled. Production still has no `INQUIRY_TRUSTED_ORIGINS` value. Preview now has that variable set to `https://levelup-digital.dev` only. No submission flag, activation gate, Brevo credential, or Upstash credential was added.
 
-When the same origin is present in `INQUIRY_TRUSTED_ORIGINS` and the source gate is still false, the origin check passes and the response is 503 `SUBMISSIONS_UNAVAILABLE`. An isolated harness with the launch configuration, the source gate simulated on, and mocked Redis and Brevo accepts that origin and can return success. The allow-list is unchanged: other origins, wildcards, and localhost stay rejected.
+On the protected Preview, `Origin: https://levelup-digital.dev` passes validation and returns 503 `SUBMISSIONS_UNAVAILABLE`. `Origin: https://example.invalid` returns 403 `FORBIDDEN_ORIGIN`. The source gate remains false, so the accepted origin does not deliver an inquiry. An isolated local harness can still return success only when the launch configuration and source gate are simulated together. The allow-list is unchanged: other origins, wildcards, and localhost stay rejected.
 
 ## Client identity
 
-The handler trusts one `x-vercel-forwarded-for` address, hashes it, and ignores `x-forwarded-for` and `x-real-ip`. A missing header, a comma-separated list, and a malformed value fail closed. Vercel’s request-header documentation says the platform overwrites `x-forwarded-for` and does not forward a caller-supplied address, and that `x-vercel-forwarded-for` carries that platform value.
+The handler trusts one `x-vercel-forwarded-for` address, hashes it, and ignores `x-forwarded-for` and `x-real-ip`. A missing header, a comma-separated list, and a malformed value fail closed. Vercel’s request-header documentation says the platform overwrites `x-forwarded-for` and does not forward a caller-supplied address. It describes `x-vercel-forwarded-for` and `x-real-ip` as that same platform address. `src/proxy.ts` does not rewrite any of those headers.
 
-The disabled deployments return 403 before this code runs, so this phase did not observe a real platform header on the Preview. The application cannot, by itself, prove that a forged single-address `x-vercel-forwarded-for` would be replaced before the function reads it. That remains a release check: on a future protected Preview, compare one normal browser request with one request that supplies only a forged forwarding header, and record only whether the rate-limit identity was present. Do not log the address. Do not enable delivery for that check.
+A protected Preview confirmed that behavior without enabling delivery. The temporary comparison returned only booleans. A caller-controlled probe header arrived unchanged, which shows the test request could carry a chosen value. Forged `x-vercel-forwarded-for`, `x-forwarded-for`, and `x-real-ip` values, including a comma-separated list, did not. The function saw one address in all three headers, those three values matched each other, and none matched the forged candidate. The rate-limit identity therefore comes from the platform address. The diagnostic route and its secret were removed after that check.
 
 ## Redis and Brevo verification
 
