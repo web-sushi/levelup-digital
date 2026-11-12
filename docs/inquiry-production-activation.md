@@ -164,12 +164,51 @@ Owner decisions still required before activation:
 
 The seven-day Redis TTL is only the marker lifetime.
 
+## Git deployment safeguard
+
+`vercel.json` on this feature branch sets `git.deploymentEnabled` to false. That is Vercel’s documented control for Git-triggered deployments. It does not change domains, protection, environment variables, or the inquiry source gate. A manual `vercel deploy` is a separate action and is not blocked by this file.
+
+The setting is committed only on `feature/inquiry-production-activation`. `main` does not contain it, so a push to `main` can still create a production deployment until an approved release puts this file on `main`. This phase does not push.
+
+`gitProviderOptions.createDeployments: disabled` remains a different project option. It did not stop the earlier Git production build.
+
+## Origin validation
+
+`POST /api/inquiries` checks `Origin` before it checks whether submissions are enabled. The Preview and production project have no `INQUIRY_TRUSTED_ORIGINS` value, so the trusted list is empty. A request with `Origin: https://levelup-digital.dev` therefore returns 403 `FORBIDDEN_ORIGIN` even though that origin is the intended site. The disabled source gate is not the cause of that 403.
+
+When the same origin is present in `INQUIRY_TRUSTED_ORIGINS` and the source gate is still false, the origin check passes and the response is 503 `SUBMISSIONS_UNAVAILABLE`. An isolated harness with the launch configuration, the source gate simulated on, and mocked Redis and Brevo accepts that origin and can return success. The allow-list is unchanged: other origins, wildcards, and localhost stay rejected.
+
+## Client identity
+
+The handler trusts one `x-vercel-forwarded-for` address, hashes it, and ignores `x-forwarded-for` and `x-real-ip`. A missing header, a comma-separated list, and a malformed value fail closed. Vercel’s request-header documentation says the platform overwrites `x-forwarded-for` and does not forward a caller-supplied address, and that `x-vercel-forwarded-for` carries that platform value.
+
+The disabled deployments return 403 before this code runs, so this phase did not observe a real platform header on the Preview. The application cannot, by itself, prove that a forged single-address `x-vercel-forwarded-for` would be replaced before the function reads it. That remains a release check: on a future protected Preview, compare one normal browser request with one request that supplies only a forged forwarding header, and record only whether the rate-limit identity was present. Do not log the address. Do not enable delivery for that check.
+
+## Redis and Brevo verification
+
+The unit suite covers atomic rate-limit and idempotency behavior, five attempts per hour, the seven-day marker, concurrent claims, repeated keys, a different body with the same key, storage failure, and uncertain delivery. No isolated Upstash database was available, so live Redis is unverified.
+
+Brevo tests use mocked responses for an accepted business notification, a rejected business notification, a timeout, an unknown outcome, and a failed customer acknowledgement. The adapter does not retry. No email was sent. A later live check needs a separate approval and must name the verified sender, the business recipient, and the expected message count before it runs.
+
+## Owner decisions before activation
+
+These are recommendations for the owner to accept or replace. They are not measured retention settings and they are not a compliance claim.
+
+- Business mailbox: choose and write down how long inquiry email stays in `levelupdigital.support@gmail.com`. A practical start is to keep it with the other client correspondence and name the period in the policy before the Send button appears.
+- Brevo: open the transactional-email settings and record the account’s actual log and content retention. This repository does not know that number.
+- Hosting logs: the live site is served by Vercel. Connection logs can include IP addresses. Record the Vercel log product and its retention, then say that in the policy if the owner wants the host named.
+- Privacy contact: keep `levelupdigital.support@gmail.com` unless the owner names a different address.
+- Access, correction, and deletion: receive those requests at the privacy contact, confirm the person controls the email address on the inquiry, and delete or correct the mailbox copies the studio controls. Provider copies need a separate request to that provider.
+- Visitors outside Japan: say that an inquiry may be processed in Japan and by the email and Redis providers in the regions of those accounts, after the owner confirms those regions. Do not name a region that has not been checked.
+
+The seven-day Redis TTL remains the marker lifetime only.
+
 ## Remaining launch blockers
 
 - `publicInquirySubmissionsAvailable` is false, so the live route and the Send button stay off.
 - Production env for Brevo and Upstash is not part of this phase and must be configured separately.
 - The privacy decisions above are unresolved.
-- A push to `main` can still create a Vercel production deployment. `git.deploymentEnabled` has not been set to false. This branch must not be pushed until the owner wants a deployment.
+- `git.deploymentEnabled` is false only on this feature branch. Do not push to `main` until that safeguard is part of the approved release.
 - The earlier controlled Brevo check is not repeated here and is not fresh evidence that the sender is still verified.
 - No CAPTCHA is added. The origin allow-list, honeypot, rate limit, and idempotency remain the controls. Add a CAPTCHA only if abuse after activation shows those are insufficient.
 - CSRF: the endpoint has no session cookie. The trusted `Origin` check is the cross-site control for this stateless JSON post. A browser page on another origin cannot pass it.
