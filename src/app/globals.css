@@ -603,6 +603,10 @@ body {
   color: var(--color-accent-primary);
 }
 
+.page-prose code {
+  overflow-wrap: anywhere;
+}
+
 .page-prose ul {
   margin: 0.75rem 0 0 1.25rem;
 }
