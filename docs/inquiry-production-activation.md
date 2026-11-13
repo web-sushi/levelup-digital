@@ -221,7 +221,7 @@ The seven-day Redis TTL remains the marker lifetime only.
 
 ## LS-12C.1 release candidate
 
-This section prepares the release. It does not activate submissions, change Vercel, push `main`, or send mail. The live site remains `dpl_3WDgPNEuUibC1csuPjAzwdDLSuZ4`. The protected Preview remains `dpl_BcrREtsTdSunwD1bhQxUfyoLdrQm`.
+This section prepares the release. It does not activate submissions, change Vercel, push `main`, or send mail. When this section was written, the live site was `dpl_3WDgPNEuUibC1csuPjAzwdDLSuZ4`. LS-12C.2 later promoted `dpl_8YCSZVo9QPiWGdjKjwXmauvkciF4`. The protected Preview remains `dpl_BcrREtsTdSunwD1bhQxUfyoLdrQm`.
 
 The feature HEAD for this candidate keeps `publicInquirySubmissionsAvailable` false. The contact page therefore keeps the review step, the mailto fallback `mailto:levelupdigital.support@gmail.com`, and the WhatsApp link `https://wa.me/818074310125`. It does not render Send and does not post.
 
@@ -266,6 +266,8 @@ vercel inspect <printed-url> --scope levelupdigital
 
 The inspect target must be `production`, and the deployment must be the commit just built. Then check `https://levelup-digital.dev/contact` and a direct POST as listed below. Do not add `--prod` to any other command.
 
+LS-12C.2 did not use the command above. It built with `vercel deploy --prod --skip-domain --scope levelupdigital --yes`, verified that deployment, and then ran `vercel promote` for `dpl_8YCSZVo9QPiWGdjKjwXmauvkciF4`. A later production build uses that same two-step sequence.
+
 Rollback is `vercel rollback <stage-a-or-current-production-url> --scope levelupdigital` after confirming that URL belongs to this project. Today’s known-good production deployment is `dpl_3WDgPNEuUibC1csuPjAzwdDLSuZ4`.
 
 ### Environment inventory
@@ -275,9 +277,9 @@ Each deployment captures the environment present when it is created. A later das
 | Name | Purpose | Format | Scope | Class | Required | Verified | If missing | Next deployment |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | `publicInquirySubmissionsAvailable` | Source gate for the page and `createInquiryRuntime()` | Boolean constant in `src/lib/inquiries/public-availability.ts` | Build | Source | Stage A false; Stage B true | False in this candidate | Page and route stay closed | Required to change it |
-| `INQUIRY_SUBMISSIONS_ENABLED` | Submission flag | Exact `true` or `false` | Production | Config | Stage A `false`; Stage B `true` | Local value is `false`. Not set in Vercel Production | Readiness stays incomplete and the launch route stays closed | Set before the deployment that should observe it |
-| `INQUIRY_ACTIVATION_GATE` | `disabled`, `testing`, or `launch` | One of those three tokens | Production | Config | Stage A `disabled`; Stage B `launch` | Local value is `testing`. Not set in Vercel Production | Readiness stays incomplete | Set before the deployment that should observe it |
-| `INQUIRY_TRUSTED_ORIGINS` | Allowed browser origins | Comma-separated exact HTTPS origins. No wildcard, localhost, or credentials. Production value is `https://levelup-digital.dev` | Preview has the canonical origin. Production does not | Config | Required for a request to pass the origin check | Preview behavior verified. Production not set | Present `Origin` returns 403 `FORBIDDEN_ORIGIN` | Set before the deployment that should observe it |
+| `INQUIRY_SUBMISSIONS_ENABLED` | Submission flag | Exact `true` or `false` | Production | Config | Stage A `false`; Stage B `true` | Production is `false`, captured by `dpl_8YCSZVo9QPiWGdjKjwXmauvkciF4` | Readiness stays incomplete and the launch route stays closed | Set before the deployment that should observe it |
+| `INQUIRY_ACTIVATION_GATE` | `disabled`, `testing`, or `launch` | One of those three tokens | Production | Config | Stage A `disabled`; Stage B `launch` | Production is `disabled`, captured by the same deployment | Readiness stays incomplete | Set before the deployment that should observe it |
+| `INQUIRY_TRUSTED_ORIGINS` | Allowed browser origins | Comma-separated exact HTTPS origins. No wildcard, localhost, or credentials. Production value is `https://levelup-digital.dev` | Production and Preview | Config | Required for a request to pass the origin check | Both scopes list `https://levelup-digital.dev` | Present `Origin` returns 403 `FORBIDDEN_ORIGIN` | Set before the deployment that should observe it |
 | `INQUIRY_RATE_LIMIT_KEY_SECRET` | HMAC for the client-address key | At least 16 characters and different from the idempotency secret | Production at Stage B | Secret | Required before Stage B | Present locally. Not in Vercel | Launch runtime stays closed | Set before the Stage B deployment |
 | `INQUIRY_IDEMPOTENCY_KEY_SECRET` | HMAC for the idempotency key | At least 16 characters and different from the rate-limit secret | Production at Stage B | Secret | Required before Stage B | Present locally. Not in Vercel | Launch runtime stays closed | Set before the Stage B deployment |
 | `UPSTASH_REDIS_REST_URL` | Redis REST endpoint | `https` URL on `upstash.io`, without userinfo or a query | Production at Stage B | Secret | Required before Stage B | Isolated empty database verified. Not in Vercel | Launch runtime stays closed | Set before the Stage B deployment |
@@ -360,3 +362,185 @@ Stage B, only after a separate approval:
 - Choose the separate production Upstash database and its region.
 - Approve Stage A before any production deploy.
 - Approve Stage B separately, including one synthetic public submission.
+
+## LS-12C.3 production setup preparation
+
+Stage A is the live site. This section prepares the later activation. It does not change Vercel, create a database, send mail, flip the source gate, push GitHub, or publish the privacy draft below.
+
+Checked on 13 November 2026:
+
+- Branch `feature/inquiry-production-activation`, HEAD `f0aa1c1c4a936dbffcc9fd8cabece20dbea9276a`, no upstream.
+- `main` remains `3c0b6e2a074da1061dbb4f401378efe55204cb95`.
+- Working tree changes are `.DS_Store` and untracked `AGENTS.md` only.
+- `https://levelup-digital.dev` serves `dpl_8YCSZVo9QPiWGdjKjwXmauvkciF4`, target production, Ready, functions in `iad1`.
+- The only newer production deployment is that one. The previous production deployment `dpl_3WDgPNEuUibC1csuPjAzwdDLSuZ4` is still Ready.
+- Production env names are `INQUIRY_SUBMISSIONS_ENABLED`, `INQUIRY_ACTIVATION_GATE`, and `INQUIRY_TRUSTED_ORIGINS`. Preview still has only `INQUIRY_TRUSTED_ORIGINS`. No Brevo, Upstash, or HMAC name is set.
+- `publicInquirySubmissionsAvailable` is false. The live contact page includes “Nothing you type is sent” and does not include “Send inquiry”.
+- CLI user `web-sushi-1474`, project `levelupdigital/levelup-digital-redesign`.
+
+`assessInquiryActivation()` against the Production names above is `disabled`, with configuration incomplete. `ready_for_launch_review` requires every row in the environment inventory to be present and valid, the gate to be the exact token `launch`, and the submissions flag to be the exact token `true`. The public route still returns `publicClosedRuntime()` until the source constant is true as well. The contact page shows Send only when that constant is true and the gate and flag are `launch` and `true`. The page does not check Redis or Brevo. That is why the provider values have to be confirmed before the source constant changes.
+
+A Vercel deployment copies the environment that exists when the deployment is created. Editing a variable afterward does not change `dpl_8YCSZVo9QPiWGdjKjwXmauvkciF4`. The source constant is compiled, so changing it also needs a new deployment. Rollback remains promotion of the earlier deployment, not an in-place edit.
+
+### Dedicated production Redis
+
+Keep the tested database separate. Its REST token is in local configuration, prefixes are not an access boundary, and a later test can read or delete whatever that token can reach. It was empty before and after the isolated tests. Its region was not stored. Do not copy its URL or token into Vercel, and do not put customer information in it.
+
+Upstash’s published free tier allows one database. Adding a payment method moves the account’s free resources onto the paid plan, so a second database is a paid change. This phase does not create it. The owner authorizes creation first.
+
+When authorized, create one regional Pay as you go database:
+
+1. In the Upstash console, confirm `us-east-1` (N. Virginia) is offered. Vercel functions for this project run in `iad1`, and the inquiry scripts are writes. `us-east-1` is the closest published Upstash region to that function region. Tokyo (`ap-northeast-1`) is also on the published list and is closer to the studio, but it adds a trans-Pacific hop to every request. If `us-east-1` is not offered on the account, stop and record the regions that are.
+2. Choose a single primary region and no read regions. The adapter sends `EVAL` to one REST URL. Upstash documents a global database as asynchronous replication, so a read region can return a stale key. Do not use one.
+3. Set a monthly budget before copying the token. The published billing page says a reached budget rate-limits that database instead of continuing to bill. This workload is a few Redis commands per inquiry. A small cap is a safety limit, not a capacity estimate.
+4. Record the database name and id, the selected region, and the plan. The REST URL has the form `https://<endpoint>.upstash.io`. The adapter accepts an HTTPS URL and a non-empty token. Store the token only as the Vercel Production secret `UPSTASH_REDIS_REST_TOKEN`.
+5. Run `npm run test:upstash` against that new database with a `levelup:test:` prefix, then delete that prefix. Upstash documents `EVAL` as one atomic script and exposes it on the REST API. The command page does not restrict `EVAL` by region. The existing test database already ran these scripts. Repeat that run on the new database before production uses the token.
+6. Leave the test database and its token off Vercel. After the production token is stored, rotate or remove the test token so the laptop credential cannot reach production keys.
+
+Published provider behavior, not an account reading:
+
+- Free tier, from the billing page: 250 MB, 500,000 commands per month, one database. Pay as you go: $0.20 per 100,000 commands, storage $0.25 per GB after the first GB, first 10 databases included. Prices can change. Read them again at creation.
+- The FAQ says data is written to disk by default, and a free database can be archived after at least 30 days without use. That archival rule is for the free tier. Application keys still expire by their own TTL: the rate-limit key uses `EXPIRE` of 3600 seconds on the first increment, and the idempotency marker uses 604800 seconds.
+- Console Usage charts cover throughput, latency, data size, connections, and keyspace. Prometheus, Datadog, and encryption-at-rest are listed as Prod Pack features at $200 per database per month. This workload does not need that add-on unless the owner wants those controls. The base plan still uses HTTPS for the REST calls this adapter makes.
+- No production database id exists yet.
+
+### Brevo production credential
+
+The sender `levelupdigital.support@gmail.com`, the name `LevelUp Digital`, and the business recipient `levelupdigital.support@gmail.com` stay the required values. The one approved verification message returned HTTP 201, message ID `<202611120355.69813901658@smtp-relay.mailin.fr>`, and the owner confirmed inbox receipt. Do not send another message for this preparation.
+
+Create a new API key for Vercel. Do not copy the local key.
+
+Brevo’s current permission model can restrict a key. Transactional email offers None, Read, and All. Read cannot send. All is the smallest level that can `POST /v3/smtp/email`, and that level can also manage templates, blocked contacts, and log deletion. There is no narrower send-only level. Set every other resource to None. Name the key so it can be revoked on its own. Keys created before permissions existed keep full access until edited, so a new restricted key is safer than reusing the local one.
+
+Rotation: create the restricted key, store it only as Production `BREVO_API_KEY`, deploy the activation build, and complete the one approved synthetic inquiry. Delete the previous key only after that message is accepted. Deleting it first removes the fallback if the new key is rejected.
+
+Before that deploy, the existing dry-run (`npm run test:brevo`, without `--send`) must show the sender listed, active, and named `LevelUp Digital`. Watch the business notification in Brevo’s transactional logs and in the mailbox. Watch the customer acknowledgement as a second log entry. The API can report the business message accepted while the acknowledgement is rejected or unknown. The page claims a queued confirmation only when the acknowledgement outcome is `accepted`.
+
+Published Brevo statements, not a reading of this account’s settings screen:
+
+- Transactional logs and previews are kept until a retention rule is saved. A custom rule can be 1 to 24 months and applies to existing logs. The default preview choice described in the help article is not to store previews.
+- Accounts above 10 million email events also drop events older than 24 months.
+- The data-storage article says processing stays in the European Union, with OVH in France and Germany and Google Cloud in Belgium.
+- This account’s retention rule, preview choice, and event count were not opened. Record them before the privacy page states a Brevo period. The recommended rule, once the owner accepts it, is 12 months for logs and no stored previews, because a preview contains the inquiry.
+
+### HMAC secrets
+
+`rateLimitSecret()` trims the value and accepts it only at 16 characters or more. Readiness rejects the pair when the trimmed secrets are equal. Generate two values with `openssl rand -hex 32` (32 bytes, 64 hex characters). Compare them without pasting them into the repository, `.env.example`, a client variable, a log, or this document. A local check of `secrets.token_hex(32)` produced two different 64-character values and discarded them. Generate the production pair only when the owner authorizes storing them in Vercel Production. Do not reuse the local test secrets.
+
+### Future Production values
+
+These are the activation target. They are not applied in this phase.
+
+| Name | Target |
+| --- | --- |
+| `INQUIRY_SUBMISSIONS_ENABLED` | `true` |
+| `INQUIRY_ACTIVATION_GATE` | `launch` |
+| `INQUIRY_TRUSTED_ORIGINS` | `https://levelup-digital.dev` |
+| `INQUIRY_RATE_LIMIT_KEY_SECRET` | new 32-byte secret |
+| `INQUIRY_IDEMPOTENCY_KEY_SECRET` | a different new 32-byte secret |
+| `UPSTASH_REDIS_REST_URL` | HTTPS REST URL of the new database |
+| `UPSTASH_REDIS_REST_TOKEN` | token of that database |
+| `BREVO_API_KEY` | new restricted key |
+| `BREVO_SENDER_EMAIL` | `levelupdigital.support@gmail.com` |
+| `BREVO_SENDER_NAME` | `LevelUp Digital` |
+| `INQUIRY_NOTIFICATION_EMAIL` | `levelupdigital.support@gmail.com` |
+
+Set them on Production only, while the deployed source constant is still false. Pull them to a temporary file outside the repository, run the readiness assessment, confirm `ready_for_launch_review` and the canonical origin, then delete the file. Do not print the secrets. The current deployment keeps ignoring those values until a new deployment is promoted.
+
+The risk to avoid: a build with the source constant true, while the gate and flag are `launch` and `true`, shows Send even if Redis or Brevo is incomplete. The API then stays closed. Confirm readiness before changing the constant, build that commit with `--prod --skip-domain`, and promote it only after the staged checks pass.
+
+### Privacy draft, not published
+
+The live privacy page stays as published. It already says submissions are off, names Brevo and Upstash as built but unused, leaves retention open, and does not name the host. The following text is a draft for the owner to accept or replace before any page edit. It is not a certification and it does not claim that a law has been met.
+
+Proposed mailbox rule: keep an inquiry email for 12 months after the last meaningful reply about that inquiry, and longer only when a contract, a business record, or a legal obligation requires it.
+
+Proposed contact and requests: privacy questions, access, correction, and deletion go to `levelupdigital.support@gmail.com`. Ask the requester to show they control the email address on the inquiry, and do not ask for unrelated identity documents. The studio can correct or delete the mailbox copies it controls. A Brevo log or a Redis marker needs a request to that provider, or it expires on the provider’s own rule.
+
+Analytics stays the separate footer choice. Submitting an inquiry does not accept analytics.
+
+Redis, from the code and the isolated tests: idempotency markers expire after seven days. Rate-limit keys expire after the one-hour window. The stored values are hashes, not the name, email, or message.
+
+Provider facts that can be said only at the strength they were checked:
+
+- Vercel functions for the live deployment run in `iad1` (US East). Vercel’s published runtime-log retention is 1 hour on Hobby and 1 day on Pro. This deployment used the plan-default machine. The billing plan was not reopened in this phase. Earlier project work treated the team as Hobby.
+- Upstash region: not selected in an account yet. The recommendation is `us-east-1` if the console offers it. Do not name a region on the public page before the database exists.
+- Brevo’s published hosting description places processing in the EU, as cited above. The account retention screen was not read.
+- The Gmail mailbox region was not read. Do not invent it.
+
+Draft paragraphs, to replace the open retention and hosting sentences only after those account screens are recorded and the owner accepts the 12-month rule:
+
+> Online inquiries, once enabled, are sent to levelupdigital.support@gmail.com. LevelUp Digital keeps that correspondence for 12 months after the last meaningful reply about the inquiry, unless a contract or a legal obligation requires longer. A request for access, correction, or deletion can be sent to the same address. LevelUp Digital will ask the requester to show control of the email address on the inquiry and will not ask for unrelated identity documents.
+>
+> The server stores a hashed rate-limit entry for about one hour and a hashed idempotency marker for seven days in Upstash Redis in [recorded region]. Those records do not contain the name, email address, or message. Brevo sends the business notification and the visitor acknowledgement. Brevo’s published description places that processing in the European Union. This account keeps transactional logs for [recorded period] and does not store email previews, if that is the setting recorded before publication.
+>
+> The site is hosted by Vercel. The inquiry function runs in Vercel’s US East region. Vercel runtime logs are kept for the period of the current plan, published as one hour on Hobby and one day on Pro. Analytics consent is separate from an inquiry.
+
+Leave the bracketed words until the console readings exist. Do not publish the draft before then.
+
+### Activation sequence, not started
+
+Service preparation, after a separate authorization:
+
+1. Create the production Redis database as specified above.
+2. Create the restricted Brevo key and the two HMAC secrets.
+3. Add the future Production values. Leave Preview unchanged.
+4. Confirm `ready_for_launch_review` from a temporary pull, then delete that file.
+5. Keep `dpl_8YCSZVo9QPiWGdjKjwXmauvkciF4` as the rollback deployment.
+
+Activation, after another authorization:
+
+1. Change `publicInquirySubmissionsAvailable` to true in one commit.
+2. Run `npm test`, `npm run lint`, `npm run typecheck`, and `npm run build`.
+3. From a clean worktree of that commit, `vercel deploy --prod --skip-domain --scope levelupdigital --yes`.
+4. Confirm the staged deployment is the new SHA, Ready, Node.js 22.x, and not yet aliased to the apex. Confirm Send is present only on that staged host, a trusted-origin synthetic body is not sent during this check, and the previous deployment still serves `https://levelup-digital.dev`.
+5. `vercel promote` that deployment id. Do not build again.
+6. Run one approved synthetic inquiry from the apex. Confirm the business mailbox received it and that the acknowledgement matches the API confirmation.
+7. Publish the approved privacy text in the same release or before the public uses Send.
+
+### GitHub synchronization
+
+`vercel.json` on this branch sets `git.deploymentEnabled` to false. Vercel’s Git configuration page says that value turns off automatic deployments for every branch, and that CLI deploys are unaffected. `main` does not contain the file. This project already saw a production deployment from a Git push while a different project setting, `createDeployments: disabled`, was set. The `vercel.json` flag has not been observed to skip a push. Do not treat it as a guarantee.
+
+When the owner authorizes synchronization:
+
+1. Do not force-push.
+2. Confirm the apex still serves the intended deployment.
+3. Push `feature/inquiry-production-activation`. Its tip contains the flag. Immediately list deployments. A new deployment, if one appears, must not be promoted.
+4. Merge that tip into `main` so the resulting `main` commit contains `git.deploymentEnabled: false`. Do not push a `main` commit that lacks the file.
+5. List production deployments again. If a new production deployment took the apex, promote the intended deployment back. Do not change DNS.
+
+The setting that does not depend on the unproven flag is to pause the project’s Git connection, update `main`, confirm no deployment appeared, and reconnect. That changes project configuration and needs its own authorization.
+
+### Monitoring and shutdown
+
+| Situation | Visitor result | Action |
+| --- | --- | --- |
+| Redis unavailable | 503 `INQUIRY_STORAGE_UNAVAILABLE` or `RATE_LIMIT_UNAVAILABLE` before mail | Restore the database or roll back. No mail was sent for that attempt. |
+| Brevo rejects the business message | 503, no success claim | Check the sender and the key. A stored rejection is replayed. Do not send a second copy unless the mailbox has no matching message. |
+| Unknown business outcome | 503 `DELIVERY_OUTCOME_UNKNOWN` | Check the mailbox and the Brevo log before any resend. The adapter does not retry. |
+| Rising 429 | Rate limit after five attempts in the hour | Expected for one client. A broad rise is a reason to roll back. |
+| Rising 503 | Storage, rate-limit, or delivery failure | Read the response code. Roll back if visitors cannot leave a message and email volume is not the cause. |
+| Duplicate request | Replay, or 409 during the 120-second lease | Ask the visitor to wait. Compare the mailbox before sending anything by hand. |
+| Success response, empty mailbox | Visitor was told the business message was accepted | Search Brevo by message ID, including spam. Do not send a second business message if Brevo accepted the first. |
+| Credential rotation | — | Add the new Production secret, deploy so the new deployment captures it, confirm one request, then delete the old provider credential. |
+| Emergency shutdown | Site returns to the disabled release | `vercel promote dpl_8YCSZVo9QPiWGdjKjwXmauvkciF4 --scope levelupdigital` after confirming that id still belongs to this project. That deployment has the source gate false and no provider credentials. Do not rely on editing the current deployment’s variables. |
+
+### Go / no-go
+
+| Check | State |
+| --- | --- |
+| Production Redis database | Pending. Not created. Needs owner authorization because a second database is a paid change. |
+| Production Redis credentials | Pending. Not in Vercel. |
+| Brevo production credentials | Pending. Sender and one verification message are done. A new restricted key is not created. |
+| HMAC secrets | Pending. Requirements checked. Values are not generated for storage. |
+| Trusted origin | Done for the disabled release. |
+| Privacy policy | Pending. Draft written. Live page unchanged. Account retention and Redis region unread. |
+| Activation gate | Done as `disabled`. `launch` is not set. |
+| Source gate | Done as false. |
+| Automated testing | Done for the current commit. Repeat on the activation commit. |
+| Staged deployment | Done for Stage A. Not started for activation. |
+| Rollback | Done. `dpl_3WDgPNEuUibC1csuPjAzwdDLSuZ4` and the disabled release `dpl_8YCSZVo9QPiWGdjKjwXmauvkciF4` are Ready. |
+| Approved synthetic inquiry | Pending a separate authorization. |
+
+Owner authorization is still required to create the paid Redis database, store Production secrets, change the source gate, deploy or promote an activation build, send a synthetic inquiry, publish the privacy draft, and push or merge to GitHub.
