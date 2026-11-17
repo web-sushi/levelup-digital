@@ -24,6 +24,7 @@ import {
 } from "@/components/contact/inquiry-model";
 import {
   createInquiryClient,
+  presentedSubmissionState,
   validateInquiryDraft,
   type InquiryClient,
   type InquirySubmissionState,
@@ -141,16 +142,24 @@ export function ProjectInquiryWizard({
     setPrivacyError(undefined);
     setErrors({});
     setSubmission({ status: "submitting" });
-    const result = await inquiryClient.submit(draft, companyWebsite);
-    if (result.status === "aborted" || result.status === "submitting") {
+    let result: InquirySubmissionState;
+    try {
+      result = await inquiryClient.submit(draft, companyWebsite);
+    } catch {
+      setSubmission({ status: "unknown_outcome" });
       return;
     }
-    if (result.status === "validation_error") {
-      setSubmission(result);
-      showFieldErrors(result.step, result.errors, result.focusId);
+    const presented = presentedSubmissionState(result);
+    if (presented === "pending") {
       return;
     }
-    setSubmission(result);
+    if (presented.status === "validation_error") {
+      setPrivacyError(presented.privacy);
+      setSubmission(presented);
+      showFieldErrors(presented.step, presented.errors, presented.focusId);
+      return;
+    }
+    setSubmission(presented);
   }
 
   const current = steps[step];

@@ -2,13 +2,17 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import type { InquiryDraft } from "@/components/contact/inquiry-model";
 import {
+  allowsManualSubmit,
   createIdempotencyKey,
   createInquiryClient,
+  INQUIRY_SUBMISSION_DEADLINE_MS,
   interpretInquiryResponse,
+  presentedSubmissionState,
   requestFingerprint,
   submissionCopy,
   toInquiryRequest,
   validateInquiryDraft,
+  type InquirySubmissionState,
 } from "@/lib/inquiries/client";
 import { IDEMPOTENCY_KEY_PATTERN } from "@/lib/inquiries/idempotency";
 import { publicInquirySubmissionsAvailable } from "@/lib/inquiries/public-availability";
@@ -282,6 +286,189 @@ describe("inquiry response handling", () => {
     } finally {
       console.log = original;
     }
+  });
+});
+
+function verificationDraft(): InquiryDraft {
+  return {
+    projectType: "website",
+    budget: "range-100",
+    timeline: "exploring",
+    name: "LevelUp Digital QA Test",
+    email: "levelupdigital.support@gmail.com",
+    business: "LevelUp Digital",
+    details: "Production inquiry verification test. This is synthetic data and does not require a quotation or follow-up.",
+    references: [{ id: "ref-1", url: "", note: "" }],
+  };
+}
+
+function claimsDelivery(state: InquirySubmissionState) {
+  const copy = submissionCopy(state);
+  const text = `${copy?.title ?? ""} ${copy?.message ?? ""} ${copy?.confirmation ?? ""}`;
+  return text.includes("accepted for review") || text.includes("queued for delivery");
+}
+
+describe("submission stall recovery", () => {
+  it("keeps the client deadline long enough for both provider sends and shorter than the stuck review", () => {
+    assert.equal(INQUIRY_SUBMISSION_DEADLINE_MS > 20_000, true);
+    assert.equal(INQUIRY_SUBMISSION_DEADLINE_MS < 120_000, true);
+  });
+
+  it("sends one request for one attempt and does not follow a hung request with another", async () => {
+    let calls = 0;
+    const client = createInquiryClient({
+      deadlineMs: 40,
+      randomUUID: () => KEY_A,
+      fetchImpl: () => {
+        calls += 1;
+        return new Promise(() => undefined);
+      },
+    });
+    const started = Date.now();
+    const result = await client.submit(verificationDraft(), "");
+    assert.equal(result.status, "unknown_outcome");
+    assert.equal(calls, 1);
+    assert.equal(Date.now() - started < 1_000, true);
+    assert.equal(presentedSubmissionState(result) === "pending", false);
+    assert.equal(claimsDelivery(result), false);
+    assert.equal(allowsManualSubmit(result), false);
+    await new Promise((resolve) => setTimeout(resolve, 30));
+    assert.equal(calls, 1);
+  });
+
+  it("shows success only after the mocked server accepts the inquiry", async () => {
+    let calls = 0;
+    const client = createInquiryClient({
+      deadlineMs: 500,
+      randomUUID: () => KEY_A,
+      fetchImpl: async () => {
+        calls += 1;
+        await new Promise((resolve) => setTimeout(resolve, 15));
+        return jsonResponse(200, { ok: true, confirmation: "accepted" });
+      },
+    });
+    const result = await client.submit(verificationDraft(), "");
+    assert.deepEqual(result, { status: "success", confirmation: "accepted" });
+    assert.equal(presentedSubmissionState(result) === "pending", false);
+    assert.match(submissionCopy(result)?.confirmation ?? "", /queued for delivery/);
+    assert.equal(calls, 1);
+  });
+
+  it("leaves the pending state on a definite server rejection", async () => {
+    const client = createInquiryClient({
+      randomUUID: () => KEY_A,
+      fetchImpl: async () => jsonResponse(422, {
+        ok: false,
+        code: "VALIDATION_ERROR",
+        message: "Please check the highlighted fields.",
+        fieldErrors: { email: "Enter a valid email address." },
+      }),
+    });
+    const result = await client.submit(verificationDraft(), "");
+    assert.equal(result.status, "validation_error");
+    assert.equal(presentedSubmissionState(result) === "pending", false);
+    assert.equal(claimsDelivery(result), false);
+    if (result.status === "validation_error") {
+      assert.equal(result.errors.email, "Enter a valid email address.");
+    }
+  });
+
+  it("treats a rejected fetch as an unknown outcome and does not claim delivery", async () => {
+    let calls = 0;
+    const client = createInquiryClient({
+      randomUUID: () => KEY_A,
+      fetchImpl: async () => {
+        calls += 1;
+        throw new TypeError("network down");
+      },
+    });
+    const result = await client.submit(verificationDraft(), "");
+    assert.equal(result.status, "unknown_outcome");
+    assert.equal(calls, 1);
+    assert.equal(claimsDelivery(result), false);
+    assert.match(submissionCopy(result)?.message ?? "", /may have reached us/);
+  });
+
+  it("keeps the same idempotency key when the same payload is submitted again after a timeout", async () => {
+    const keys: string[] = [];
+    const client = createInquiryClient({
+      deadlineMs: 30,
+      randomUUID: () => (keys.length === 0 ? KEY_A : KEY_B),
+      fetchImpl: (_url, init) => {
+        const key = new Headers(init?.headers).get("idempotency-key") ?? "";
+        keys.push(key);
+        if (keys.length === 1) {
+          return new Promise(() => undefined);
+        }
+        return Promise.resolve(jsonResponse(503, { ok: false, code: "DELIVERY_OUTCOME_UNKNOWN", message: "Unknown." }));
+      },
+    });
+    assert.equal((await client.submit(verificationDraft(), "")).status, "unknown_outcome");
+    assert.deepEqual(keys, [KEY_A]);
+    assert.equal((await client.submit(verificationDraft(), "")).status, "unknown_outcome");
+    assert.deepEqual(keys, [KEY_A, KEY_A]);
+  });
+
+  it("does not call fetch for a request that is already aborted, and presents that as unconfirmed", async () => {
+    let calls = 0;
+    const controller = new AbortController();
+    controller.abort();
+    const client = createInquiryClient({
+      randomUUID: () => KEY_A,
+      fetchImpl: async () => {
+        calls += 1;
+        return jsonResponse(200, { ok: true, confirmation: "accepted" });
+      },
+    });
+    const result = await client.submit(verificationDraft(), "", controller.signal);
+    assert.equal(result.status, "aborted");
+    assert.equal(calls, 0);
+    const presented = presentedSubmissionState(result);
+    assert.equal(presented === "pending", false);
+    if (presented !== "pending") {
+      assert.equal(presented.status, "unknown_outcome");
+      assert.equal(claimsDelivery(presented), false);
+    }
+  });
+
+  it("keeps the entered draft when a request does not finish", async () => {
+    const source = verificationDraft();
+    const before = JSON.stringify(source);
+    const client = createInquiryClient({
+      deadlineMs: 20,
+      randomUUID: () => KEY_A,
+      fetchImpl: () => new Promise(() => undefined),
+    });
+    await client.submit(source, "");
+    assert.equal(JSON.stringify(source), before);
+  });
+
+  it("requires the privacy acknowledgement and does not turn an in-flight duplicate into a second post", async () => {
+    const missing = validateInquiryDraft(verificationDraft(), false);
+    assert.equal(missing.status, "validation_error");
+    let calls = 0;
+    let release: () => void = () => undefined;
+    const gate = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    const client = createInquiryClient({
+      randomUUID: () => KEY_A,
+      fetchImpl: async () => {
+        calls += 1;
+        await gate;
+        return jsonResponse(200, { ok: true, confirmation: "rejected" });
+      },
+    });
+    const first = client.submit(verificationDraft(), "");
+    const duplicate = await client.submit(verificationDraft(), "");
+    assert.equal(duplicate.status, "submitting");
+    assert.equal(presentedSubmissionState(duplicate), "pending");
+    assert.equal(calls, 1);
+    release();
+    const result = await first;
+    assert.deepEqual(result, { status: "success", confirmation: "rejected" });
+    assert.equal(submissionCopy(result)?.confirmation, undefined);
+    assert.equal(calls, 1);
   });
 });
 

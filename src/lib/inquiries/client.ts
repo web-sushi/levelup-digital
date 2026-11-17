@@ -10,6 +10,13 @@ import { IDEMPOTENCY_KEY_PATTERN } from "@/lib/inquiries/idempotency";
 import type { InquiryErrorCode, InquirySuccessBody } from "@/lib/inquiries/types";
 
 export const INQUIRY_ENDPOINT = "/api/inquiries";
+/**
+ * The server allows up to 10 seconds for the business notification and 10 more
+ * for the acknowledgement. This is longer than both, and shorter than the
+ * two-minute wait that left the review step spinning. Ending the wait does not
+ * prove the server never received the request.
+ */
+export const INQUIRY_SUBMISSION_DEADLINE_MS = 35_000;
 const PRIVACY_FIELD_ID = "inquiry-privacy";
 
 const KNOWN_FIELDS = [
@@ -384,9 +391,89 @@ function isAbortError(error: unknown) {
   return error instanceof DOMException && error.name === "AbortError";
 }
 
-export function createInquiryClient(options: { fetchImpl?: InquiryFetch; randomUUID?: () => string } = {}): InquiryClient {
+function combineSignals(primary: AbortSignal, secondary: AbortSignal) {
+  if (typeof AbortSignal.any === "function") {
+    return AbortSignal.any([primary, secondary]);
+  }
+  const controller = new AbortController();
+  const forward = (signal: AbortSignal) => {
+    if (signal.aborted) {
+      controller.abort(signal.reason);
+      return;
+    }
+    signal.addEventListener("abort", () => {
+      if (!controller.signal.aborted) {
+        controller.abort(signal.reason);
+      }
+    }, { once: true });
+  };
+  forward(primary);
+  forward(secondary);
+  return controller.signal;
+}
+
+function requestInquiry(fetchImpl: InquiryFetch, body: string, key: string, signal: AbortSignal) {
+  return new Promise<Response>((resolve, reject) => {
+    if (signal.aborted) {
+      reject(signal.reason ?? new DOMException("The inquiry request was aborted.", "AbortError"));
+      return;
+    }
+    let settled = false;
+    const finish = (callback: () => void) => {
+      if (settled) {
+        return;
+      }
+      settled = true;
+      signal.removeEventListener("abort", onAbort);
+      callback();
+    };
+    const onAbort = () => {
+      finish(() => {
+        reject(signal.reason ?? new DOMException("The inquiry request was aborted.", "AbortError"));
+      });
+    };
+    signal.addEventListener("abort", onAbort, { once: true });
+    fetchImpl(INQUIRY_ENDPOINT, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        "idempotency-key": key,
+      },
+      body,
+      cache: "no-store",
+      redirect: "error",
+      signal,
+    }).then(
+      (response) => finish(() => resolve(response)),
+      (error: unknown) => finish(() => reject(error)),
+    );
+  });
+}
+
+/**
+ * The in-flight result belongs to the request that is already running.
+ * An abort is ambiguous: the request may already have reached the server.
+ */
+export function presentedSubmissionState(result: InquirySubmissionState): InquirySubmissionState | "pending" {
+  if (result.status === "submitting") {
+    return "pending";
+  }
+  if (result.status === "aborted") {
+    return { status: "unknown_outcome" };
+  }
+  return result;
+}
+
+export function createInquiryClient(options: {
+  fetchImpl?: InquiryFetch;
+  randomUUID?: () => string;
+  deadlineMs?: number;
+} = {}): InquiryClient {
   const fetchImpl = options.fetchImpl ?? fetch;
   const randomUUID = options.randomUUID ?? crypto.randomUUID;
+  const deadlineMs = typeof options.deadlineMs === "number" && Number.isFinite(options.deadlineMs) && options.deadlineMs > 0
+    ? options.deadlineMs
+    : INQUIRY_SUBMISSION_DEADLINE_MS;
   let ledger: KeyLedger | null = null;
   let inFlight = false;
 
@@ -409,42 +496,37 @@ export function createInquiryClient(options: { fetchImpl?: InquiryFetch; randomU
       if (inFlight) {
         return { status: "submitting" };
       }
+      const active = ledger;
+      if (!active) {
+        return { status: "error", reason: "unexpected" };
+      }
       inFlight = true;
+      const timeoutController = new AbortController();
+      const timeout = setTimeout(() => {
+        timeoutController.abort(new DOMException("The inquiry request timed out.", "TimeoutError"));
+      }, deadlineMs);
+      const requestSignal = signal ? combineSignals(signal, timeoutController.signal) : timeoutController.signal;
       try {
-        const response = await fetchImpl(INQUIRY_ENDPOINT, {
-          method: "POST",
-          headers: {
-            "content-type": "application/json",
-            "idempotency-key": ledger.key,
-          },
-          body: JSON.stringify(body),
-          cache: "no-store",
-          redirect: "error",
-          signal,
-        });
+        const response = await requestInquiry(fetchImpl, JSON.stringify(body), active.key, requestSignal);
         const result = await interpretInquiryResponse(response, draft);
-        if (shouldLock(result) && ledger) {
-          ledger = { ...ledger, locked: true };
+        if (shouldLock(result)) {
+          ledger = { ...active, locked: true };
         }
         if (result.status === "error" && result.reason === "invalid_key") {
           ledger = null;
         }
-        if (result.status === "error" && result.reason === "unexpected" && ledger) {
-          ledger = { ...ledger, locked: true };
+        if (result.status === "error" && result.reason === "unexpected") {
+          ledger = { ...active, locked: true };
         }
         return result;
       } catch (error) {
+        ledger = { ...active, locked: true };
         if (isAbortError(error)) {
-          if (ledger) {
-            ledger = { ...ledger, locked: true };
-          }
           return { status: "aborted" };
-        }
-        if (ledger) {
-          ledger = { ...ledger, locked: true };
         }
         return { status: "unknown_outcome" };
       } finally {
+        clearTimeout(timeout);
         inFlight = false;
       }
     },
