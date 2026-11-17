@@ -108,7 +108,7 @@ describe("analytics consent storage", () => {
     assert.equal(raw.includes("inquiry"), false);
   });
 
-  it("does not enable public inquiry submissions", () => {
-    assert.equal(publicInquirySubmissionsAvailable, false);
+  it("records the activated inquiry source gate", () => {
+    assert.equal(publicInquirySubmissionsAvailable, true);
   });
 });

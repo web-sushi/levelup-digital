@@ -28,7 +28,7 @@ export type InquiryReadiness = {
   submissionsEnabled: boolean;
   activationGate: InquiryActivationGate;
   publicPageEnabled: boolean;
-  /** The shipped source gate is false, so this assessment does not attach live adapters. */
+  /** This assessment classifies configuration. It does not attach live adapters. */
   publicRouteUsesLiveAdapters: false;
   brevoAuthenticationVerified: false;
   inboxDeliveryVerified: false;
@@ -179,8 +179,8 @@ export function assessInquiryActivation(env: NodeJS.ProcessEnv = process.env): I
 }
 
 /**
- * The contact page uses this value. The hardcoded flag stays false, so the
- * Send button cannot appear in this phase even if the launch gate is set.
+ * The contact page uses this value. The source gate, the launch gate, and the
+ * submissions flag all have to be on before the Send button can appear.
  */
 export function resolvePublicInquirySubmissionsAvailable(env: NodeJS.ProcessEnv = process.env) {
   if (!publicInquirySubmissionsAvailable) {

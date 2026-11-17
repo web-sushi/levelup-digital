@@ -86,7 +86,7 @@ describe("search metadata", () => {
     ]);
     assert.equal(crumbs.itemListElement.length, 3);
     assert.equal(crumbs.itemListElement[2]?.item, `${SITE_ORIGIN}/work/tour-basic`);
-    assert.equal(publicInquirySubmissionsAvailable, false);
+    assert.equal(publicInquirySubmissionsAvailable, true);
   });
 
   it("adds a preview noindex header without changing production indexing", () => {

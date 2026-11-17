@@ -513,7 +513,7 @@ describe("live inquiry handler pipeline", { concurrency: 1 }, () => {
     assert.equal(local.inboxDeliveryVerified, false);
     assert.deepEqual(local.missing, []);
     assert.deepEqual(local.invalid, []);
-    assert.equal(publicInquirySubmissionsAvailable, false);
+    assert.equal(publicInquirySubmissionsAvailable, true);
 
     const runtime = createInquiryRuntime(preparedEnv());
     assert.equal(runtime.idempotency ?? null, null);

@@ -54,4 +54,4 @@ The first visit shows Accept Analytics and Reject Analytics together, plus a lin
 
 ## Legal notes
 
-The privacy policy states that analytics is optional and not anonymous, and that the seven-day Redis marker is not an email retention period. It does not certify compliance with Japanese or other privacy law. The source revision dated 13 November 2026 proposes a 12-month mailbox practice and names Vercel. Publication of that revision, including the mailbox practice, still needs owner approval. The live page is unchanged until that approval.
+The privacy policy states that analytics is optional and not anonymous, and that the seven-day Redis marker is not an email retention period. It does not certify compliance with Japanese or other privacy law. The revision dated 13 November 2026, including the 12-month mailbox practice, is published with the inquiry activation release.

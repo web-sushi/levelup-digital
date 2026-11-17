@@ -143,6 +143,6 @@ describe("Google Analytics loading", () => {
     const preferences = readFileSync("src/components/privacy/ConsentPreferences.tsx", "utf8");
     assert.equal(preferences.includes("showModal"), true);
     assert.equal(preferences.includes("preventDefault"), false);
-    assert.equal(publicInquirySubmissionsAvailable, false);
+    assert.equal(publicInquirySubmissionsAvailable, true);
   });
 });

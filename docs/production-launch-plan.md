@@ -240,7 +240,7 @@ Do not do these during this phase.
 
 ## 8. Privacy decisions
 
-**Verified on 9 November 2026.** The privacy page at that date matched the implementation then. LS-12C.5 prepared a later source revision, dated 13 November 2026, which names Vercel and proposes a 12-month mailbox practice. That revision is not published, and the live page is still the earlier text. The 9 November page:
+**Verified on 9 November 2026.** The privacy page at that date matched the implementation then. The activation commit publishes the 13 November 2026 revision, which names Vercel and keeps ordinary inquiry correspondence for 12 months after the last meaningful reply. The 9 November page:
 
 - It says online inquiry submission is not enabled, typed answers are not sent, and the Brevo check was not a customer inquiry.
 - It does not set an inquiry-email retention period.

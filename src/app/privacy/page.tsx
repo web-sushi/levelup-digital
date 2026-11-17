@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { PageHeader } from "@/components/ui/PageHeader";
-import { PolicyReviewNote } from "@/components/ui/PolicyReviewNote";
 import { verifiedContactLinks } from "@/lib/nav";
 import { createPageMetadata } from "@/lib/metadata";
 
@@ -24,14 +23,6 @@ export default function PrivacyPage() {
           <p>
             <strong>Last updated:</strong> 13 November 2026
           </p>
-
-          <PolicyReviewNote>
-            This revision is prepared for publication and is not yet the page
-            served at levelup-digital.dev. The 12-month mailbox practice below
-            still needs owner approval before this revision is published. This
-            page is not a legal certification, and it does not claim that a
-            privacy law has been met.
-          </PolicyReviewNote>
 
           <h2>Who we are</h2>
           <p>

@@ -649,3 +649,13 @@ Do this only after a separate approval. Do not enable the source gate in a deplo
 | Tokyo database budget | Not set. Recommend `$20` only if the owner accepts that the cap stops that database. |
 
 LS-12C.6 should be the approved activation release above, and only after the owner accepts the privacy revision. It should not start while the source gate and the launch flags are changed in separate deployments.
+
+## LS-12C.6 source activation
+
+This commit publishes the 13 November 2026 privacy revision and sets `publicInquirySubmissionsAvailable` to true. The “not yet published” review note is removed. The page still says it does not decide which privacy law applies.
+
+The Send button appears only when that constant is true, `INQUIRY_ACTIVATION_GATE` is `launch`, and `INQUIRY_SUBMISSIONS_ENABLED` is `true`. `createInquiryRuntime()` still returns the closed runtime unless the assessment is `ready_for_launch_review`, the canonical origin is listed, and Redis and Brevo configuration actually enable submissions. A testing gate, a disabled flag, a missing secret, or an unavailable Redis call stays fail-closed and does not send mail.
+
+Production `INQUIRY_SUBMISSIONS_ENABLED=true` and `INQUIRY_ACTIVATION_GATE=launch` are set before the staged deployment is created. `INQUIRY_TRUSTED_ORIGINS` stays `https://levelup-digital.dev`. `vercel.json` keeps `git.deploymentEnabled` false. No diagnostic route is added.
+
+The staged deployment is created with `vercel deploy --prod --skip-domain` from a clean worktree at this commit. It is promoted only after non-sending checks pass. Rollback remains `vercel promote dpl_8YCSZVo9QPiWGdjKjwXmauvkciF4 --scope levelupdigital`. A synthetic inquiry is not part of this commit.

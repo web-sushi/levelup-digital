@@ -286,8 +286,8 @@ describe("inquiry response handling", () => {
 });
 
 describe("public inquiry submission safety", () => {
-  it("keeps the public page closed and the API on unavailable adapters", () => {
-    assert.equal(publicInquirySubmissionsAvailable, false);
+  it("keeps an incomplete public runtime on unavailable adapters", () => {
+    assert.equal(publicInquirySubmissionsAvailable, true);
     const runtime = createInquiryRuntime({
       NODE_ENV: "test",
       INQUIRY_SUBMISSIONS_ENABLED: "true",

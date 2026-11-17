@@ -117,7 +117,7 @@ describe("release safeguard configuration", () => {
       git?: { deploymentEnabled?: boolean };
     };
     assert.equal(config.git?.deploymentEnabled, false);
-    assert.equal(publicInquirySubmissionsAvailable, false);
+    assert.equal(publicInquirySubmissionsAvailable, true);
     assert.equal(existsSync("src/app/api/inquiries/forwarding-check/route.ts"), false);
     assert.equal(existsSync("src/lib/inquiries/forwarding-diagnostic.ts"), false);
   });
@@ -134,7 +134,7 @@ describe("canonical origin on a disabled deployment", () => {
     assert.equal(body.code, "FORBIDDEN_ORIGIN");
   });
 
-  it("accepts the production origin and then stays unavailable while the source gate is false", async () => {
+  it("accepts the production origin and stays unavailable while the activation gate is disabled", async () => {
     const runtime = createInquiryRuntime({
       ...LAUNCH_ENV,
       INQUIRY_SUBMISSIONS_ENABLED: "false",
@@ -192,7 +192,7 @@ describe("enabled inquiry rehearsal", () => {
     assert.equal(submissionCopy(result)?.confirmation, "A confirmation email has been queued for delivery.");
     assert.equal(harness.posts(), 1);
     assert.equal(deliveries.length, 1);
-    assert.equal(publicInquirySubmissionsAvailable, false);
+    assert.equal(publicInquirySubmissionsAvailable, true);
   });
 
   it("does not claim delivery when Redis, the business notification, or the acknowledgement fails", async () => {

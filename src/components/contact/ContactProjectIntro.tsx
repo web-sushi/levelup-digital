@@ -8,6 +8,7 @@ type ContactProjectIntroProps = {
 };
 
 export function ContactProjectIntro({ reference = null }: ContactProjectIntroProps) {
+  const submissionsAvailable = resolvePublicInquirySubmissionsAvailable();
   return (
     <section className="contact-band contact-band-surface" aria-labelledby="contact-project-heading">
       <div className="site-container contact-project">
@@ -16,9 +17,9 @@ export function ContactProjectIntro({ reference = null }: ContactProjectIntroPro
             Tell us what you&apos;re building.
           </h2>
           <p className="contact-lead">
-            Answer a few questions about the project. Nothing you type is sent or
-            saved. Email, WhatsApp, and the social links further down the page
-            still work if you would rather write directly.
+            {submissionsAvailable
+              ? "Answer a few questions about the project, then send the inquiry from the last step. Email, WhatsApp, and the social links further down the page still work if you would rather write directly."
+              : "Answer a few questions about the project. Nothing you type is sent or saved. Email, WhatsApp, and the social links further down the page still work if you would rather write directly."}
           </p>
           {reference ? (
             <p className="contact-lead">
@@ -31,7 +32,7 @@ export function ContactProjectIntro({ reference = null }: ContactProjectIntroPro
           ) : null}
         </div>
         <div className="contact-inquiry-slot">
-          <ProjectInquiryWizard submissionsAvailable={resolvePublicInquirySubmissionsAvailable()} />
+          <ProjectInquiryWizard submissionsAvailable={submissionsAvailable} />
         </div>
       </div>
     </section>

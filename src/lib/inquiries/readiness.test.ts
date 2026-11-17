@@ -52,14 +52,10 @@ describe("inquiry activation readiness", () => {
     assert.equal(assessment.publicRouteUsesLiveAdapters, false);
     assert.equal(assessment.brevoAuthenticationVerified, false);
     assert.equal(assessment.inboxDeliveryVerified, false);
-    assert.equal(publicInquirySubmissionsAvailable, false);
+    assert.equal(publicInquirySubmissionsAvailable, true);
     assert.equal(resolvePublicInquirySubmissionsAvailable(env()), false);
 
-    const runtime = createInquiryRuntime({
-      ...env({ INQUIRY_SUBMISSIONS_ENABLED: "true", INQUIRY_ACTIVATION_GATE: "launch" }),
-      INQUIRY_DELIVERY: "mock",
-      INQUIRY_USE_REDIS: "true",
-    });
+    const runtime = createInquiryRuntime(env());
     assert.equal(runtime.idempotency ?? null, null);
     assert.equal(runtime.delivery instanceof UnavailableInquiryDelivery, true);
     assert.equal(runtime.rateLimiter instanceof UnavailableRateLimiter, true);
@@ -164,7 +160,7 @@ describe("prepared inquiry runtime", () => {
     assert.equal(fetches, 0);
   });
 
-  it("keeps the launch gate off the public page and the public runtime", () => {
+  it("opens the public page and public runtime for a complete launch configuration", () => {
     const launchEnv = env({
       INQUIRY_ACTIVATION_GATE: "launch",
       INQUIRY_SUBMISSIONS_ENABLED: "true",
@@ -172,14 +168,19 @@ describe("prepared inquiry runtime", () => {
     const assessment = assessInquiryActivation(launchEnv);
     assert.equal(assessment.state, "ready_for_launch_review");
     assert.equal(assessment.brevoAuthenticationVerified, false);
-    assert.equal(resolvePublicInquirySubmissionsAvailable(launchEnv), false);
+    assert.equal(resolvePublicInquirySubmissionsAvailable(launchEnv), true);
     const prepared = createPreparedInquiryRuntime(launchEnv, {
       fetchImpl: async () => {
         throw new Error("Brevo must not be called");
       },
     });
     assert.equal(prepared.delivery instanceof BrevoInquiryDelivery, true);
-    assert.equal(createInquiryRuntime(launchEnv).delivery instanceof UnavailableInquiryDelivery, true);
+    const opened = createInquiryRuntime(launchEnv);
+    assert.equal(opened.delivery instanceof BrevoInquiryDelivery, true);
+    assert.equal(opened.submissionsEnabled, true);
+    const held = createInquiryRuntime(launchEnv, { ownerActivation: false });
+    assert.equal(held.delivery instanceof UnavailableInquiryDelivery, true);
+    assert.equal(held.submissionsEnabled, false);
   });
 
   it("does not trust a Vercel preview origin unless it is listed exactly", () => {
@@ -252,15 +253,16 @@ describe("public inquiry runtime selection", () => {
     INQUIRY_SUBMISSIONS_ENABLED: "true",
   });
 
-  it("keeps a complete launch configuration closed while the source gate is false", () => {
+  it("keeps a complete launch configuration closed when activation is held off", () => {
     let fetches = 0;
     const runtime = createInquiryRuntime(launchEnv, {
+      ownerActivation: false,
       fetchImpl: async () => {
         fetches += 1;
         throw new Error("Brevo must not be called");
       },
     });
-    assert.equal(publicInquirySubmissionsAvailable, false);
+    assert.equal(publicInquirySubmissionsAvailable, true);
     assert.equal(runtime.submissionsEnabled, false);
     assert.equal(runtime.delivery instanceof UnavailableInquiryDelivery, true);
     assert.equal(runtime.idempotency ?? null, null);
