@@ -11,6 +11,7 @@ import {
   buildControlledBrevoMessage,
   controlledBrevoSendAuthorized,
   parseControlledBrevoArgs,
+  resolveBrevoVerificationRequest,
   runControlledBrevoVerification,
 } from "@/lib/inquiries/brevo-verification";
 import { createInquiryRuntime } from "@/lib/inquiries/config";
@@ -152,8 +153,60 @@ describe("controlled Brevo verification", () => {
     assert.deepEqual(calls.map((call) => call.url), [BREVO_ACCOUNT_URL]);
   });
 
+  it("checks local configuration without a live credential", async () => {
+    let called = 0;
+    const fetchImpl: BrevoFetch = async () => {
+      called += 1;
+      throw new Error("network must not be called");
+    };
+    const report = await runControlledBrevoVerification(env({ BREVO_API_KEY: undefined }), {
+      mode: "local",
+      authenticatedCheckSkip: "not_requested",
+    }, fetchImpl);
+    assert.equal(report.ok, true);
+    assert.equal(report.mode, "local");
+    assert.equal(report.authenticatedChecks, "skipped");
+    assert.equal(report.authenticatedCheckSkip, "not_requested");
+    assert.equal(report.sendingRequests, 0);
+    assert.equal(report.nonSendingRequests, 0);
+    assert.equal(report.missing.includes("BREVO_API_KEY"), false);
+    assert.equal(called, 0);
+  });
+
+  it("skips account checks when a diagnostic credential is absent and refuses a send", () => {
+    const absent = resolveBrevoVerificationRequest({ requested: "diagnose", diagnosticKey: "  " });
+    assert.equal(absent.ok, true);
+    if (!absent.ok) {
+      return;
+    }
+    assert.equal(absent.mode, "local");
+    assert.equal(absent.authenticatedCheckSkip, "diagnostic_credential_absent");
+    const ordinary = resolveBrevoVerificationRequest({ requested: "local", diagnosticKey: "diagnostic-key" });
+    assert.equal(ordinary.ok, true);
+    if (ordinary.ok) {
+      assert.equal(ordinary.mode, "local");
+    }
+    const ready = resolveBrevoVerificationRequest({ requested: "diagnose", diagnosticKey: "diagnostic-key" });
+    assert.equal(ready.ok, true);
+    if (ready.ok) {
+      assert.equal(ready.mode, "dry-run");
+    }
+    const refused = resolveBrevoVerificationRequest({ requested: "send" });
+    assert.equal(refused.ok, false);
+    if (!refused.ok) {
+      assert.equal(refused.reason, "diagnostic_credential_required");
+    }
+    const authorized = resolveBrevoVerificationRequest({ requested: "send", diagnosticKey: "diagnostic-key" });
+    assert.equal(authorized.ok, true);
+    if (authorized.ok) {
+      assert.equal(authorized.mode, "send");
+    }
+  });
+
   it("requires the exact confirmation and ignores it during dry-run", async () => {
-    assert.equal(parseControlledBrevoArgs([]).mode, "dry-run");
+    assert.equal(parseControlledBrevoArgs([]).requested, "local");
+    assert.equal(parseControlledBrevoArgs(["--diagnose"]).requested, "diagnose");
+    assert.equal(parseControlledBrevoArgs(["--send"]).requested, "send");
     assert.equal(controlledBrevoSendAuthorized({ mode: "send" }), false);
     assert.equal(controlledBrevoSendAuthorized({ mode: "send", confirm: "yes" }), false);
     assert.equal(controlledBrevoSendAuthorized({ mode: "dry-run", confirm: CONTROLLED_BREVO_CONFIRMATION }), false);
@@ -292,6 +345,10 @@ describe("controlled Brevo verification", () => {
     const pkg = JSON.parse(readFileSync("package.json", "utf8")) as { scripts: Record<string, string> };
     assert.equal(pkg.scripts.test.includes("verify-brevo-delivery"), false);
     assert.equal(pkg.scripts["test:brevo"].includes("--send"), false);
+    assert.equal(pkg.scripts["test:brevo"].includes("--diagnose"), false);
     assert.equal(pkg.scripts["test:brevo"].includes("verify-brevo-delivery.ts"), true);
+    const source = readFileSync("scripts/verify-brevo-delivery.ts", "utf8");
+    assert.equal(source.includes("BREVO_API_KEY: loaded.BREVO_API_KEY"), false);
+    assert.equal(source.includes("loaded.BREVO_API_KEY"), false);
   });
 });

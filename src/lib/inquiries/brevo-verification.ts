@@ -24,11 +24,14 @@ export const CONTROLLED_BREVO_TEXT = "This is an authorized transactional email 
 const TIMEOUT_MS = 10_000;
 const MAX_BODY_CHARS = 65_536;
 
-export type ControlledBrevoMode = "dry-run" | "send";
+export type ControlledBrevoMode = "local" | "dry-run" | "send";
+export type ControlledBrevoRequest = "local" | "diagnose" | "send";
+export type AuthenticatedCheckSkip = "not_requested" | "diagnostic_credential_absent";
 
 export type ControlledBrevoInput = {
   mode: ControlledBrevoMode;
   confirm?: string;
+  authenticatedCheckSkip?: AuthenticatedCheckSkip;
 };
 
 export type ControlledBrevoAccess = {
@@ -55,6 +58,8 @@ export type ControlledBrevoReport = {
   publicRouteUsesLiveAdapters: false;
   inboxDeliveryVerified: false;
   transactionalSendVerified: false;
+  authenticatedChecks: "skipped" | "performed";
+  authenticatedCheckSkip?: AuthenticatedCheckSkip;
   access?: ControlledBrevoAccess;
   planned?: {
     recipient: typeof EXPECTED_BREVO_NOTIFICATION_EMAIL;
@@ -79,12 +84,20 @@ type BrevoPayload = {
   htmlContent: string;
 };
 
+const LOCAL_CONFIG_KEY = "local-config-check-not-a-credential";
+
 export function parseControlledBrevoArgs(argv: readonly string[]) {
-  let send = false;
+  let requested: ControlledBrevoRequest = "local";
   let confirm: string | undefined;
   for (const arg of argv) {
     if (arg === "--send") {
-      send = true;
+      requested = "send";
+      continue;
+    }
+    if (arg === "--diagnose") {
+      if (requested !== "send") {
+        requested = "diagnose";
+      }
       continue;
     }
     if (arg.startsWith("--confirm=")) {
@@ -95,9 +108,32 @@ export function parseControlledBrevoArgs(argv: readonly string[]) {
   }
   return {
     ok: true as const,
-    mode: send ? "send" as const : "dry-run" as const,
+    requested,
     confirm,
   };
+}
+
+export function resolveBrevoVerificationRequest(input: {
+  requested: ControlledBrevoRequest;
+  diagnosticKey?: string;
+}):
+  | { ok: true; mode: "local"; authenticatedCheckSkip: AuthenticatedCheckSkip }
+  | { ok: true; mode: "dry-run" | "send" }
+  | { ok: false; reason: "diagnostic_credential_required" } {
+  const diagnosticKey = input.diagnosticKey?.trim() ?? "";
+  if (input.requested === "send") {
+    if (!diagnosticKey) {
+      return { ok: false, reason: "diagnostic_credential_required" };
+    }
+    return { ok: true, mode: "send" };
+  }
+  if (input.requested === "diagnose") {
+    if (!diagnosticKey) {
+      return { ok: true, mode: "local", authenticatedCheckSkip: "diagnostic_credential_absent" };
+    }
+    return { ok: true, mode: "dry-run" };
+  }
+  return { ok: true, mode: "local", authenticatedCheckSkip: "not_requested" };
 }
 
 export function controlledBrevoSendAuthorized(input: ControlledBrevoInput) {
@@ -181,6 +217,7 @@ function baseReport(env: NodeJS.ProcessEnv, mode: ControlledBrevoReport["mode"])
     publicRouteUsesLiveAdapters: false,
     inboxDeliveryVerified: false,
     transactionalSendVerified: false,
+    authenticatedChecks: "skipped",
     planned: plannedMessage(),
   };
 }
@@ -323,8 +360,9 @@ function acceptedMessage(status: number, text: string) {
 }
 
 /**
- * Checks Brevo with account and sender reads. Sends one verification message
- * only when the caller passes send mode and the exact confirmation string.
+ * Local mode checks sender configuration and the closed public route without
+ * calling Brevo. Dry-run reads the account and sender list. Send mode sends
+ * one message only when the caller also passes the exact confirmation string.
  * The public route does not call this function.
  */
 export async function runControlledBrevoVerification(
@@ -333,6 +371,33 @@ export async function runControlledBrevoVerification(
   fetchImpl: BrevoFetch,
 ): Promise<ControlledBrevoReport> {
   const report = baseReport(env, input.mode);
+  if (input.mode === "local") {
+    report.authenticatedCheckSkip = input.authenticatedCheckSkip ?? "not_requested";
+    const problems = configProblems({ ...env, BREVO_API_KEY: LOCAL_CONFIG_KEY });
+    report.missing = problems.missing.filter((name) => name !== "BREVO_API_KEY");
+    report.invalid = problems.invalid.filter((name) => name !== "BREVO_API_KEY");
+    if (!problems.config || report.missing.length > 0 || report.invalid.length > 0) {
+      report.mode = "refused";
+      report.reason = "configuration";
+      return report;
+    }
+    const message = buildControlledBrevoMessage(problems.config);
+    if (!message.ok) {
+      report.mode = "refused";
+      report.reason = message.reason;
+      return report;
+    }
+    if (!publicRouteClosed(env)) {
+      report.mode = "refused";
+      report.reason = "public_route_open";
+      return report;
+    }
+    report.ok = env.INQUIRY_SUBMISSIONS_ENABLED === "false";
+    if (!report.ok) {
+      report.reason = "submissions_enabled";
+    }
+    return report;
+  }
   const problems = configProblems(env);
   report.missing = problems.missing;
   report.invalid = problems.invalid;
@@ -363,6 +428,7 @@ export async function runControlledBrevoVerification(
     return report;
   }
 
+  report.authenticatedChecks = "performed";
   const account = await brevoCall(fetchImpl, BREVO_ACCOUNT_URL, problems.config.apiKey, { method: "GET" });
   report.nonSendingRequests += 1;
   if (!account.ok) {

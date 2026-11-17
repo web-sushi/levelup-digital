@@ -342,7 +342,9 @@ This is not exactly-once delivery. Redis and Brevo are separate systems. The han
 
 `npm run test:brevo` runs `scripts/verify-brevo-delivery.ts`. It is not part of `npm test`, lint, or the production build. It does not add an HTTP route. A query parameter, cookie, or public header cannot start it.
 
-The default run is a dry-run. It reads server-only configuration, then calls two non-sending Brevo endpoints: `GET https://api.brevo.com/v3/account` and `GET https://api.brevo.com/v3/senders`. Both use the `api-key` header, a 10 second timeout, and no retry. The script does not print the API key, the Redis token, or the HMAC secrets. It does not POST to `https://api.brevo.com/v3/smtp/email`.
+The default run does not call Brevo and does not read `BREVO_API_KEY`. It checks the local sender, sender name, and notification address, and it checks that the public inquiry route is still closed. Authenticated account and sender reads are skipped. The script does not print the API key, the Redis token, or the HMAC secrets. It does not POST to `https://api.brevo.com/v3/smtp/email`.
+
+To read `GET https://api.brevo.com/v3/account` and `GET https://api.brevo.com/v3/senders`, pass `--diagnose` and provide `BREVO_DIAGNOSTIC_API_KEY`. That key is separate from `BREVO_API_KEY`. If it is absent, the script keeps the local check and skips the authenticated reads. Both reads use the `api-key` header, a 10 second timeout, and no retry.
 
 The dry-run reports whether Brevo accepted the key, whether `relay.enabled` is true, and whether `levelupdigital.support@gmail.com` is listed as an active sender named LevelUp Digital. Account authentication does not prove that transactional delivery is enabled. A listed sender does not prove DKIM, DMARC, or that a message reached an inbox. The Gmail sender remains verified in Brevo, with the existing DKIM and DMARC warnings for that free-email domain.
 
@@ -355,7 +357,7 @@ The message reserved for a later authorized send is one message only:
 
 There is no recipient argument. The script refuses any other notification address, and it does not send a customer confirmation. It also refuses to send when `INQUIRY_SUBMISSIONS_ENABLED` is not `false` or when the public runtime is no longer the unavailable adapter.
 
-A real send requires both flags below. Do not run that command unless the owner has approved that exact execution. It sends one message and does not retry a rejected, timed-out, or unknown result. HTTP 201 with a `messageId` means Brevo accepted the request. It does not mean the mailbox received it.
+A real send requires `BREVO_DIAGNOSTIC_API_KEY` and both flags below. The command refuses when that diagnostic key is absent, and it never substitutes `BREVO_API_KEY`. Do not run it unless the owner has approved that exact execution. It sends one message and does not retry a rejected, timed-out, or unknown result. HTTP 201 with a `messageId` means Brevo accepted the request. It does not mean the mailbox received it.
 
 ```bash
 npm run test:brevo -- --send --confirm=SEND-ONE-LEVELUP-BREVO-VERIFICATION
@@ -363,10 +365,11 @@ npm run test:brevo -- --send --confirm=SEND-ONE-LEVELUP-BREVO-VERIFICATION
 
 The dry-run on 9 November 2026 authenticated to Brevo. `GET /v3/account` returned HTTP 200 and `relay.enabled` was true. `GET /v3/senders` showed `levelupdigital.support@gmail.com` as an active sender. The stored display name on that sender is not exactly `LevelUp Digital`, so the script reported `sender_name_mismatch` and did not send. The account has a second sender record. That address was not used and is not recorded here. `sendingRequests` was 0. No request was POSTed to `/v3/smtp/email`. This did not check DKIM, DMARC, or inbox delivery.
 
-The authorized send command also refuses while that stored display name differs. Align the Brevo sender name with `LevelUp Digital`, then run the dry-run again, before approving a real send.
+The authorized send command also refuses while that stored display name differs. Align the Brevo sender name with `LevelUp Digital`, then run the diagnostic check again, before approving a real send.
 
 ```bash
 npm run test:brevo
+npm run test:brevo -- --diagnose
 ```
 
 ## Local testing
@@ -383,7 +386,7 @@ Run the live Upstash script checks only when `.env.local` contains the Redis RES
 npm run test:upstash
 ```
 
-Run the Brevo dry-run separately. It calls the account and sender endpoints and does not send mail.
+Run the Brevo configuration check separately. The default command does not call Brevo or send mail.
 
 ```bash
 npm run test:brevo
