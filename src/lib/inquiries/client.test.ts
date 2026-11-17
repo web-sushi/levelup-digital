@@ -314,6 +314,29 @@ describe("submission stall recovery", () => {
     assert.equal(INQUIRY_SUBMISSION_DEADLINE_MS < 120_000, true);
   });
 
+  it("calls the platform UUID function as a method so the browser can generate a key", async () => {
+    const original = crypto.randomUUID;
+    const method = function (this: unknown) {
+      assert.equal(this, crypto);
+      return "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa";
+    };
+    Object.defineProperty(crypto, "randomUUID", { configurable: true, writable: true, value: method });
+    try {
+      let calls = 0;
+      const client = createInquiryClient({
+        fetchImpl: async () => {
+          calls += 1;
+          return jsonResponse(200, { ok: true, confirmation: "accepted" });
+        },
+      });
+      const result = await client.submit(draft(), "");
+      assert.equal(calls, 1);
+      assert.equal(result.status, "success");
+    } finally {
+      Object.defineProperty(crypto, "randomUUID", { configurable: true, writable: true, value: original });
+    }
+  });
+
   it("sends one request for one attempt and does not follow a hung request with another", async () => {
     let calls = 0;
     const client = createInquiryClient({

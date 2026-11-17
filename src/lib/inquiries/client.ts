@@ -96,7 +96,11 @@ const BEFORE_DELIVERY = new Set<InquiryErrorCode>([
   "DELIVERY_UNAVAILABLE",
 ]);
 
-export function createIdempotencyKey(randomUUID: () => string = crypto.randomUUID) {
+function platformRandomUUID() {
+  return crypto.randomUUID();
+}
+
+export function createIdempotencyKey(randomUUID: () => string = platformRandomUUID) {
   return randomUUID();
 }
 
@@ -470,7 +474,7 @@ export function createInquiryClient(options: {
   deadlineMs?: number;
 } = {}): InquiryClient {
   const fetchImpl = options.fetchImpl ?? fetch;
-  const randomUUID = options.randomUUID ?? crypto.randomUUID;
+  const randomUUID = options.randomUUID ?? platformRandomUUID;
   const deadlineMs = typeof options.deadlineMs === "number" && Number.isFinite(options.deadlineMs) && options.deadlineMs > 0
     ? options.deadlineMs
     : INQUIRY_SUBMISSION_DEADLINE_MS;
